@@ -1,0 +1,14 @@
+# ==========================================
+# ARNA JOB ALERTS
+# ROBOTS.TXT
+# ==========================================
+
+User-agent: *
+
+Allow: /
+
+Disallow: /admin/
+Disallow: /assets/private/
+Disallow: /.git/
+Disallow: /node_modules/
+

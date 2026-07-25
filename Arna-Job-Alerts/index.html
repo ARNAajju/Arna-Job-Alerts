@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Arna Job Alerts | AP, TS & Central Government Jobs</title>
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <meta name="description"
+        content="Latest AP Jobs, TS Jobs, Central Government Jobs, Railway Jobs, Bank Jobs, Police Jobs, Results and Hall Tickets.">
+
+    <meta name="keywords"
+        content="AP Jobs, TS Jobs, Central Jobs, Government Jobs, Railway Jobs, Bank Jobs">
+
+    <meta name="author"
+        content="Arna Job Alerts">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet"
+        href="style.css">
+
+        <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d6efd">
+
+</head>
+
+<body>
+
+<!-- =========================================
+HEADER
+========================================= -->
+
+<header class="shadow-sm bg-white sticky-top">
+
+<div class="container">
+
+<nav class="navbar navbar-expand-lg">
+
+<a class="navbar-brand fw-bold text-primary fs-3"
+href="
+
+
+<i class="fa-solid fa-briefcase"></i>
+
+Arna Job Alerts
+
+</a>
+
+<button
+class="navbar-toggler"
+type="button"
+data-bs-toggle="collapse"
+data-bs-target="#navbar">
+
+<span class="navbar-toggler-icon"></span>
+
+</button>
+
+<div class="collapse navbar-collapse"
+id="navbar">
+
+<ul class="navbar-nav ms-auto">
+
+<li class="nav-item">
+<a class="nav-link active" href="index.html">
+Home
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#todayContainer">
+🔥 Latest
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#apJobs">
+📍 AP Jobs
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#tsJobs">
+📍 TS Jobs
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#centralJobs">
+🇮🇳 Central
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#railwayJobs">
+🚆 Railway
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#bankJobs">
+🏦 Bank
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#policeJobs">
+👮 Police
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#results">
+🏆 Results
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#halltickets">
+🎫 Hall Tickets
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="#schemes">
+📢 Schemes
+</a>
+</li>
+
+</ul>
+
+</div>
+
+</nav>
+
+</div>
+
+</header>
+
+<!-- =========================================
+HERO SEARCH
+========================================= -->
+
+<section class="hero-search">
+
+<div class="container">
+
+<div class="hero-box">
+
+<h1>
+Find Your Dream Government Job
+</h1>
+
+<p>
+AP • Telangana • Central • Railway • Bank • Police
+</p>
+
+<div class="search-box">
+
+<input
+type="text"
+id="searchInput"
+placeholder="Search Jobs, District, Qualification...">
+
+<button id="searchBtn">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+Search
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ======================
+BREAKING NEWS
+====================== -->
+
+<section class="breaking-news">
+
+<div class="container">
+
+<div class="breaking-box">
+
+<div class="breaking-title">
+
+LIVE
+
+</div>
+
+<marquee id="breakingNews">
+
+Loading Latest Jobs...
+
+</marquee>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- BREAKING NEWS BAR -->
+
+<section class="bg-danger text-white py-2">
+
+<div class="container">
+
+<div class="d-flex align-items-center">
+
+<span class="badge bg-warning text-dark me-3">
+
+🔥 Breaking
+
+</span>
+
+<marquee>
+
+Latest Government Job Notifications • AP Jobs • Telangana Jobs • Central Government Jobs • Railway • Bank • Police • Results • Hall Tickets
+
+</marquee>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ======================
+CATEGORY BUTTONS
+====================== -->
+
+<section class="py-3 bg-white border-bottom">
+
+<div class="container">
+
+<div class="d-flex flex-wrap gap-2">
+
+<button class="btn btn-primary category-btn active" data-category="all">
+
+All Jobs
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="AP Jobs">
+
+AP Jobs
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="TS Jobs">
+
+TS Jobs
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="Central Jobs">
+
+Central Jobs
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="Railway">
+
+Railway
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="Bank">
+
+Bank
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="Police">
+
+Police
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="Results">
+
+Results
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="Hall Tickets">
+
+Hall Tickets
+
+</button>
+
+<button class="btn btn-outline-primary category-btn" data-category="Schemes">
+
+Schemes
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ======================
+DISTRICT FILTER
+====================== -->
+
+<section class="py-3 bg-light">
+
+<div class="container">
+
+<h5 class="mb-3">
+
+📍 District Filter
+
+</h5>
+
+<div class="district-filter">
+
+<button class="district-btn active" data-district="All">
+
+All
+
+</button>
+
+<button class="district-btn" data-district="Visakhapatnam">
+
+Visakhapatnam
+
+</button>
+
+<button class="district-btn" data-district="Srikakulam">
+
+Srikakulam
+
+</button>
+
+<button class="district-btn" data-district="Vizianagaram">
+
+Vizianagaram
+
+</button>
+
+<button class="district-btn" data-district="Anakapalli">
+
+Anakapalli
+
+</button>
+
+<button class="district-btn" data-district="Kakinada">
+
+Kakinada
+
+</button>
+
+<button class="district-btn" data-district="Hyderabad">
+
+Hyderabad
+
+</button>
+
+<button class="district-btn" data-district="Warangal">
+
+Warangal
+
+</button>
+
+<button class="district-btn" data-district="Karimnagar">
+
+Karimnagar
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+LIVE STATISTICS
+========================== -->
+
+<section class="stats-section">
+
+<div class="container">
+
+<div class="row g-4">
+
+<div class="col-6 col-lg-3">
+
+<div class="stats-card">
+
+<h2 id="totalJobs">0</h2>
+
+<p>📢 Active Jobs</p>
+
+</div>
+
+</div>
+
+<div class="col-6 col-lg-3">
+
+<div class="stats-card">
+
+<h2 id="todayJobs">0</h2>
+
+<p>🔥 Today's Jobs</p>
+
+</div>
+
+</div>
+
+<div class="col-6 col-lg-3">
+
+<div class="stats-card">
+
+<h2 id="savedCount">0</h2>
+
+<p>❤️ Saved Jobs</p>
+
+</div>
+
+</div>
+
+<div class="col-6 col-lg-3">
+
+<div class="stats-card">
+
+<h2>24/7</h2>
+
+<p>⚡ Updates</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+TRENDING JOBS
+========================== -->
+
+<section class="py-5">
+
+<div class="container">
+
+<h2 class="section-title">
+
+🔥 Trending Jobs
+
+</h2>
+
+<div class="row" id="trendingJobs">
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+CLOSING SOON JOBS
+========================== -->
+
+<section class="container my-5">
+
+<div class="section-title">
+
+<h2>⏰ Closing Soon Jobs</h2>
+
+<p>Applications closing within 3 days</p>
+
+</div>
+
+<div class="row" id="closingSoonContainer">
+
+</div>
+
+</section>
+
+<!-- ==========================
+FEATURED JOB SLIDER
+========================== -->
+
+<section class="py-4">
+
+<div class="container">
+
+<div id="featuredSlider"
+
+class="carousel slide"
+
+data-bs-ride="carousel">
+
+<div class="carousel-inner"
+
+id="featuredContainer">
+
+<!-- Featured Jobs Loaded From Firestore -->
+
+</div>
+
+<button
+
+class="carousel-control-prev"
+
+type="button"
+
+data-bs-target="#featuredSlider"
+
+data-bs-slide="prev">
+
+<span class="carousel-control-prev-icon"></span>
+
+</button>
+
+<button
+
+class="carousel-control-next"
+
+type="button"
+
+data-bs-target="#featuredSlider"
+
+data-bs-slide="next">
+
+<span class="carousel-control-next-icon"></span>
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- =========================
+MAIN CONTENT
+========================= -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="row">
+
+<!-- =========================
+LEFT SIDE
+========================= -->
+
+<div class="col-lg-8">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<h3>
+
+🔥 Latest Job Notifications
+
+</h3>
+
+<a href="#"
+
+class="btn btn-sm btn-outline-primary">
+
+View All
+
+</a>
+
+</div>
+
+<!-- =========================
+TODAY'S JOBS
+========================= -->
+
+<div class="mb-5">
+
+<h3 class="latest-title">
+
+🔥 Today's Jobs
+
+</h3>
+
+<div class="row"
+
+id="todayContainer">
+
+</div>
+
+</div>
+
+<!-- =========================
+LATEST JOBS
+========================= -->
+
+<div>
+
+<h3 class="latest-title">
+
+🆕 Latest Jobs
+
+</h3>
+
+<div class="row"
+
+id="jobContainer">
+
+</div>
+
+</div>
+
+<!-- =========================
+ADVERTISEMENT
+========================= -->
+
+<div class="my-4">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-body text-center">
+
+<h4>
+
+Advertisement Space
+
+</h4>
+
+<p>
+
+Google AdSense Banner
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =========================
+RIGHT SIDEBAR
+========================= -->
+
+<div class="col-lg-4">
+
+<!-- Latest Updates -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header bg-primary text-white">
+
+Latest Updates
+
+</div>
+
+<div class="list-group list-group-flush">
+
+<a href="#" class="list-group-item">
+
+🆕 Today's Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+📢 Latest Notifications
+
+</a>
+
+<a href="#" class="list-group-item">
+
+🎫 Hall Tickets
+
+</a>
+
+<a href="#" class="list-group-item">
+
+🏆 Results
+
+</a>
+
+<a href="#" class="list-group-item">
+
+📜 Government Schemes
+
+</a>
+
+</div>
+
+</div>
+
+<!-- Categories -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header bg-success text-white">
+
+Categories
+
+</div>
+
+<div class="list-group list-group-flush">
+
+<a href="#" class="list-group-item">
+
+📍 Andhra Pradesh Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+📍 Telangana Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+🇮🇳 Central Govt Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+🚆 Railway Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+🏦 Bank Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+👮 Police Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+🏥 Medical Jobs
+
+</a>
+
+<a href="#" class="list-group-item">
+
+🎓 Teaching Jobs
+
+</a>
+
+</div>
+
+</div>
+
+<!-- Follow Us -->
+
+<div class="card shadow-sm">
+
+<div class="card-header bg-dark text-white">
+
+Follow Us
+
+</div>
+
+<div class="card-body text-center">
+
+<a href="#" class="btn btn-primary w-100 mb-2">
+
+📘 Facebook
+
+</a>
+
+<a href="#" class="btn btn-danger w-100 mb-2">
+
+📸 Instagram
+
+</a>
+
+<a href="#" class="btn btn-danger w-100 mb-2">
+
+▶️ YouTube
+
+</a>
+
+<a href="#" class="btn btn-info w-100">
+
+📢 Telegram
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==========================
+FOOTER
+========================== -->
+
+<footer class="footer">
+
+<div class="container">
+
+<div class="row">
+
+<!-- About -->
+
+<div class="col-lg-4 mb-4">
+
+<h3>
+
+📰 Arna Job Alerts
+
+</h3>
+
+<p>
+
+Latest AP Jobs, Telangana Jobs, Central Government Jobs,
+Railway Jobs, Bank Jobs, Police Jobs,
+Results, Hall Tickets and Government Schemes.
+
+</p>
+
+</div>
+
+<!-- Quick Links -->
+
+<div class="col-lg-2">
+
+<h5>
+
+Quick Links
+
+</h5>
+
+<ul class="list-unstyled">
+
+<li><a href="index.html">Home</a></li>
+
+<li><a href="#">Latest Jobs</a></li>
+
+<li><a href="#">Results</a></li>
+
+<li><a href="#">Hall Tickets</a></li>
+
+<li><a href="#">Schemes</a></li>
+
+</ul>
+
+</div>
+
+<!-- Categories -->
+
+<div class="col-lg-3">
+
+<h5>
+
+Categories
+
+</h5>
+
+<ul class="list-unstyled">
+
+<li>AP Jobs</li>
+
+<li>TS Jobs</li>
+
+<li>Central Jobs</li>
+
+<li>Railway</li>
+
+<li>Bank</li>
+
+<li>Police</li>
+
+</ul>
+
+</div>
+
+<!-- Social -->
+
+<div class="col-lg-3">
+
+<h5>
+
+Follow Us
+
+</h5>
+
+<div class="footer-social">
+
+<a href="#"><i class="fab fa-facebook"></i></a>
+
+<a href="#"><i class="fab fa-instagram"></i></a>
+
+<a href="#"><i class="fab fa-youtube"></i></a>
+
+<a href="#"><i class="fab fa-telegram"></i></a>
+
+<a href="#"><i class="fab fa-whatsapp"></i></a>
+
+</div>
+
+</div>
+
+</div>
+
+<hr>
+
+<div class="footer-bottom text-center">
+
+© 2026 Arna Job Alerts | All Rights Reserved
+
+</div>
+
+</div>
+
+</footer>
+
+<!-- ==========================
+FLOATING BUTTONS
+========================== -->
+
+<a href="#" class="floating-whatsapp">
+
+<i class="fab fa-whatsapp"></i>
+
+</a>
+
+<a href="#" class="floating-telegram">
+
+<i class="fab fa-telegram-plane"></i>
+
+</a>
+
+<button id="topBtn" class="top-btn">
+
+<i class="fas fa-arrow-up"></i>
+
+</button>
+
+<!-- ==========================
+BOTTOM NAVIGATION
+========================== -->
+
+<nav class="bottom-nav">
+
+<a href="index.html" class="bottom-item active">
+
+<i class="fa-solid fa-house"></i>
+
+<span>Home</span>
+
+</a>
+
+<a href="#todayContainer" class="bottom-item">
+
+<i class="fa-solid fa-fire"></i>
+
+<span>Latest</span>
+
+</a>
+
+<a href="saved.html" class="bottom-item" id="savedJobsBtn">
+
+<i class="fa-solid fa-heart"></i>
+
+<span>Saved</span>
+
+</a>
+
+<a href="#searchInput" class="bottom-item">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+<span>Search</span>
+
+</a>
+
+<a href="#" class="bottom-item" id="menuBtn">
+
+<i class="fa-solid fa-bars"></i>
+
+<span>Menu</span>
+
+</a>
+
+</nav>
+
+<!-- ==========================
+SCRIPTS
+========================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module" src="js/script.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+        navigator.serviceWorker
+            .register("./sw.js")
+            .then(() => {
+
+                console.log("Service Worker Registered");
+
+            })
+            .catch((error) => {
+
+                console.error(error);
+
+            });
+
+    });
+
+}
+</script>
+
+</body>
+
+</html>

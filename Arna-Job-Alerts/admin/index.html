@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Arna Jobs Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+        <h2 class="m-0">
+            🛠 Arna Jobs Admin Dashboard
+        </h2>
+
+        <div>
+
+            <a href="login-history.html" class="btn btn-primary">
+                Login History
+            </a>
+
+            <button id="logoutBtn" class="btn btn-danger">
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Dashboard Cards -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow text-center">
+                <div class="card-body">
+                    <h3 id="totalJobs">0</h3>
+                    <p class="mb-0">Total Jobs</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow text-center">
+                <div class="card-body">
+                    <h3 id="featuredJobs">0</h3>
+                    <p class="mb-0">Featured Jobs</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow text-center">
+                <div class="card-body">
+                    <h3 id="todayJobs">0</h3>
+                    <p class="mb-0">Today's Jobs</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow text-center">
+                <div class="card-body">
+                    <h3 id="urgentJobs">0</h3>
+                    <p class="mb-0">Closing Soon</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Analytics Cards -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card shadow text-center">
+
+                <div class="card-body">
+
+                    <h3 id="expiringToday">0</h3>
+
+                    <p class="mb-0">Expiring Today</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow text-center">
+
+                <div class="card-body">
+
+                    <h3 id="expiringWeek">0</h3>
+
+                    <p class="mb-0">Expiring This Week</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow text-center">
+
+                <div class="card-body">
+
+                    <h3 id="featuredPercent">0%</h3>
+
+                    <p class="mb-0">Featured %</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow text-center">
+
+                <div class="card-body">
+
+                    <h3 id="averageSalary">₹0</h3>
+
+                    <p class="mb-0">Average Salary</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+
+    <div class="row g-4 mb-5">
+
+        <div class="col-lg-6">
+
+            <div class="card shadow">
+
+                <div class="card-header">
+
+                    <strong>📊 Jobs by Category</strong>
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas id="categoryChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <div class="card shadow">
+
+                <div class="card-header">
+
+                    <strong>📍 Jobs by District</strong>
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas id="districtChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<div class="card shadow mb-5">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">📜 Recent Activity</h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <div id="activityList">
+
+            <p class="text-muted">
+                Loading activity...
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- Search -->
+
+    <div class="mb-4">
+
+        <input
+            type="text"
+            id="searchJob"
+            class="form-control"
+            placeholder="🔍 Search Jobs">
+
+    </div>
+
+    <!-- Job Form -->
+
+    <form id="jobForm">
+
+        <hr class="my-5">
+
+        <h3 class="mb-3">
+            📋 Manage Jobs
+        </h3>
+
+        <div id="jobsTable"></div>
+
+        <div class="card shadow p-4">
+
+            <div class="row">
+
+                <!-- Job Title -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Job Title</label>
+    <input type="text" id="title" class="form-control" required>
+</div>
+
+<!-- Department -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Department</label>
+    <input type="text" id="department" class="form-control" required>
+</div>
+
+<!-- Category -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Category</label>
+    <select id="category" class="form-select">
+        <option>AP Jobs</option>
+        <option>TS Jobs</option>
+        <option>Central Jobs</option>
+        <option>Railway</option>
+        <option>Bank</option>
+        <option>Police</option>
+    </select>
+</div>
+
+<!-- District -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">District</label>
+    <input type="text" id="district" class="form-control">
+</div>
+
+<!-- Qualification -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Qualification</label>
+    <input type="text" id="qualification" class="form-control">
+</div>
+
+<!-- Salary -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Salary</label>
+    <input type="text" id="salary" class="form-control">
+</div>
+
+<!-- Last Date -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Last Date</label>
+    <input type="date" id="lastDate" class="form-control">
+</div>
+
+<!-- Thumbnail -->
+<div class="col-md-6 mb-3">
+
+    <label class="form-label">Thumbnail Image</label>
+
+    <input
+        type="file"
+        id="thumbnailFile"
+        class="form-control"
+        accept="image/*">
+
+    <input
+        type="hidden"
+        id="thumbnail">
+
+</div>
+
+<!-- Instagram -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Instagram Link</label>
+    <input type="url" id="instagram" class="form-control">
+</div>
+
+<!-- YouTube -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">YouTube Link</label>
+    <input type="url" id="youtube" class="form-control">
+</div>
+
+<!-- Apply -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Apply Link</label>
+    <input type="url" id="apply" class="form-control">
+</div>
+
+<!-- Notification -->
+<div class="col-md-6 mb-3">
+    <label class="form-label">Notification PDF Link</label>
+    <input type="url" id="notification" class="form-control">
+</div>
+
+<hr class="my-4">
+
+<h4 class="mb-3">📄 Job Details</h4>
+
+<div class="mb-3">
+    <label class="form-label">About Recruitment</label>
+    <textarea id="about" class="form-control" rows="4"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Vacancy Details</label>
+    <textarea id="vacancies" class="form-control" rows="4"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Qualification Details</label>
+    <textarea id="qualificationDetails" class="form-control" rows="4"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Selection Process</label>
+    <textarea id="selectionProcess" class="form-control" rows="4"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Important Dates</label>
+    <textarea id="importantDates" class="form-control" rows="4"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">How To Apply</label>
+    <textarea id="howToApply" class="form-control" rows="4"></textarea>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Official Website</label>
+    <input type="url" id="officialWebsite" class="form-control">
+</div>
+
+<div class="mb-4">
+    <label class="form-label">Featured Job</label>
+    <select id="featured" class="form-select">
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+    </select>
+</div>
+
+<div class="d-grid mt-4">
+    <button
+        type="submit"
+        id="publishBtn"
+        class="btn btn-success btn-lg">
+        🚀 Publish Job
+    </button>
+</div>
+
+</div>
+</div>
+
+</form>
+
+</div>
+
+<script type="module" src="auth.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script type="module" src="dashboard.js"></script>
+<script type="module" src="add-job.js"></script>
+<script type="module" src="analytics.js"></script>
+<script type="module" src="charts.js"></script>
+<script type="module" src="activity.js"></script>

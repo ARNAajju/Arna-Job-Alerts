@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Manage Users | Arna Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body class="bg-light">
+
+<div class="container py-4">
+
+<!-- Header -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h2>👥 Manage Users</h2>
+
+<div>
+
+<a href="dashboard.html" class="btn btn-secondary">
+
+← Dashboard
+
+</a>
+
+</div>
+
+</div>
+
+<!-- Statistics -->
+
+<div class="row mb-4">
+
+<div class="col-md-4 mb-3">
+
+<div class="card border-primary shadow-sm">
+
+<div class="card-body text-center">
+
+<h2 id="totalUsers">0</h2>
+
+<p class="mb-0">
+
+Total Users
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<div class="card border-success shadow-sm">
+
+<div class="card-body text-center">
+
+<h2 id="verifiedUsers">0</h2>
+
+<p class="mb-0">
+
+Verified Users
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<div class="card border-warning shadow-sm">
+
+<div class="card-body text-center">
+
+<h2 id="todayUsers">0</h2>
+
+<p class="mb-0">
+
+Today's Registrations
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Users Card -->
+
+<div class="card shadow">
+
+<div class="card-header bg-primary text-white">
+
+<div class="d-flex justify-content-between align-items-center">
+
+<h5 class="mb-0">
+
+Registered Users
+
+</h5>
+
+<input
+
+type="text"
+
+id="searchUser"
+
+class="form-control w-50"
+
+placeholder="🔍 Search Name or Email">
+
+</div>
+
+</div>
+
+<div class="card-body">
+
+<div class="table-responsive">
+
+<table class="table table-hover table-bordered align-middle">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>#</th>
+
+<th>Name</th>
+
+<th>Email</th>
+
+<th>Status</th>
+
+<th>UID</th>
+
+<th>Joined</th>
+
+<th width="150">
+
+Action
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="usersTable">
+
+<tr>
+
+<td colspan="7" class="text-center py-5">
+
+<div class="spinner-border text-primary"></div>
+
+<br><br>
+
+Loading Users...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- View User Modal -->
+
+<div
+class="modal fade"
+id="userModal"
+tabindex="-1">
+
+<div class="modal-dialog">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5 class="modal-title">
+
+👤 User Details
+
+</h5>
+
+<button
+
+class="btn-close"
+
+data-bs-dismiss="modal">
+
+</button>
+
+</div>
+
+<div class="modal-body">
+
+<p>
+
+<b>Name :</b>
+
+<span id="viewName">-</span>
+
+</p>
+
+<p>
+
+<b>Email :</b>
+
+<span id="viewEmail">-</span>
+
+</p>
+
+<p>
+
+<b>UID :</b>
+
+<span id="viewUID">-</span>
+
+</p>
+
+<p>
+
+<b>Status :</b>
+
+<span id="viewStatus">-</span>
+
+</p>
+
+<p>
+
+<b>Joined :</b>
+
+<span id="viewCreated">-</span>
+
+</p>
+
+</div>
+
+<div class="modal-footer">
+
+<button
+
+class="btn btn-secondary"
+
+data-bs-dismiss="modal">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module" src="auth.js"></script>
+
+<script type="module" src="users.js"></script>
+
+</body>
+
+</html>
