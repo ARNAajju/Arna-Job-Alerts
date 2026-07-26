@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Arna Job Alerts Admin Panel - Government Schemes">
+
+    <meta name="keywords"
+          content="Government Schemes, AP Schemes, TS Schemes, Central Schemes">
+
+    <meta name="author"
+          content="Arna Digital Hub">
+
+    <title>Manage Government Schemes | Arna Admin</title>
+
+    <!-- Google Fonts -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <!-- Bootstrap -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Main CSS -->
+
+    <link rel="stylesheet"
+          href="../css/style.css">
+
+    <style>
+
+        :root{
+
+            --sidebar-width:270px;
+
+            --primary:#198754;
+
+            --sidebar:#0f172a;
+
+            --bg:#f8fafc;
+
+            --text:#334155;
+
+            --border:#e2e8f0;
+
+            --radius:16px;
+
+            --shadow:0 10px 25px rgba(15,23,42,.08);
+
+        }
+
+        *{
+
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+
+        }
+
+        body{
+
+            font-family:'Inter',sans-serif;
+
+            background:var(--bg);
+
+            color:var(--text);
+
+            overflow-x:hidden;
+
+        }
+
+        a{
+
+            text-decoration:none;
+
+        }
+
+        .sidebar{
+
+            position:fixed;
+
+            left:0;
+
+            top:0;
+
+            width:var(--sidebar-width);
+
+            height:100vh;
+
+            background:var(--sidebar);
+
+            color:#fff;
+
+            padding:24px;
+
+            overflow-y:auto;
+
+            z-index:1040;
+
+        }
+
+        .sidebar h3{
+
+            text-align:center;
+
+            margin-bottom:30px;
+
+            font-weight:700;
+
+        }
+
+        .sidebar a{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:12px;
+
+            color:#cbd5e1;
+
+            padding:12px 14px;
+
+            border-radius:10px;
+
+            margin-bottom:6px;
+
+            transition:.25s;
+
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active{
+
+            background:var(--primary);
+
+            color:#fff;
+
+        }
+
+        .section-title{
+
+            color:#94a3b8;
+
+            font-size:12px;
+
+            text-transform:uppercase;
+
+            letter-spacing:1px;
+
+            margin:20px 0 10px;
+
+        }
+
+        .main{
+
+            margin-left:var(--sidebar-width);
+
+            padding:30px;
+
+            min-height:100vh;
+
+        }
+
+        .card{
+
+            border:none;
+
+            border-radius:var(--radius);
+
+            box-shadow:var(--shadow);
+
+        }
+
+        .stat-card{
+
+            transition:.25s;
+
+        }
+
+        .stat-card:hover{
+
+            transform:translateY(-5px);
+
+        }
+
+        .stat-icon{
+
+            width:60px;
+
+            height:60px;
+
+            border-radius:14px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            font-size:24px;
+
+        }
+
+        @media(max-width:992px){
+
+            .sidebar{
+
+                transform:translateX(-100%);
+
+                transition:.3s;
+
+            }
+
+            .sidebar.show{
+
+                transform:translateX(0);
+
+            }
+
+            .main{
+
+                margin-left:0;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+        <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+
+        <h3>
+            <i class="fas fa-briefcase text-success"></i>
+            Arna Jobs
+        </h3>
+
+        <div class="section-title">
+            Dashboard
+        </div>
+
+        <a href="dashboard.html">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+
+        <a href="manage-jobs.html">
+            <i class="fas fa-list"></i>
+            Manage Jobs
+        </a>
+
+        <a href="add-job-card.html">
+            <i class="fas fa-plus-circle"></i>
+            Add Job
+        </a>
+
+        <div class="section-title">
+            Collections
+        </div>
+
+        <a href="results.html">
+            <i class="fas fa-file-alt"></i>
+            Results
+        </a>
+
+        <a href="halltickets.html">
+            <i class="fas fa-id-card"></i>
+            Hall Tickets
+        </a>
+
+        <a href="schemes.html" class="active">
+            <i class="fas fa-landmark"></i>
+            Government Schemes
+        </a>
+
+        <div class="section-title">
+            Administration
+        </div>
+
+        <a href="users.html">
+            <i class="fas fa-users"></i>
+            Users
+        </a>
+
+        <a href="notifications.html">
+            <i class="fas fa-bell"></i>
+            Notifications
+        </a>
+
+        <a href="analytics.html">
+            <i class="fas fa-chart-line"></i>
+            Analytics
+        </a>
+
+        <a href="settings.html">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+
+        <hr class="my-4 text-secondary">
+
+        <button
+            id="logoutBtn"
+            class="btn btn-outline-danger w-100 fw-bold">
+
+            <i class="fas fa-sign-out-alt me-2"></i>
+
+            Logout
+
+        </button>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <button
+                    class="btn btn-light border d-lg-none"
+                    id="menuBtn">
+
+                    <i class="fas fa-bars"></i>
+
+                </button>
+
+                <div>
+
+                    <nav style="font-size:14px;">
+
+                        <a
+                            href="dashboard.html"
+                            class="text-secondary">
+
+                            Dashboard
+
+                        </a>
+
+                        <span class="mx-2 text-secondary">/</span>
+
+                        <strong>
+                            Government Schemes
+                        </strong>
+
+                    </nav>
+
+                    <h2 class="fw-bold mt-2 mb-0">
+
+                        🏛 Manage Government Schemes
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a
+                    href="dashboard.html"
+                    class="btn btn-secondary">
+
+                    <i class="fas fa-arrow-left me-2"></i>
+
+                    Dashboard
+
+                </a>
+
+                <button
+                    class="btn btn-success"
+                    id="addSchemeBtn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addSchemeModal">
+
+                    <i class="fas fa-plus me-2"></i>
+
+                    Add Scheme
+
+                </button>
+
+            </div>
+
+        </div>
+                <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+
+            <!-- Total Schemes -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="card stat-card h-100">
+
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <p class="text-muted mb-1 fw-semibold">
+                                Total Schemes
+                            </p>
+
+                            <h3 class="fw-bold mb-0" id="totalSchemes">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+
+                            <i class="fas fa-landmark"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Active Schemes -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="card stat-card h-100">
+
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <p class="text-muted mb-1 fw-semibold">
+                                Active Schemes
+                            </p>
+
+                            <h3 class="fw-bold text-success mb-0" id="activeSchemes">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+
+                            <i class="fas fa-check-circle"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- AP Schemes -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="card stat-card h-100">
+
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <p class="text-muted mb-1 fw-semibold">
+                                AP Schemes
+                            </p>
+
+                            <h3 class="fw-bold text-warning mb-0" id="apSchemes">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+
+                            <i class="fas fa-map-marker-alt"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Central Schemes -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+
+                <div class="card stat-card h-100">
+
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <p class="text-muted mb-1 fw-semibold">
+                                Central Schemes
+                            </p>
+
+                            <h3 class="fw-bold text-info mb-0" id="centralSchemes">
+                                0
+                            </h3>
+
+                        </div>
+
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+
+                            <i class="fas fa-building-columns"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+                <!-- Search & Filters -->
+        <div class="card mb-4">
+
+            <div class="card-body">
+
+                <div class="row g-3 align-items-end">
+
+                    <!-- Search -->
+                    <div class="col-lg-4 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Search Scheme
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="searchInput"
+                                placeholder="Search scheme name, department, category...">
+
+                        </div>
+
+                    </div>
+
+                    <!-- State Filter -->
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            State
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="stateFilter">
+
+                            <option value="">All States</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Central">Central</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Category
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="categoryFilter">
+
+                            <option value="">All Categories</option>
+
+                            <option value="Women">
+                                Women
+                            </option>
+
+                            <option value="Farmers">
+                                Farmers
+                            </option>
+
+                            <option value="Students">
+                                Students
+                            </option>
+
+                            <option value="Employment">
+                                Employment
+                            </option>
+
+                            <option value="Health">
+                                Health
+                            </option>
+
+                            <option value="Housing">
+                                Housing
+                            </option>
+
+                            <option value="Pension">
+                                Pension
+                            </option>
+
+                            <option value="Scholarship">
+                                Scholarship
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Status
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="statusFilter">
+
+                            <option value="">All</option>
+                            <option value="active">Active</option>
+                            <option value="closed">Closed</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col-lg-2 col-md-12">
+
+                        <div class="d-grid gap-2">
+
+                            <button
+                                class="btn btn-success"
+                                id="refreshBtn">
+
+                                <i class="fas fa-rotate-right me-2"></i>
+
+                                Refresh
+
+                            </button>
+
+                            <button
+                                class="btn btn-outline-primary"
+                                id="exportBtn">
+
+                                <i class="fas fa-download me-2"></i>
+
+                                Export
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+                <!-- Schemes Table -->
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0 fw-bold">
+
+                    <i class="fas fa-landmark text-success me-2"></i>
+
+                    Government Schemes List
+
+                </h5>
+
+                <span class="badge bg-success fs-6" id="recordCount">
+                    0 Records
+                </span>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <!-- Loading -->
+                <div id="loadingState" class="text-center py-5">
+
+                    <div class="spinner-border text-success mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                    <h5 class="fw-bold">
+                        Loading Government Schemes...
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Please wait while data is loading.
+                    </p>
+
+                </div>
+
+                <!-- Error State -->
+                <div id="errorState" class="text-center py-5 d-none">
+
+                    <i class="fas fa-circle-exclamation text-danger fa-4x mb-3"></i>
+
+                    <h4 class="fw-bold text-danger">
+                        Failed to Load Schemes
+                    </h4>
+
+                    <p class="text-muted">
+                        Something went wrong while loading data.
+                    </p>
+
+                    <button
+                        class="btn btn-danger"
+                        id="retryBtn">
+
+                        <i class="fas fa-rotate-right me-2"></i>
+
+                        Retry
+
+                    </button>
+
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center py-5 d-none">
+
+                    <i class="fas fa-folder-open text-secondary fa-4x mb-3"></i>
+
+                    <h4 class="fw-bold">
+                        No Government Schemes Found
+                    </h4>
+
+                    <p class="text-muted">
+                        No schemes match your current filters.
+                    </p>
+
+                </div>
+
+                <!-- Table -->
+                <div
+                    class="table-responsive d-none"
+                    id="tableWrapper">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th style="width:70px;">#</th>
+
+                                <th style="width:90px;">Thumbnail</th>
+
+                                <th>Scheme Name</th>
+
+                                <th>Department</th>
+
+                                <th>State</th>
+
+                                <th>Category</th>
+
+                                <th>Status</th>
+
+                                <th style="width:190px;">
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="schemesTableBody">
+
+                            <!-- JavaScript will render data here -->
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+                <!-- Pagination -->
+        <div class="card mt-4">
+
+            <div class="card-body">
+
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+
+                    <!-- Page Info -->
+                    <div id="pageInfo" class="text-muted fw-semibold">
+                        Showing 0 to 0 of 0 entries
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Schemes Pagination">
+
+                        <ul class="pagination mb-0" id="pagination">
+
+                            <!-- JavaScript will generate pagination -->
+
+                        </ul>
+
+                    </nav>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-5 text-center text-muted">
+
+            <hr>
+
+            <p class="mb-1 fw-semibold">
+                © 2026 Arna Job Alerts Admin Panel
+            </p>
+
+            <small>
+                Developed by Arna Digital Hub
+            </small>
+
+        </footer>
+
+    </main>
+
+    <!-- Toast Container -->
+    <div
+        class="toast-container position-fixed bottom-0 end-0 p-3"
+        id="toastContainer">
+
+        <!-- Toasts generated by JavaScript -->
+
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade"
+         id="deleteModal"
+         tabindex="-1"
+         aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+
+                    <h5 class="modal-title" id="deleteModalLabel">
+
+                        <i class="fas fa-trash-alt me-2"></i>
+
+                        Delete Scheme
+
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p class="mb-0">
+                        Are you sure you want to permanently delete this Government Scheme?
+                    </p>
+
+                    <div class="alert alert-warning mt-3 mb-0">
+
+                        <i class="fas fa-triangle-exclamation me-2"></i>
+
+                        This action cannot be undone.
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        id="confirmDeleteBtn">
+
+                        <i class="fas fa-trash me-2"></i>
+
+                        Delete Scheme
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+        <!-- Add / Edit Scheme Modal -->
+    <div class="modal fade"
+         id="addSchemeModal"
+         tabindex="-1"
+         aria-labelledby="addSchemeModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+            <div class="modal-content">
+
+                <form id="schemeForm">
+
+                    <div class="modal-header bg-success text-white">
+
+                        <h5 class="modal-title" id="addSchemeModalLabel">
+                            <i class="fas fa-landmark me-2"></i>
+                            Add / Edit Government Scheme
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"></button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <input type="hidden" id="docId">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Scheme Name *</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="schemeName"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Department *</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="department"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">State *</label>
+
+                                <select
+                                    class="form-select"
+                                    id="state"
+                                    required>
+
+                                    <option value="">Select State</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Central">Central Government</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Category *</label>
+
+                                <select
+                                    class="form-select"
+                                    id="category"
+                                    required>
+
+                                    <option value="">Select Category</option>
+                                    <option>Women</option>
+                                    <option>Farmers</option>
+                                    <option>Students</option>
+                                    <option>Employment</option>
+                                    <option>Health</option>
+                                    <option>Housing</option>
+                                    <option>Pension</option>
+                                    <option>Scholarship</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+
+                                <select
+                                    class="form-select"
+                                    id="status">
+
+                                    <option value="active">Active</option>
+                                    <option value="closed">Closed</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Published Date</label>
+
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="publishedDate">
+
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Thumbnail URL</label>
+
+                                <input
+                                    type="url"
+                                    class="form-control"
+                                    id="thumbnail">
+
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Official Link</label>
+
+                                <input
+                                    type="url"
+                                    class="form-control"
+                                    id="officialLink">
+
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+
+                                <textarea
+                                    class="form-control"
+                                    rows="5"
+                                    id="description"></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                            Cancel
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-success"
+                            id="saveBtn">
+
+                            <i class="fas fa-save me-2"></i>
+
+                            Save Scheme
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Firebase -->
+    <script type="module" src="../js/firebase-config.js"></script>
+
+    <!-- Authentication -->
+    <script type="module" src="../js/auth.js"></script>
+
+    <!-- Schemes -->
+    <script type="module" src="../js/schemes.js"></script>
+
+    <script>
+
+        // Mobile Sidebar Toggle
+
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+
+        if (menuBtn && sidebar) {
+
+            menuBtn.addEventListener("click", () => {
+
+                sidebar.classList.toggle("show");
+
+            });
+
+        }
+
+    </script>
+
+</body>
+
+</html>

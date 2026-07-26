@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Arna Job Alerts Admin Panel - Manage Hall Tickets">
+    <meta name="keywords" content="Arna Jobs, Hall Tickets, Admin Panel">
+    <meta name="author" content="Arna Digital Hub">
+
+    <title>Manage Hall Tickets | Arna Job Alerts Admin</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        :root{
+            --sidebar-width:270px;
+            --primary:#198754;
+            --primary-dark:#157347;
+            --bg:#f8fafc;
+            --sidebar:#0f172a;
+            --text:#334155;
+            --muted:#64748b;
+            --border:#e2e8f0;
+            --shadow:0 8px 24px rgba(15,23,42,.08);
+            --radius:16px;
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Inter',sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            overflow-x:hidden;
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        .sidebar{
+            position:fixed;
+            left:0;
+            top:0;
+            width:var(--sidebar-width);
+            height:100vh;
+            background:var(--sidebar);
+            color:#fff;
+            overflow-y:auto;
+            padding:24px;
+            z-index:1040;
+        }
+
+        .sidebar h3{
+            font-size:24px;
+            font-weight:700;
+            margin-bottom:30px;
+            text-align:center;
+        }
+
+        .sidebar .section-title{
+            color:#94a3b8;
+            font-size:12px;
+            text-transform:uppercase;
+            margin:18px 0 10px;
+            letter-spacing:1px;
+        }
+
+        .sidebar a{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            color:#cbd5e1;
+            padding:12px 14px;
+            border-radius:10px;
+            transition:.25s;
+            margin-bottom:6px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active{
+            background:var(--primary);
+            color:#fff;
+        }
+
+        .main{
+            margin-left:var(--sidebar-width);
+            padding:30px;
+            min-height:100vh;
+        }
+
+        .card{
+            border:none;
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+        }
+
+        .stat-card{
+            transition:.25s;
+        }
+
+        .stat-card:hover{
+            transform:translateY(-5px);
+        }
+
+        .stat-icon{
+            width:58px;
+            height:58px;
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:22px;
+        }
+
+        @media(max-width:992px){
+
+            .sidebar{
+                transform:translateX(-100%);
+                transition:.3s;
+            }
+
+            .sidebar.show{
+                transform:translateX(0);
+            }
+
+            .main{
+                margin-left:0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+        <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+
+        <h3>
+            <i class="fas fa-briefcase text-success"></i>
+            Arna Jobs
+        </h3>
+
+        <div class="section-title">Dashboard</div>
+
+        <a href="dashboard.html">
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+
+        <a href="manage-jobs.html">
+            <i class="fas fa-list"></i>
+            Manage Jobs
+        </a>
+
+        <a href="add-job-card.html">
+            <i class="fas fa-plus-circle"></i>
+            Add Job
+        </a>
+
+        <div class="section-title">Collections</div>
+
+        <a href="results.html">
+            <i class="fas fa-file-alt"></i>
+            Results
+        </a>
+
+        <a href="halltickets.html" class="active">
+            <i class="fas fa-id-card"></i>
+            Hall Tickets
+        </a>
+
+        <a href="schemes.html">
+            <i class="fas fa-gift"></i>
+            Schemes
+        </a>
+
+        <div class="section-title">Administration</div>
+
+        <a href="users.html">
+            <i class="fas fa-users"></i>
+            Users
+        </a>
+
+        <a href="notifications.html">
+            <i class="fas fa-bell"></i>
+            Notifications
+        </a>
+
+        <a href="analytics.html">
+            <i class="fas fa-chart-line"></i>
+            Analytics
+        </a>
+
+        <a href="settings.html">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+
+        <hr class="my-4 text-secondary">
+
+        <button
+            id="logoutBtn"
+            class="btn btn-outline-danger w-100 fw-bold">
+            <i class="fas fa-sign-out-alt me-2"></i>
+            Logout
+        </button>
+
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <button
+                    class="btn btn-light border d-lg-none"
+                    id="menuBtn">
+
+                    <i class="fas fa-bars"></i>
+
+                </button>
+
+                <div>
+
+                    <nav style="font-size:14px;">
+
+                        <a href="dashboard.html" class="text-secondary">
+                            Dashboard
+                        </a>
+
+                        <span class="mx-2 text-secondary">/</span>
+
+                        <strong>Hall Tickets</strong>
+
+                    </nav>
+
+                    <h2 class="fw-bold mt-2 mb-0">
+                        🎫 Manage Hall Tickets
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a
+                    href="dashboard.html"
+                    class="btn btn-secondary">
+
+                    <i class="fas fa-arrow-left me-2"></i>
+
+                    Dashboard
+
+                </a>
+
+                <button
+                    class="btn btn-success"
+                    id="addHallTicketBtn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addHallTicketModal">
+
+                    <i class="fas fa-plus me-2"></i>
+
+                    Add Hall Ticket
+
+                </button>
+
+            </div>
+
+        </div>
+                <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+
+            <!-- Total Hall Tickets -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card stat-card h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-1 fw-semibold">
+                                Total Hall Tickets
+                            </p>
+
+                            <h3 class="fw-bold mb-0" id="totalHallTickets">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card stat-card h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-1 fw-semibold">
+                                Active
+                            </p>
+
+                            <h3 class="fw-bold text-success mb-0" id="activeHallTickets">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expired -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card stat-card h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-1 fw-semibold">
+                                Expired
+                            </p>
+
+                            <h3 class="fw-bold text-danger mb-0" id="expiredHallTickets">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Uploads -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card stat-card h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-1 fw-semibold">
+                                Today's Uploads
+                            </p>
+
+                            <h3 class="fw-bold text-warning mb-0" id="todayHallTickets">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+                <!-- Search & Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+
+                <div class="row g-3 align-items-end">
+
+                    <!-- Search -->
+                    <div class="col-lg-4 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Search
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="searchInput"
+                                placeholder="Search title, department, exam name...">
+
+                        </div>
+
+                    </div>
+
+                    <!-- Department Filter -->
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Department
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="departmentFilter">
+
+                            <option value="">All Departments</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Status
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="statusFilter">
+
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="expired">Expired</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Sort By
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="sortFilter">
+
+                            <option value="latest">Latest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="title">Title (A-Z)</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col-lg-2 col-md-12">
+
+                        <div class="d-grid gap-2">
+
+                            <button
+                                class="btn btn-success"
+                                id="refreshBtn">
+
+                                <i class="fas fa-rotate-right me-2"></i>
+                                Refresh
+
+                            </button>
+
+                            <button
+                                class="btn btn-outline-primary"
+                                id="exportBtn">
+
+                                <i class="fas fa-download me-2"></i>
+                                Export
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+                <!-- Hall Tickets Table -->
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-id-card text-success me-2"></i>
+                    Hall Tickets List
+                </h5>
+
+                <span class="badge bg-success fs-6" id="recordCount">
+                    0 Records
+                </span>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <!-- Loading -->
+                <div id="loadingState" class="text-center py-5">
+
+                    <div class="spinner-border text-success mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                    <h5 class="fw-bold">Loading Hall Tickets...</h5>
+
+                    <p class="text-muted mb-0">
+                        Please wait while data is loading.
+                    </p>
+
+                </div>
+
+                <!-- Error -->
+                <div id="errorState" class="text-center py-5 d-none">
+
+                    <i class="fas fa-circle-exclamation text-danger fa-4x mb-3"></i>
+
+                    <h4 class="fw-bold text-danger">
+                        Failed to Load Data
+                    </h4>
+
+                    <p class="text-muted">
+                        Something went wrong while fetching hall tickets.
+                    </p>
+
+                    <button
+                        class="btn btn-danger"
+                        id="retryBtn">
+
+                        <i class="fas fa-rotate-right me-2"></i>
+                        Retry
+
+                    </button>
+
+                </div>
+
+                <!-- Empty -->
+                <div id="emptyState" class="text-center py-5 d-none">
+
+                    <i class="fas fa-folder-open text-secondary fa-4x mb-3"></i>
+
+                    <h4 class="fw-bold">
+                        No Hall Tickets Found
+                    </h4>
+
+                    <p class="text-muted">
+                        No records match your current filters.
+                    </p>
+
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive d-none" id="tableWrapper">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th style="width:70px;">#</th>
+
+                                <th>Title</th>
+
+                                <th>Department</th>
+
+                                <th>Exam Date</th>
+
+                                <th>Last Date</th>
+
+                                <th>Status</th>
+
+                                <th style="width:170px;">Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="hallTicketsTableBody">
+
+                            <!-- JavaScript will render rows here -->
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+                <!-- Pagination -->
+        <div class="card mt-4">
+            <div class="card-body">
+
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3">
+
+                    <!-- Page Info -->
+                    <div id="pageInfo" class="text-muted fw-semibold">
+                        Showing 0 to 0 of 0 entries
+                    </div>
+
+                    <!-- Pagination Buttons -->
+                    <nav aria-label="Hall Tickets Pagination">
+
+                        <ul class="pagination mb-0" id="pagination">
+
+                            <!-- JavaScript will generate pagination -->
+
+                        </ul>
+
+                    </nav>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-5 text-center text-muted">
+
+            <hr>
+
+            <p class="mb-1 fw-semibold">
+                © 2026 Arna Job Alerts Admin Panel
+            </p>
+
+            <small>
+                Developed by Arna Digital Hub
+            </small>
+
+        </footer>
+
+    </main>
+
+    <!-- Toast Container -->
+    <div
+        class="toast-container position-fixed bottom-0 end-0 p-3"
+        id="toastContainer">
+
+        <!-- Toasts will be added dynamically -->
+
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+        class="modal fade"
+        id="deleteModal"
+        tabindex="-1"
+        aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+
+                    <h5
+                        class="modal-title"
+                        id="deleteModalLabel">
+
+                        <i class="fas fa-trash-alt me-2"></i>
+
+                        Delete Hall Ticket
+
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p class="mb-0">
+                        Are you sure you want to delete this hall ticket?
+                    </p>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        id="confirmDeleteBtn">
+
+                        <i class="fas fa-trash me-2"></i>
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+        <!-- Add / Edit Hall Ticket Modal -->
+    <div class="modal fade"
+         id="addHallTicketModal"
+         tabindex="-1"
+         aria-labelledby="addHallTicketModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+            <div class="modal-content">
+
+                <form id="hallTicketForm">
+
+                    <div class="modal-header bg-success text-white">
+
+                        <h5 class="modal-title" id="addHallTicketModalLabel">
+                            <i class="fas fa-id-card me-2"></i>
+                            Add / Edit Hall Ticket
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal"></button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <input type="hidden" id="docId">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Title *</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="title"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Department *</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="department"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Exam Name</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="examName">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Organisation</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="organisation">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Hall Ticket Date</label>
+                                <input type="date"
+                                       class="form-control"
+                                       id="hallTicketDate">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Exam Date</label>
+                                <input type="date"
+                                       class="form-control"
+                                       id="examDate">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Last Date</label>
+                                <input type="date"
+                                       class="form-control"
+                                       id="lastDate">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+
+                                <select
+                                    class="form-select"
+                                    id="status">
+
+                                    <option value="active">Active</option>
+                                    <option value="expired">Expired</option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Notification Link</label>
+                                <input type="url"
+                                       class="form-control"
+                                       id="notificationLink">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Hall Ticket Link</label>
+                                <input type="url"
+                                       class="form-control"
+                                       id="hallTicketLink">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+
+                                <textarea
+                                    class="form-control"
+                                    rows="4"
+                                    id="description"></textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-success"
+                                id="saveBtn">
+
+                            <i class="fas fa-save me-2"></i>
+
+                            Save Hall Ticket
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script type="module" src="../js/firebase-config.js"></script>
+
+    <!-- Authentication -->
+    <script type="module" src="../js/auth.js"></script>
+
+    <!-- Hall Tickets -->
+    <script type="module" src="../js/halltickets.js"></script>
+
+    <script>
+        // Mobile Sidebar
+
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+
+        if (menuBtn && sidebar) {
+
+            menuBtn.addEventListener("click", () => {
+
+                sidebar.classList.toggle("show");
+
+            });
+
+        }
+    </script>
+
+</body>
+
+</html>
