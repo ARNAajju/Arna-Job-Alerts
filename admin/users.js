@@ -6,8 +6,10 @@ import {
     updateDoc,
     doc,
     query,
+
     orderBy,
     onSnapshot
+
 } from "../js/firebase.js";
 
 const usersTable = document.getElementById("usersTable");
@@ -317,7 +319,9 @@ function bindButtons() {
 
             if (!user) return;
 
+
             const isDisabled = user.disabled === true || user.status === "disabled";
+
 
             document.getElementById("viewName").textContent =
                 user.name || "-";

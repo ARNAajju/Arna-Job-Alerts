@@ -15,7 +15,9 @@ import { escapeHTML, IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
 // PART 1
 // ==========================================
 
+
 const IMAGE_FALLBACK = LOCAL_FB;
+
 
 function getSchemeTitle(scheme) {
     return scheme.title || scheme.schemeName || "Government Scheme";
@@ -196,7 +198,9 @@ async function loadRelatedSchemes() {
 
             const item = docSnap.data();
 
+
             if (item.published === false) return;
+
             if ((item.status || "").toLowerCase() === "closed") return;
 
             relatedSchemes.innerHTML += `
@@ -208,8 +212,10 @@ async function loadRelatedSchemes() {
 <div class="job-image-box">
 
 <img
+
 src="${escapeHTML(getSchemeThumbnail(item))}"
 alt="${escapeHTML(getSchemeTitle(item))}"
+
 class="job-image"
 onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
@@ -219,7 +225,9 @@ onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 <h5 class="job-title">
 
+
 ${escapeHTML(getSchemeTitle(item))}
+
 
 </h5>
 

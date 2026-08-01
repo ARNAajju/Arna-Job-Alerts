@@ -57,7 +57,9 @@ function matchesDepartmentFilter(item, filter) {
 const TICKETS_PER_PAGE = 9;
 let currentPage = 1;
 
+
 const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
+
 
 function getTicketTitle(ticket) {
     return ticket.title || ticket.examName || "Hall Ticket";
@@ -76,9 +78,11 @@ function getTicketThumbnail(ticket) {
 }
 
 function isActiveTicket(ticket) {
+
     if (ticket.published === false) return false;
     const status = (ticket.status || "active").toLowerCase();
     return status !== "expired" && status !== "closed" && status !== "draft";
+
 }
 
 // ==========================================
@@ -187,8 +191,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
+
 src="${escapeHTML(getTicketThumbnail(ticket))}"
 alt="${escapeHTML(getTicketTitle(ticket))}"
+
 class="job-image"
 onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
@@ -198,7 +204,9 @@ onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 <h5 class="job-title">
 
+
 ${escapeHTML(getTicketTitle(ticket))}
+
 
 </h5>
 
@@ -212,7 +220,9 @@ ${escapeHTML(getTicketTitle(ticket))}
 
 <span>
 
+
 📅 ${escapeHTML(getTicketDate(ticket))}
+
 
 </span>
 

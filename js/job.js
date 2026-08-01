@@ -435,6 +435,7 @@ officialBtn.rel = "noopener noreferrer";
 
             allJobsSnapshot.forEach(docSnap => {
 
+
                 const record = normalizeJobRecord({
                     id: docSnap.id,
                     ...docSnap.data()
@@ -442,6 +443,7 @@ officialBtn.rel = "noopener noreferrer";
                 if (isPubliclyVisible(record)) {
                     allJobs.push(record);
                 }
+
 
             });
 

@@ -3,7 +3,9 @@ import {
     doc,
     getDoc
 } from "./firebase.js";
+
 import { IMAGE_FALLBACK } from "./job-utils.js";
+
 
 const params = new URLSearchParams(window.location.search);
 const resultId = params.get("id");
@@ -66,7 +68,9 @@ async function loadResult() {
         document.title = `${getResultTitle(result)} | Arna Job Alerts`;
 
         document.getElementById("thumbnail").src =
+
             result.thumbnail || IMAGE_FALLBACK;
+
 
         document.getElementById("title").textContent =
             getResultTitle(result);

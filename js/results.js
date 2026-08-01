@@ -142,10 +142,12 @@ function renderPage(page) {
                 <div class="job-card">
                     <div class="job-image-box">
                         <img
+
                             src="${escapeHTML(result.thumbnail || IMAGE_FALLBACK)}"
                             alt="${escapeHTML(getResultTitle(result))}"
                             class="job-image"
                             onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}'">
+
                     </div>
                     <div class="job-content">
                         <h5 class="job-title">

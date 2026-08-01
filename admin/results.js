@@ -1426,7 +1426,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bindEvents();
     setModalMode("create");
     loadResults();
-
     const params = new URLSearchParams(window.location.search);
     if (params.get("add") === "1") {
         openCreateModal();

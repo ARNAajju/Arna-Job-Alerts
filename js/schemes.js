@@ -42,7 +42,9 @@ let filteredSchemes = [];
 const SCHEMES_PER_PAGE = 9;
 let currentPage = 1;
 
+
 const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
+
 
 function getSchemeTitle(scheme) {
     return scheme.title || scheme.schemeName || "Government Scheme";
@@ -175,8 +177,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
+
 src="${escapeHTML(getSchemeThumbnail(scheme))}"
 alt="${escapeHTML(getSchemeTitle(scheme))}"
+
 class="job-image"
 onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
@@ -186,7 +190,9 @@ onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 <h5 class="job-title">
 
+
 ${escapeHTML(getSchemeTitle(scheme))}
+
 
 </h5>
 
@@ -200,7 +206,9 @@ ${escapeHTML(getSchemeTitle(scheme))}
 
 <span>
 
+
 📅 ${escapeHTML(getSchemeDate(scheme))}
+
 
 </span>
 

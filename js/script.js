@@ -1098,8 +1098,10 @@ function previewCard(options) {
 <div class="col-12 mb-3">
 <div class="job-card">
 <div class="job-content">
+
 <h5 class="job-title mb-2">${escapeHTML(options.title)}</h5>
 <p class="mb-2">${escapeHTML(options.meta)}</p>
+
 <a href="${options.href}" class="btn ${options.btnClass} w-100">View Details</a>
 </div>
 </div>
