@@ -552,15 +552,22 @@ function getTodayJobs(){
 
 function isUrgent(lastDate){
 
-    const expire=new Date(lastDate);
+    if (!lastDate) return false;
 
-    const diff=Math.ceil(
+    const expire = new Date(lastDate);
+    if (Number.isNaN(expire.getTime())) return false;
 
-        (expire-today)/(1000*60*60*24)
+    const today = new Date(currentDate);
+    today.setHours(0, 0, 0, 0);
+    expire.setHours(0, 0, 0, 0);
+
+    const diff = Math.ceil(
+
+        (expire - today) / (1000 * 60 * 60 * 24)
 
     );
 
-    return diff<=3;
+    return diff >= 0 && diff <= 3;
 
 }
 
@@ -659,6 +666,10 @@ alert("Unable to Copy Link");
     }
 
 }
+
+// Expose for inline onclick handlers (ES modules are scoped)
+window.saveJob = saveJob;
+window.shareJob = shareJob;
 
 // ======================================
 // FEATURED JOB SLIDER
