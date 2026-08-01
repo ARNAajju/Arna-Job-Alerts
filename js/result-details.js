@@ -61,7 +61,7 @@ async function loadResult() {
         document.title = `${getResultTitle(result)} | Arna Job Alerts`;
 
         document.getElementById("thumbnail").src =
-            result.thumbnail || "";
+            result.thumbnail || "https://placehold.co/600x400?text=Result";
 
         document.getElementById("title").textContent =
             getResultTitle(result);

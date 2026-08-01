@@ -56,6 +56,29 @@ function matchesDepartmentFilter(item, filter) {
 const TICKETS_PER_PAGE = 9;
 let currentPage = 1;
 
+const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Hall+Ticket";
+
+function getTicketTitle(ticket) {
+    return ticket.title || ticket.examName || "Hall Ticket";
+}
+
+function getTicketDate(ticket) {
+    return ticket.date || ticket.hallTicketDate || ticket.examDate || "-";
+}
+
+function getTicketDownloadLink(ticket) {
+    return ticket.downloadLink || ticket.hallTicketLink || ticket.notificationLink || "#";
+}
+
+function getTicketThumbnail(ticket) {
+    return ticket.thumbnail || IMAGE_FALLBACK;
+}
+
+function isActiveTicket(ticket) {
+    const status = (ticket.status || "active").toLowerCase();
+    return status !== "expired" && status !== "closed";
+}
+
 // ==========================================
 // LOAD HALL TICKETS
 // ==========================================
@@ -80,12 +103,14 @@ async function loadHallTickets() {
 
         snapshot.forEach(doc => {
 
-            allTickets.push({
-
+            const ticket = {
                 id: doc.id,
                 ...doc.data()
+            };
 
-            });
+            if (isActiveTicket(ticket)) {
+                allTickets.push(ticket);
+            }
 
         });
 
@@ -160,9 +185,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
-src="${ticket.thumbnail || "assets/images/no-image.png"}"
-alt="${ticket.title || "Hall Ticket"}"
-class="job-image">
+src="${getTicketThumbnail(ticket)}"
+alt="${getTicketTitle(ticket)}"
+class="job-image"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 </div>
 
@@ -170,7 +196,7 @@ class="job-image">
 
 <h5 class="job-title">
 
-${ticket.title || "Untitled Hall Ticket"}
+${getTicketTitle(ticket)}
 
 </h5>
 
@@ -184,7 +210,7 @@ ${ticket.title || "Untitled Hall Ticket"}
 
 <span>
 
-📅 ${ticket.date || "-"}
+📅 ${getTicketDate(ticket)}
 
 </span>
 
@@ -231,7 +257,7 @@ function filterTickets() {
     filteredTickets = allTickets.filter(ticket => {
 
         const title =
-            (ticket.title || "").toLowerCase();
+            getTicketTitle(ticket).toLowerCase();
 
         const dept =
             (ticket.department || "").toLowerCase();
@@ -242,6 +268,9 @@ function filterTickets() {
         const state =
             (ticket.state || "").toLowerCase();
 
+        const examName =
+            (ticket.examName || "").toLowerCase();
+
         const keywordMatch =
 
             title.includes(keyword) ||
@@ -250,7 +279,9 @@ function filterTickets() {
 
             category.includes(keyword) ||
 
-            state.includes(keyword);
+            state.includes(keyword) ||
+
+            examName.includes(keyword);
 
         const departmentMatch =
 

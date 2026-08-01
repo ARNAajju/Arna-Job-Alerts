@@ -141,7 +141,7 @@ function renderPage(page) {
                 <div class="job-card">
                     <div class="job-image-box">
                         <img
-                            src="${result.thumbnail || "assets/images/no-image.png"}"
+                            src="${result.thumbnail || "https://placehold.co/600x400?text=Result"}"
                             alt="${getResultTitle(result)}"
                             class="job-image">
                     </div>
