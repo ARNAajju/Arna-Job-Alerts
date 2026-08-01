@@ -1432,6 +1432,4 @@ document.addEventListener("DOMContentLoaded", () => {
         openCreateModal();
     }
 
-    console.log("Results admin loaded successfully.");
-
 });

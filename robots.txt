@@ -12,3 +12,4 @@ Disallow: /assets/private/
 Disallow: /.git/
 Disallow: /node_modules/
 
+Sitemap: https://arna-jobs.web.app/sitemap.xml
