@@ -1091,8 +1091,6 @@ View Details
 // MODULE PREVIEWS (Results / Hall Tickets / Schemes)
 // =========================================
 
-const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Arna+Jobs";
-
 function previewCard(options) {
     return `
 <div class="col-12 mb-3">
