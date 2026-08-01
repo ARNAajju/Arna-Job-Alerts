@@ -464,11 +464,30 @@
                             <i class="fas fa-search position-absolute top-50 translate-middle-y text-muted ms-3" style="z-index: 5;" aria-hidden="true"></i>
                             <input type="text" id="searchInput" class="form-control ps-5 shadow-sm" placeholder="Search by name, department, category..." aria-label="Search results">
                         </div>
+                        <!-- Export CSV -->
+                        <button class="btn btn-light border text-secondary shadow-sm px-3" id="exportBtn" data-bs-toggle="tooltip" title="Export CSV" aria-label="Export CSV">
+                            <i class="fas fa-file-csv"></i>
+                        </button>
                         <!-- Refresh Button -->
                         <button class="btn btn-light border text-secondary shadow-sm px-3" id="refreshBtn" data-bs-toggle="tooltip" title="Refresh Data" aria-label="Refresh Data">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div id="bulkActionsBar" class="d-none d-flex align-items-center gap-2 flex-wrap mb-3">
+                    <button type="button" class="btn btn-outline-danger btn-sm shadow-sm" id="bulkDeleteBtn">
+                        <i class="fas fa-trash me-1"></i>Delete Selected
+                    </button>
+                    <select id="bulkStatusSelect" class="form-select form-select-sm shadow-sm" style="width: auto;" aria-label="Bulk status">
+                        <option value="Active">Active</option>
+                        <option value="Upcoming">Upcoming</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary btn-sm shadow-sm" id="bulkStatusBtn">
+                        Update Status
+                    </button>
                 </div>
 
                 <!-- Professional Filters Row -->
@@ -515,6 +534,9 @@
                     <table class="table table-hover align-middle mb-0" aria-label="Results Data Table">
                         <thead>
                             <tr>
+                                <th width="40" class="text-center" scope="col">
+                                    <input type="checkbox" id="selectAllResults" class="form-check-input" aria-label="Select all results">
+                                </th>
                                 <th width="90" class="text-center" scope="col">Thumbnail</th>
                                 <th scope="col">Result Name</th>
                                 <th scope="col">Department</th>
@@ -528,7 +550,7 @@
                             
                             <!-- 1. LOADING SPINNER STATE (Improved) -->
                             <tr id="loadingState">
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <div class="py-4">
                                         <div class="spinner-border text-primary spinner-glow mb-3" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 0.25em;">
                                             <span class="visually-hidden">Loading...</span>
@@ -543,6 +565,7 @@
 
                             <!-- 2. SKELETON LOADING (Polished) -->
                             <tr class="placeholder-glow d-none" id="skeletonLoading" aria-hidden="true">
+                                <td class="text-center py-3"><span class="placeholder rounded bg-secondary opacity-25" style="width:18px; height:18px;"></span></td>
                                 <td class="text-center py-3"><span class="placeholder rounded-3 bg-secondary opacity-25" style="width: 48px; height: 48px;"></span></td>
                                 <td class="py-3">
                                     <span class="placeholder col-8 rounded-pill bg-secondary opacity-50 mb-1"></span>
@@ -563,7 +586,7 @@
 
                             <!-- 3. EMPTY STATE (Upgraded) -->
                             <tr id="emptyState" class="d-none">
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <div class="py-4">
                                         <div class="mb-4">
                                             <div class="bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm" style="width: 110px; height: 110px;">
@@ -581,7 +604,7 @@
 
                             <!-- 4. ERROR ALERT SECTION (New) -->
                             <tr id="errorState" class="d-none">
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <div class="alert alert-danger d-inline-block shadow-sm rounded-4 px-5 py-4 border-0" style="max-width: 500px; background-color: #fef2f2;">
                                         <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
                                             <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
