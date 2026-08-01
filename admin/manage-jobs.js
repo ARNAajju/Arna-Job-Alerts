@@ -127,35 +127,41 @@ function renderTable() {
     const pageData = filteredJobs.slice(start, start + JOBS_PER_PAGE);
 
     table.innerHTML = pageData.map((job) => `
-        <tr>
+        <tr data-job-id="${escapeHTML(job.id)}">
             <td>
                 <input
                     type="checkbox"
                     class="form-check-input job-row-select"
-                    data-id="${job.id}">
+                    data-id="${escapeHTML(job.id)}">
             </td>
             <td>
                 <img
-                    src="${job.thumbnail || "https://placehold.co/120x80?text=No+Image"}"
+                    src="${escapeHTML(job.thumbnail || "https://placehold.co/120x80?text=No+Image")}"
                     width="120"
+                    alt=""
                     style="object-fit:cover; border-radius:8px;">
             </td>
-            <td>${job.title || "-"}</td>
-            <td>${job.department || "-"}</td>
-            <td>${job.district || "-"}</td>
-            <td>${job.lastDate || "-"}</td>
+            <td>${escapeHTML(job.title || "-")}</td>
+            <td>${escapeHTML(job.department || "-")}</td>
+            <td>${escapeHTML(job.district || "-")}</td>
+            <td>${escapeHTML(job.lastDate || "-")}</td>
             <td>
-                <span class="badge bg-secondary">${job.status || "Active"}</span>
+                <span class="badge bg-secondary">${escapeHTML(job.status || "Active")}</span>
             </td>
-            <td>
-                <a class="btn btn-sm btn-primary" href="../job.html?id=${job.id}">
+            <td class="job-actions">
+                <a class="btn btn-sm btn-primary" href="../job.html?id=${encodeURIComponent(job.id)}">
                     View
                 </a>
                 <a class="btn btn-sm btn-warning" href="add-job-card.html?edit=${encodeURIComponent(job.id)}">
                     Edit
                 </a>
-                <button class="btn btn-sm btn-danger" onclick="deleteJob('${job.id}')">
-                    Delete
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    data-action="delete-job"
+                    data-id="${escapeHTML(job.id)}"
+                    ${deletingJobId === job.id ? "disabled" : ""}>
+                    ${deletingJobId === job.id ? "Deleting..." : "Delete"}
                 </button>
             </td>
         </tr>
@@ -199,30 +205,51 @@ function loadJobsRealtime() {
     });
 }
 
-window.deleteJob = async (id) => {
-    if (!confirm("Are you sure you want to delete this job?")) return;
+async function deleteJob(id) {
+    const job = allJobs.find((item) => item.id === id);
+    const title = job?.title || id;
+
+    if (!confirm(`Delete this job?\n\n${title}`)) return;
+
+    deletingJobId = id;
+    renderTable();
 
     try {
         await deleteDoc(doc(db, "jobs", id));
+        await logActivity({
+            action: "delete",
+            module: "jobs",
+            title,
+            details: `Deleted job ${id}`
+        });
     } catch (error) {
         console.error("Error deleting job:", error);
-        alert("Failed to delete job.");
+        alert("Failed to delete job.\n\n" + (error.message || "Unknown error"));
+    } finally {
+        deletingJobId = null;
+        renderTable();
     }
-};
+}
 
 async function bulkDeleteJobs() {
     const ids = getSelectedIds();
     if (ids.length === 0) return;
 
-    if (!confirm(`Delete ${ids.length} selected job(s)?`)) return;
+    if (!confirm(`Delete ${ids.length} selected job(s)? This cannot be undone.`)) return;
 
     try {
         await Promise.all(
             ids.map((id) => deleteDoc(doc(db, "jobs", id)))
         );
+        await logActivity({
+            action: "bulk-delete",
+            module: "jobs",
+            title: `${ids.length} jobs`,
+            details: ids.join(", ")
+        });
     } catch (error) {
         console.error(error);
-        alert("Bulk delete failed.");
+        alert("Bulk delete failed.\n\n" + (error.message || "Unknown error"));
     }
 }
 
@@ -291,6 +318,16 @@ document.getElementById("selectAllJobs")?.addEventListener("change", (event) => 
 table?.addEventListener("change", (event) => {
     if (event.target.classList.contains("job-row-select")) {
         updateBulkBar();
+    }
+});
+
+table?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-action='delete-job']");
+    if (!button) return;
+
+    const id = button.dataset.id;
+    if (id) {
+        deleteJob(id);
     }
 });
 
