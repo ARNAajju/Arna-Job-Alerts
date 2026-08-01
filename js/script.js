@@ -10,7 +10,6 @@ import {
     normalizeJobCategory,
     normalizeJobRecord,
     escapeHTML,
-    isPubliclyVisible,
     IMAGE_FALLBACK
 } from "./job-utils.js";
 
@@ -28,6 +27,29 @@ let filteredJobs = [];
 
 const currentDate = new Date();
 const todayString = currentDate.toISOString().split("T")[0];
+
+/**
+ * Homepage-only visibility: Active/Upcoming jobs always render.
+ * Draft/Closed/Scheduled/Expired stay hidden.
+ */
+function isHomepageJobVisible(job = {}) {
+    const status = String(job.status || "").toLowerCase();
+
+    if (
+        status === "draft" ||
+        status === "scheduled" ||
+        status === "expired" ||
+        status === "closed"
+    ) {
+        return false;
+    }
+
+    if (status === "active" || status === "upcoming") {
+        return true;
+    }
+
+    return job.published !== false;
+}
 
 // Load Jobs
 
@@ -131,7 +153,7 @@ async function loadJobs() {
                 ...doc.data()
             });
 
-            if (isPubliclyVisible(record)) {
+            if (isHomepageJobVisible(record)) {
                 jobs.push(record);
             }
 
