@@ -229,25 +229,37 @@ function renderTable() {
 function loadJobsRealtime() {
     if (!table) return;
 
+    if (typeof jobsUnsubscribe === "function") {
+        jobsUnsubscribe();
+        jobsUnsubscribe = null;
+    }
+
+    setJobsSyncStatus("loading");
     table.innerHTML = `
         <tr>
-            <td colspan="8" class="text-center py-4">Loading jobs...</td>
+            <td colspan="8" class="text-center py-4">Loading jobs from Firestore...</td>
         </tr>`;
 
-    onSnapshot(collection(db, "jobs"), (snapshot) => {
+    jobsUnsubscribe = onSnapshot(collection(db, "jobs"), (snapshot) => {
         allJobs = snapshot.docs.map((jobDoc) => ({
             id: jobDoc.id,
             ...jobDoc.data()
         }));
+        setJobsSyncStatus("live", `${allJobs.length} job(s)`);
         applyFilters();
     }, (error) => {
         console.error("Error loading jobs:", error);
+        setJobsSyncStatus("error", error.message || "Failed to sync jobs");
         table.innerHTML = `
             <tr>
                 <td colspan="8" class="text-center text-danger py-4">
-                    Failed to load jobs.
+                    Failed to load jobs from Firestore.
+                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="retryJobsSync">
+                        Retry
+                    </button>
                 </td>
             </tr>`;
+        document.getElementById("retryJobsSync")?.addEventListener("click", loadJobsRealtime);
     });
 }
 
@@ -476,7 +488,7 @@ document.getElementById("bulkUpdateJobs")?.addEventListener("click", bulkUpdateJ
 document.getElementById("bulkPublishJobs")?.addEventListener("click", () => bulkSetPublished(true));
 document.getElementById("bulkUnpublishJobs")?.addEventListener("click", () => bulkSetPublished(false));
 document.getElementById("refreshJobs")?.addEventListener("click", () => {
-    applyFilters();
+    loadJobsRealtime();
 });
 
 loadJobsRealtime();
