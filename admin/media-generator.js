@@ -94,6 +94,9 @@ async function loadSelectedJob() {
     if (job.instagramCaption) setValue("instagramCaption", job.instagramCaption);
     if (job.telegramMessage) setValue("telegramMessage", job.telegramMessage);
     if (job.whatsappMessage) setValue("whatsappMessage", job.whatsappMessage);
+    if (job.facebookCaption) setValue("facebookCaption", job.facebookCaption);
+    if (job.youtubeDescription) setValue("youtubeDescription", job.youtubeDescription);
+    if (job.hashtags) setValue("hashtags", job.hashtags);
     if (job.thumbnailPrompt) setValue("thumbnailPrompt", job.thumbnailPrompt);
     if (job.seoTitle) setValue("seoTitle", job.seoTitle);
     if (job.seoDescription) setValue("seoDescription", job.seoDescription);
@@ -118,6 +121,9 @@ function copyAll() {
         "instagramCaption",
         "telegramMessage",
         "whatsappMessage",
+        "facebookCaption",
+        "youtubeDescription",
+        "hashtags",
         "seoTitle",
         "seoDescription"
     ]
@@ -143,6 +149,9 @@ async function saveToJob() {
         instagramCaption: getValue("instagramCaption"),
         telegramMessage: getValue("telegramMessage"),
         whatsappMessage: getValue("whatsappMessage"),
+        facebookCaption: getValue("facebookCaption"),
+        youtubeDescription: getValue("youtubeDescription"),
+        hashtags: getValue("hashtags"),
         seoTitle: getValue("seoTitle"),
         seoDescription: getValue("seoDescription")
     };
