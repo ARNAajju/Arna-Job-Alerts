@@ -29,6 +29,8 @@ form.addEventListener("submit", async (e) => {
     const category = document.getElementById("category").value.trim();
     const qualification = document.getElementById("qualification").value.trim();
     const salary = document.getElementById("salary").value.trim();
+    const age = document.getElementById("age")?.value.trim() || "";
+    const fee = document.getElementById("fee")?.value.trim() || "";
     const lastDate = document.getElementById("lastDate").value;
     let status = document.getElementById("status").value;
     const featured = document.getElementById("featured").value === "true";
