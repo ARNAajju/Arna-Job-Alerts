@@ -925,12 +925,16 @@ hallTicketForm.addEventListener("submit", async (e) => {
             examName: document.getElementById("examName").value.trim(),
             organisation: document.getElementById("organisation").value.trim(),
             hallTicketDate: document.getElementById("hallTicketDate").value,
+            date: document.getElementById("hallTicketDate").value,
             examDate: document.getElementById("examDate").value,
             lastDate: document.getElementById("lastDate").value,
             status: document.getElementById("status").value,
             notificationLink: document.getElementById("notificationLink").value.trim(),
             hallTicketLink: document.getElementById("hallTicketLink").value.trim(),
-            description: document.getElementById("description").value.trim()
+            downloadLink: document.getElementById("hallTicketLink").value.trim(),
+            thumbnail: (document.getElementById("thumbnail")?.value || "").trim(),
+            description: document.getElementById("description").value.trim(),
+            published: document.getElementById("status").value !== "expired"
         };
 
         if (currentEditId) {
@@ -1015,7 +1019,10 @@ tableBody.addEventListener("click", async (e) => {
         document.getElementById("lastDate").value = item.lastDate || "";
         document.getElementById("status").value = item.status || "active";
         document.getElementById("notificationLink").value = item.notificationLink || "";
-        document.getElementById("hallTicketLink").value = item.hallTicketLink || "";
+        document.getElementById("hallTicketLink").value = item.hallTicketLink || item.downloadLink || "";
+        if (document.getElementById("thumbnail")) {
+            document.getElementById("thumbnail").value = item.thumbnail || "";
+        }
         document.getElementById("description").value = item.description || "";
 
         addHallTicketModal.show();

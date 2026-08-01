@@ -32,6 +32,7 @@ form.addEventListener("submit", async (e) => {
     const lastDate = document.getElementById("lastDate").value;
     let status = document.getElementById("status").value;
     const featured = document.getElementById("featured").value === "true";
+    const sponsored = document.getElementById("sponsored")?.value === "true";
     const urgent = document.getElementById("urgent").value === "true";
 
     const postedDate = new Date().toISOString().split("T")[0];
@@ -52,6 +53,7 @@ form.addEventListener("submit", async (e) => {
     const apply = document.getElementById("apply").value.trim();
     const notification = document.getElementById("notification").value.trim();
     const about = document.getElementById("about").value.trim();
+    const documents = document.getElementById("documents")?.value.trim() || "";
     const vacancies = document.getElementById("vacancies").value.trim();
     const qualificationDetails = document.getElementById("qualificationDetails").value.trim();
     const selectionProcess = document.getElementById("selectionProcess").value.trim();
@@ -100,7 +102,9 @@ form.addEventListener("submit", async (e) => {
         salary,
         lastDate,
         featured,
+        sponsored,
         urgent,
+        published: status !== "Closed" && status !== "Draft",
         postedDate,
         thumbnail,
         instagram,
@@ -108,6 +112,7 @@ form.addEventListener("submit", async (e) => {
         apply,
         notification,
         about,
+        documents,
         vacancies,
         qualificationDetails,
         selectionProcess,
@@ -193,6 +198,9 @@ async function loadEditJob(id) {
         if (statusEl) statusEl.value = job.status || "Active";
 
         document.getElementById("featured").value = String(job.featured || false);
+
+        const sponsoredEl = document.getElementById("sponsored");
+        if (sponsoredEl) sponsoredEl.value = String(job.sponsored || false);
         
         const urgentEl = document.getElementById("urgent");
         if (urgentEl) urgentEl.value = String(job.urgent || false);
@@ -203,6 +211,9 @@ async function loadEditJob(id) {
         document.getElementById("instagram").value = job.instagram || "";
 
         document.getElementById("about").value = job.about || "";
+        if (document.getElementById("documents")) {
+            document.getElementById("documents").value = job.documents || "";
+        }
         document.getElementById("vacancies").value = job.vacancies || "";
         document.getElementById("qualificationDetails").value = job.qualificationDetails || "";
         document.getElementById("selectionProcess").value = job.selectionProcess || "";

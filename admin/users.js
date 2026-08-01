@@ -2,23 +2,30 @@ import {
     db,
     collection,
     getDocs,
+    deleteDoc,
+    updateDoc,
+    doc,
     query,
-    orderBy
+
+    orderBy,
+    onSnapshot
+
 } from "../js/firebase.js";
 
 const usersTable = document.getElementById("usersTable");
 const totalUsers = document.getElementById("totalUsers");
 const verifiedUsers = document.getElementById("verifiedUsers");
 const todayUsers = document.getElementById("todayUsers");
+const disabledUsers = document.getElementById("disabledUsers");
 const searchInput = document.getElementById("searchUser");
 
 let users = [];
 
 // ==========================
-// Load Users
+// Load Users (realtime)
 // ==========================
 
-async function loadUsers() {
+function loadUsers() {
 
     usersTable.innerHTML = `
         <tr>
@@ -30,41 +37,129 @@ async function loadUsers() {
         </tr>
     `;
 
+    const q = query(
+        collection(db, "users"),
+        orderBy("createdAt", "desc")
+    );
+
     try {
 
-        const q = query(
-            collection(db, "users"),
-            orderBy("createdAt", "desc")
+        onSnapshot(
+            q,
+            (snapshot) => {
+
+                users = [];
+
+                snapshot.forEach((d) => {
+
+                    users.push({
+                        id: d.id,
+                        ...d.data()
+                    });
+
+                });
+
+                applySearch();
+
+            },
+            async (error) => {
+
+                console.error(error);
+
+                // Fallback to one-shot fetch
+                try {
+
+                    const snapshot = await getDocs(q);
+
+                    users = [];
+
+                    snapshot.forEach((d) => {
+
+                        users.push({
+                            id: d.id,
+                            ...d.data()
+                        });
+
+                    });
+
+                    applySearch();
+
+                } catch (err) {
+
+                    console.error(err);
+
+                    usersTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center text-danger">
+                                Failed to Load Users
+                            </td>
+                        </tr>
+                    `;
+
+                }
+
+            }
         );
-
-        const snapshot = await getDocs(q);
-
-        users = [];
-
-        snapshot.forEach((doc) => {
-
-            users.push({
-                id: doc.id,
-                ...doc.data()
-            });
-
-        });
-
-        renderUsers(users);
 
     } catch (error) {
 
         console.error(error);
 
-        usersTable.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center text-danger">
-                    Failed to Load Users
-                </td>
-            </tr>
-        `;
+        getDocs(q)
+            .then((snapshot) => {
+
+                users = [];
+
+                snapshot.forEach((d) => {
+
+                    users.push({
+                        id: d.id,
+                        ...d.data()
+                    });
+
+                });
+
+                applySearch();
+
+            })
+            .catch((err) => {
+
+                console.error(err);
+
+                usersTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-danger">
+                            Failed to Load Users
+                        </td>
+                    </tr>
+                `;
+
+            });
 
     }
+
+}
+
+function applySearch() {
+
+    const keyword = (searchInput?.value || "").toLowerCase();
+
+    if (!keyword) {
+
+        renderUsers(users);
+        return;
+
+    }
+
+    const filtered = users.filter(user =>
+
+        (user.name || "").toLowerCase().includes(keyword) ||
+
+        (user.email || "").toLowerCase().includes(keyword)
+
+    );
+
+    renderUsers(filtered);
 
 }
 
@@ -90,20 +185,43 @@ function renderUsers(data) {
         verifiedUsers.textContent = 0;
         todayUsers.textContent = 0;
 
+        if (disabledUsers) disabledUsers.textContent = 0;
+
         return;
 
     }
 
     let verified = 0;
     let today = 0;
+    let disabled = 0;
 
     const todayDate = new Date().toLocaleDateString();
 
     data.forEach((user, index) => {
 
+        const isDisabled = user.disabled === true || user.status === "disabled";
+
         if (user.emailVerified) verified++;
 
         if (user.createdDate === todayDate) today++;
+
+        if (isDisabled) disabled++;
+
+        const statusBadges = `
+            ${
+                user.emailVerified
+                ? '<span class="badge bg-success">Verified</span>'
+                : '<span class="badge bg-danger">Not Verified</span>'
+            }
+            ${
+                isDisabled
+                ? ' <span class="badge bg-secondary">Disabled</span>'
+                : ''
+            }
+        `;
+
+        const toggleLabel = isDisabled ? "Enable" : "Disable";
+        const toggleClass = isDisabled ? "btn-success" : "btn-warning";
 
         usersTable.innerHTML += `
 
@@ -115,15 +233,7 @@ function renderUsers(data) {
 
             <td>${user.email || "-"}</td>
 
-            <td>
-
-                ${
-                    user.emailVerified
-                    ? '<span class="badge bg-success">Verified</span>'
-                    : '<span class="badge bg-danger">Not Verified</span>'
-                }
-
-            </td>
+            <td>${statusBadges}</td>
 
             <td style="font-size:12px">
 
@@ -137,13 +247,21 @@ function renderUsers(data) {
 
             </td>
 
-            <td>
+            <td class="text-nowrap">
 
                 <button
                     class="btn btn-sm btn-info me-1 viewBtn"
                     data-id="${user.id}">
 
                     View
+
+                </button>
+
+                <button
+                    class="btn btn-sm ${toggleClass} me-1 toggleBtn"
+                    data-id="${user.id}">
+
+                    ${toggleLabel}
 
                 </button>
 
@@ -167,6 +285,8 @@ function renderUsers(data) {
     verifiedUsers.textContent = verified;
     todayUsers.textContent = today;
 
+    if (disabledUsers) disabledUsers.textContent = disabled;
+
     bindButtons();
 
 }
@@ -175,21 +295,15 @@ function renderUsers(data) {
 // Search
 // ==========================
 
-searchInput.addEventListener("input", () => {
+if (searchInput) {
 
-    const keyword = searchInput.value.toLowerCase();
+    searchInput.addEventListener("input", () => {
 
-    const filtered = users.filter(user =>
+        applySearch();
 
-        (user.name || "").toLowerCase().includes(keyword) ||
+    });
 
-        (user.email || "").toLowerCase().includes(keyword)
-
-    );
-
-    renderUsers(filtered);
-
-});
+}
 
 // ==========================
 // Buttons
@@ -205,6 +319,10 @@ function bindButtons() {
 
             if (!user) return;
 
+
+            const isDisabled = user.disabled === true || user.status === "disabled";
+
+
             document.getElementById("viewName").textContent =
                 user.name || "-";
 
@@ -215,9 +333,11 @@ function bindButtons() {
                 user.uid || user.id;
 
             document.getElementById("viewStatus").textContent =
-                user.emailVerified
-                    ? "Verified"
-                    : "Not Verified";
+                isDisabled
+                    ? "Disabled"
+                    : user.emailVerified
+                        ? "Verified"
+                        : "Not Verified";
 
             document.getElementById("viewCreated").textContent =
                 user.createdDate || "-";
@@ -232,13 +352,78 @@ function bindButtons() {
 
     });
 
+    document.querySelectorAll(".toggleBtn").forEach(btn => {
+
+        btn.onclick = async () => {
+
+            const user = users.find(u => u.id === btn.dataset.id);
+
+            if (!user) return;
+
+            const isDisabled = user.disabled === true || user.status === "disabled";
+            const action = isDisabled ? "enable" : "disable";
+
+            if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+            btn.disabled = true;
+
+            try {
+
+                const ref = doc(db, "users", user.id);
+
+                if (isDisabled) {
+
+                    await updateDoc(ref, {
+                        disabled: false,
+                        status: "active"
+                    });
+
+                } else {
+
+                    await updateDoc(ref, {
+                        disabled: true,
+                        status: "disabled"
+                    });
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+                alert("Failed to update user status.");
+                btn.disabled = false;
+
+            }
+
+        };
+
+    });
+
     document.querySelectorAll(".deleteBtn").forEach(btn => {
 
-        btn.onclick = () => {
+        btn.onclick = async () => {
 
-            alert(
-                "Delete User feature will be added in next step."
-            );
+            const user = users.find(u => u.id === btn.dataset.id);
+
+            if (!user) return;
+
+            if (!confirm(`Delete user "${user.email || user.name || user.id}"?\nThis cannot be undone.`)) {
+                return;
+            }
+
+            btn.disabled = true;
+
+            try {
+
+                await deleteDoc(doc(db, "users", user.id));
+
+            } catch (error) {
+
+                console.error(error);
+                alert("Failed to delete user.");
+                btn.disabled = false;
+
+            }
 
         };
 

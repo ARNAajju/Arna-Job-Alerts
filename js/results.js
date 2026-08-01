@@ -5,6 +5,7 @@ import {
     query,
     orderBy
 } from "./firebase.js";
+import { escapeHTML, IMAGE_FALLBACK } from "./job-utils.js";
 
 const resultsContainer = document.getElementById("resultsContainer");
 const loadingState = document.getElementById("loadingState");
@@ -141,25 +142,28 @@ function renderPage(page) {
                 <div class="job-card">
                     <div class="job-image-box">
                         <img
-                            src="${result.thumbnail || "https://placehold.co/600x400?text=Result"}"
-                            alt="${getResultTitle(result)}"
-                            class="job-image">
+
+                            src="${escapeHTML(result.thumbnail || IMAGE_FALLBACK)}"
+                            alt="${escapeHTML(getResultTitle(result))}"
+                            class="job-image"
+                            onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}'">
+
                     </div>
                     <div class="job-content">
                         <h5 class="job-title">
-                            ${getResultTitle(result)}
+                            ${escapeHTML(getResultTitle(result))}
                         </h5>
                         <div class="job-info">
                             <span>
-                                🏛 ${result.department || "-"}
+                                🏛 ${escapeHTML(result.department || "-")}
                             </span>
                             <span>
-                                📅 ${getResultDate(result)}
+                                📅 ${escapeHTML(getResultDate(result))}
                             </span>
                         </div>
                         <div class="mt-3 d-grid">
                             <a
-                                href="result-details.html?id=${result.id}"
+                                href="result-details.html?id=${encodeURIComponent(result.id)}"
                                 class="btn btn-primary">
                                 View Details
                             </a>

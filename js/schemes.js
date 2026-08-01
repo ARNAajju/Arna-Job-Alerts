@@ -5,6 +5,12 @@ import {
     query,
     orderBy
 } from "./firebase.js";
+import {
+    escapeHTML,
+    IMAGE_FALLBACK as LOCAL_IMAGE_FALLBACK,
+    matchesStateFilter,
+    toSortableTime
+} from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
@@ -36,7 +42,9 @@ let filteredSchemes = [];
 const SCHEMES_PER_PAGE = 9;
 let currentPage = 1;
 
-const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Scheme";
+
+const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
+
 
 function getSchemeTitle(scheme) {
     return scheme.title || scheme.schemeName || "Government Scheme";
@@ -169,8 +177,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
-src="${getSchemeThumbnail(scheme)}"
-alt="${getSchemeTitle(scheme)}"
+
+src="${escapeHTML(getSchemeThumbnail(scheme))}"
+alt="${escapeHTML(getSchemeTitle(scheme))}"
+
 class="job-image"
 onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
@@ -180,7 +190,9 @@ onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 <h5 class="job-title">
 
-${getSchemeTitle(scheme)}
+
+${escapeHTML(getSchemeTitle(scheme))}
+
 
 </h5>
 
@@ -188,13 +200,15 @@ ${getSchemeTitle(scheme)}
 
 <span>
 
-📍 ${scheme.state || "-"}
+📍 ${escapeHTML(scheme.state || "-")}
 
 </span>
 
 <span>
 
-📅 ${getSchemeDate(scheme)}
+
+📅 ${escapeHTML(getSchemeDate(scheme))}
+
 
 </span>
 
@@ -203,7 +217,7 @@ ${getSchemeTitle(scheme)}
 <div class="mt-3 d-grid">
 
 <a
-href="scheme-details.html?id=${scheme.id}"
+href="scheme-details.html?id=${encodeURIComponent(scheme.id)}"
 class="btn btn-warning">
 
 View Details
@@ -263,7 +277,7 @@ function filterSchemes() {
 
         const matchesState =
             state === "" ||
-            scheme.state === state;
+            matchesStateFilter(scheme.state, state);
 
         return matchesKeyword && matchesState;
 
@@ -292,8 +306,8 @@ function applySorting() {
 
             filteredSchemes.sort((a, b) => {
 
-                return new Date(a.createdAt || 0) -
-                       new Date(b.createdAt || 0);
+                return toSortableTime(a.createdAt) -
+                       toSortableTime(b.createdAt);
 
             });
 
@@ -315,8 +329,8 @@ function applySorting() {
 
             filteredSchemes.sort((a, b) => {
 
-                return new Date(b.createdAt || 0) -
-                       new Date(a.createdAt || 0);
+                return toSortableTime(b.createdAt) -
+                       toSortableTime(a.createdAt);
 
             });
 

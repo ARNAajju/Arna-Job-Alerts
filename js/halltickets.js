@@ -5,6 +5,7 @@ import {
     query,
     orderBy
 } from "./firebase.js";
+import { escapeHTML, IMAGE_FALLBACK as LOCAL_IMAGE_FALLBACK } from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
@@ -56,7 +57,9 @@ function matchesDepartmentFilter(item, filter) {
 const TICKETS_PER_PAGE = 9;
 let currentPage = 1;
 
-const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Hall+Ticket";
+
+const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
+
 
 function getTicketTitle(ticket) {
     return ticket.title || ticket.examName || "Hall Ticket";
@@ -75,8 +78,11 @@ function getTicketThumbnail(ticket) {
 }
 
 function isActiveTicket(ticket) {
+
+    if (ticket.published === false) return false;
     const status = (ticket.status || "active").toLowerCase();
-    return status !== "expired" && status !== "closed";
+    return status !== "expired" && status !== "closed" && status !== "draft";
+
 }
 
 // ==========================================
@@ -185,8 +191,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
-src="${getTicketThumbnail(ticket)}"
-alt="${getTicketTitle(ticket)}"
+
+src="${escapeHTML(getTicketThumbnail(ticket))}"
+alt="${escapeHTML(getTicketTitle(ticket))}"
+
 class="job-image"
 onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
@@ -196,7 +204,9 @@ onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 <h5 class="job-title">
 
-${getTicketTitle(ticket)}
+
+${escapeHTML(getTicketTitle(ticket))}
+
 
 </h5>
 
@@ -204,13 +214,15 @@ ${getTicketTitle(ticket)}
 
 <span>
 
-🏛 ${ticket.department || "-"}
+🏛 ${escapeHTML(ticket.department || "-")}
 
 </span>
 
 <span>
 
-📅 ${getTicketDate(ticket)}
+
+📅 ${escapeHTML(getTicketDate(ticket))}
+
 
 </span>
 
@@ -219,7 +231,7 @@ ${getTicketTitle(ticket)}
 <div class="mt-3 d-grid">
 
 <a
-href="hallticket-details.html?id=${ticket.id}"
+href="hallticket-details.html?id=${encodeURIComponent(ticket.id)}"
 class="btn btn-success">
 
 View Details

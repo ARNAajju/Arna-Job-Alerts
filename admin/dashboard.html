@@ -216,6 +216,11 @@
             <a href="dashboard.html" class="active" aria-current="page"><i class="fas fa-home"></i> Dashboard</a>
             <a href="manage-jobs.html"><i class="fas fa-tasks"></i> Manage Jobs</a>
             <a href="add-job-card.html"><i class="fas fa-plus-circle"></i> Add Job</a>
+            <a href="ai-assistant.html"><i class="fas fa-robot"></i> AI Assistant</a>
+            <a href="ai-scanner.html"><i class="fas fa-broadcast-tower"></i> AI Scanner</a>
+            <a href="media-generator.html"><i class="fas fa-photo-video"></i> Media Generator</a>
+            <a href="auto-post.html"><i class="fas fa-rss"></i> Auto Post / Feeds</a>
+            <a href="monetization.html"><i class="fas fa-ad"></i> Monetization</a>
         </nav>
 
         <!-- Categories -->
@@ -236,12 +241,18 @@
             <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
         </nav>
 
-        <!-- Future Ready Placeholders (Visually distinctive but fit the workflow) -->
-        <div class="sidebar-section-title text-muted opacity-75">Future Modules</div>
-        <nav class="opacity-50" style="pointer-events: none;">
-            <a href="#" tabindex="-1"><i class="fas fa-ad"></i> Ad Campaigns <span class="badge bg-secondary ms-auto" style="font-size:0.65rem;">Soon</span></a>
-            <a href="#" tabindex="-1"><i class="fas fa-envelope-open-text"></i> Messages <span class="badge bg-secondary ms-auto" style="font-size:0.65rem;">Soon</span></a>
-            <a href="#" tabindex="-1"><i class="fas fa-headset"></i> Support Desk <span class="badge bg-secondary ms-auto" style="font-size:0.65rem;">Soon</span></a>
+        <div class="sidebar-section-title">Tools</div>
+        <nav>
+            <a href="reports.html"><i class="fas fa-file-export"></i> Reports</a>
+            <a href="backup.html"><i class="fas fa-database"></i> Backup &amp; Restore</a>
+            <a href="activity-logs.html"><i class="fas fa-list"></i> Activity Logs</a>
+            <a href="content-tools.html"><i class="fas fa-tools"></i> Content Tools</a>
+        </nav>
+
+        <!-- System Status -->
+        <div class="sidebar-section-title">System</div>
+        <nav>
+            <a href="analytics.html"><i class="fas fa-heartbeat"></i> Health & Analytics</a>
         </nav>
 
         <hr class="border-secondary my-4 opacity-25">
@@ -272,6 +283,104 @@
                 </a>
             </div>
         </header>
+
+        <!-- System Health / Sync Status -->
+        <section class="row g-3 mb-4" aria-label="System Status">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted fw-semibold">Firebase</span>
+                            <span id="firebaseStatus" class="badge bg-success">Online</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted fw-semibold">Database</span>
+                            <span id="databaseStatus" class="badge bg-success">Connected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted fw-semibold">Auth</span>
+                            <span id="authStatus" class="badge bg-success">Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small text-muted fw-semibold">Last Sync</span>
+                            <span id="lastSyncTime" class="small fw-bold text-dark">--:--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3 text-center">
+                        <div class="small text-muted">Today Jobs</div>
+                        <div id="todayJobsCount" class="fw-bold fs-5">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3 text-center">
+                        <div class="small text-muted">Today Results</div>
+                        <div id="todayResultsCount" class="fw-bold fs-5">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3 text-center">
+                        <div class="small text-muted">Today Hall Tickets</div>
+                        <div id="todayHallCount" class="fw-bold fs-5">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3 text-center">
+                        <div class="small text-muted">Today Schemes</div>
+                        <div id="todaySchemeCount" class="fw-bold fs-5">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted">Storage / Media</div>
+                            <div class="fw-semibold">Cloudinary + Firestore</div>
+                        </div>
+                        <span id="storageStatus" class="badge bg-primary">Active</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted">Server / Realtime</div>
+                            <div class="fw-semibold">Firestore Listeners</div>
+                        </div>
+                        <span id="serverStatus" class="badge bg-success">Realtime</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Top Metrics Cards -->
         <section class="row g-4 mb-5" aria-label="Key Statistics">

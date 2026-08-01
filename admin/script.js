@@ -1,13 +1,1 @@
-document
-
-.getElementById("publishBtn")
-
-.addEventListener("click",()=>{
-
-alert(
-
-"Next step we will connect Firebase."
-
-);
-
-});
+// Deprecated legacy stub. Use dashboard.js / add-job.js.

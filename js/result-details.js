@@ -4,6 +4,9 @@ import {
     getDoc
 } from "./firebase.js";
 
+import { IMAGE_FALLBACK } from "./job-utils.js";
+
+
 const params = new URLSearchParams(window.location.search);
 const resultId = params.get("id");
 
@@ -34,6 +37,10 @@ function getOfficialWebsiteUrl(result) {
     return result.officialWebsite || result.officialWebsiteUrl || "#";
 }
 
+function getResultLinkUrl(result) {
+    return result.resultLink || result.applyViewResultUrl || result.officialLink || "#";
+}
+
 if (!resultId) {
     renderNotFound();
     throw new Error("No Result ID");
@@ -61,7 +68,9 @@ async function loadResult() {
         document.title = `${getResultTitle(result)} | Arna Job Alerts`;
 
         document.getElementById("thumbnail").src =
-            result.thumbnail || "https://placehold.co/600x400?text=Result";
+
+            result.thumbnail || IMAGE_FALLBACK;
+
 
         document.getElementById("title").textContent =
             getResultTitle(result);
@@ -77,6 +86,16 @@ async function loadResult() {
 
         document.getElementById("pdfBtn").href =
             getNotificationPdfUrl(result);
+
+        const resultLinkBtn = document.getElementById("resultLinkBtn");
+        if (resultLinkBtn) {
+            const link = getResultLinkUrl(result);
+            resultLinkBtn.href = link;
+            if (!link || link === "#") {
+                resultLinkBtn.classList.add("disabled");
+                resultLinkBtn.setAttribute("aria-disabled", "true");
+            }
+        }
 
         document.getElementById("officialBtn").href =
             getOfficialWebsiteUrl(result);
