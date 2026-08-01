@@ -24,16 +24,21 @@ let currentPage = 1;
 let sortField = "createdAt";
 let sortDir = "desc";
 
+function normalizeCategory(value) {
+    return (value || "").toLowerCase().trim();
+}
+
 function matchesCategory(job, selected) {
     if (!selected) return true;
 
-    const category = normalizeJobCategory(job.category || "");
-    const selectedValue = normalizeJobCategory(selected);
+    const category = normalizeCategory(normalizeJobCategory(job.category));
+    const selectedValue = normalizeCategory(normalizeJobCategory(selected));
 
-    const a = category.toLowerCase();
-    const b = selectedValue.toLowerCase();
-
-    return a === b || a.includes(b) || b.includes(a);
+    return (
+        category === selectedValue ||
+        category.includes(selectedValue) ||
+        selectedValue.includes(category)
+    );
 }
 
 function sortJobs(list) {
@@ -226,9 +231,8 @@ async function bulkUpdateJobStatus() {
     if (ids.length === 0 || !status) return;
 
     try {
-        const published = status !== "Closed" && status !== "Draft";
         await Promise.all(
-            ids.map((id) => updateDoc(doc(db, "jobs", id), { status, published }))
+            ids.map((id) => updateDoc(doc(db, "jobs", id), { status }))
         );
     } catch (error) {
         console.error(error);

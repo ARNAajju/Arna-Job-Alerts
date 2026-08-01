@@ -37,12 +37,10 @@ form.addEventListener("submit", async (e) => {
 
     const postedDate = new Date().toISOString().split("T")[0];
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
     if (lastDate) {
         const end = new Date(lastDate);
-        end.setHours(23, 59, 59, 999);
-        if (!Number.isNaN(end.getTime()) && end < today) {
+        if (end < today) {
             status = "Closed";
         }
     }
@@ -106,7 +104,7 @@ form.addEventListener("submit", async (e) => {
         featured,
         sponsored,
         urgent,
-        published: status !== "Closed" && status !== "Draft",
+        published: status !== "Closed",
         postedDate,
         thumbnail,
         instagram,
@@ -140,7 +138,7 @@ form.addEventListener("submit", async (e) => {
                 btn.textContent = "Publish Job";
             }
         } else {
-            const ref = await addDoc(
+            const docRef = await addDoc(
                 collection(db, "jobs"),
                 {
                     ...jobData,
@@ -148,13 +146,17 @@ form.addEventListener("submit", async (e) => {
                 }
             );
 
-            const publicUrl = `${window.location.origin}/job.html?id=${encodeURIComponent(ref.id)}`;
+            const jobUrl = new URL("../job.html", window.location.href);
+            jobUrl.searchParams.set("id", docRef.id);
 
             alert(
-                "✅ Job Published Successfully!\n\nShareable link:\n" +
-                publicUrl +
-                "\n\nHomepage / Latest / Category / Search will show this job."
+                "✅ Job Published Successfully!\n\nShare this link:\n" +
+                jobUrl.href
             );
+
+            if (confirm("Open the job detail page?")) {
+                window.open(jobUrl.href, "_blank");
+            }
         }
 
         form.reset();

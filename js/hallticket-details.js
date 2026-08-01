@@ -6,7 +6,6 @@ import {
 } from "./firebase.js";
 import { IMAGE_FALLBACK } from "./job-utils.js";
 
-
 function getTicketTitle(ticket) {
     return ticket.title || ticket.examName || "Hall Ticket";
 }

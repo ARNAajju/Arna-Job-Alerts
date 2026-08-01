@@ -10,10 +10,7 @@ import {
     limit
 } from "../js/firebase.js";
 
-import {
-    sanitizeText,
-    logActivity
-} from "./admin-utils.js";
+import { sanitizeText } from "./admin-utils.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -38,11 +35,11 @@ function buildCaptions({ title, department, lastDate, applyUrl }) {
 
     return {
         thumbnailPrompt: `Professional job alert thumbnail, bold text "${t}", department ${dept}, last date ${ld}, clean blue and white design, high contrast, 1280x720`,
-        instagramCaption: `📢 ${t}\n\n🏛 ${dept}\n📅 Last Date: ${ld}\n\n✅ Apply / Details:\n${link}\n\n#ArnaJobAlerts #GovtJobs #Jobs`,
+        instagramCaption: `📢 ${t}\n\n🏛 ${dept}\n📅 Last Date: ${ld}\n\n✅ Details:\n${link}\n\n#ArnaJobAlerts #GovtJobs #Jobs`,
         telegramMessage: `🔔 *${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nApply: ${link}\n\n— Arna Job Alerts`,
         whatsappMessage: `*${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nDetails: ${link}\n\nArna Job Alerts`,
         seoTitle: `${t} | Apply Online | Arna Job Alerts`,
-        seoDescription: `${t}. Department: ${dept}. Last date: ${ld}. Check eligibility, notification and apply online on Arna Job Alerts.`
+        seoDescription: `${t}. Department: ${dept}. Last date: ${ld}. Check eligibility, notification and apply online at Arna Job Alerts.`
     };
 }
 
@@ -86,8 +83,9 @@ async function loadSelectedJob() {
     setValue("lastDate", job.lastDate || "");
     setValue(
         "applyUrl",
-        job.apply || job.applyLink || job.officialWebsite ||
-        `${window.location.origin}/job.html?id=${id}`
+        job.apply ||
+            job.applyLink ||
+            `https://arna-jobs.web.app/job.html?id=${id}`
     );
 
     if (job.instagramCaption) setValue("instagramCaption", job.instagramCaption);
@@ -108,7 +106,7 @@ function generate() {
         applyUrl: getValue("applyUrl")
     });
     applyCaptions(captions);
-    $("status").textContent = "Generated from this job. Edit before saving.";
+    $("status").textContent = "Generated. Edit before saving.";
 }
 
 function copyAll() {
@@ -119,7 +117,9 @@ function copyAll() {
         "whatsappMessage",
         "seoTitle",
         "seoDescription"
-    ].map((id) => `=== ${id} ===\n${getValue(id)}`).join("\n\n");
+    ]
+        .map((id) => `=== ${id} ===\n${getValue(id)}`)
+        .join("\n\n");
 
     navigator.clipboard.writeText(blocks).then(() => {
         $("status").textContent = "Copied to clipboard.";
@@ -146,12 +146,6 @@ async function saveToJob() {
 
     try {
         await updateDoc(doc(db, "jobs", id), payload);
-        await logActivity({
-            action: "updated",
-            module: "media-generator",
-            title: getValue("title") || id,
-            details: "media captions saved"
-        });
         $("status").textContent = "Saved to job document.";
         alert("Media fields saved.");
     } catch (error) {
