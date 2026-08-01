@@ -7,17 +7,13 @@ import {
     query,
     orderBy
 } from "./firebase.js";
-import { escapeHTML, IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
+import { escapeHTML, IMAGE_FALLBACK } from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
 // SCHEME DETAILS
 // PART 1
 // ==========================================
-
-
-const IMAGE_FALLBACK = LOCAL_FB;
-
 
 function getSchemeTitle(scheme) {
     return scheme.title || scheme.schemeName || "Government Scheme";

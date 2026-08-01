@@ -5,7 +5,7 @@ import {
     query,
     orderBy
 } from "./firebase.js";
-import { escapeHTML, IMAGE_FALLBACK as LOCAL_IMAGE_FALLBACK } from "./job-utils.js";
+import { escapeHTML, IMAGE_FALLBACK } from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
@@ -57,8 +57,6 @@ function matchesDepartmentFilter(item, filter) {
 const TICKETS_PER_PAGE = 9;
 let currentPage = 1;
 
-
-const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
 
 
 function getTicketTitle(ticket) {
