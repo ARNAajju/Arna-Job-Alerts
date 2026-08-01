@@ -620,7 +620,7 @@
                                 =========================================================
                                 JS RENDER TEMPLATE REFERENCE FOR ACTION BUTTONS 
                                 Replace text actions in JS with this professional icon layout
-                                Ensure image tags use: onerror="this.onerror=null; this.src='assets/images/no-image.png';"
+                                Ensure image tags use: onerror="this.onerror=null; this.src='../assets/images/no-image.png';"
                                 =========================================================
                                 
                                 <td class="text-end pe-4">
@@ -897,7 +897,7 @@
             // Fallback error handler for any images loaded later
             document.addEventListener('error', function(event) {
                 if (event.target.tagName.toLowerCase() === 'img' && event.target.classList.contains('result-thumbnail')) {
-                    event.target.src = 'assets/images/no-image.png';
+                    event.target.src = '../assets/images/no-image.png';
                 }
             }, true);
         });

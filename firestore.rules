@@ -10,11 +10,6 @@ service cloud.firestore {
         && request.auth.token.email == 'rkarjundev@gmail.com';
     }
 
-    function isPubliclyReadable() {
-      return resource.data.published != false
-        && !(resource.data.status in ['draft', 'scheduled', 'expired', 'closed']);
-    }
-
     match /jobs/{jobId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();

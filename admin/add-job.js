@@ -19,6 +19,9 @@ window.editingJobId = null;
 // Keep existing thumbnail while editing
 let existingThumbnail = "";
 
+if (!form) {
+    console.error("Add Job form (#jobForm) was not found on this page.");
+} else {
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -189,6 +192,7 @@ form.addEventListener("submit", async (e) => {
         }
     }
 });
+} // end form guard
 
 // =============================
 // EDIT MODE

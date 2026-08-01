@@ -4,7 +4,7 @@
 // VERSION 2.0.0
 // ==========================================
 
-const CACHE_NAME = "arna-job-alerts-v2.1";
+const CACHE_NAME = "arna-job-alerts-v2.2";
 
 const urlsToCache = [
     "/",

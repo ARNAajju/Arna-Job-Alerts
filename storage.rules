@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // App uploads use Cloudinary, not Firebase Storage.
+    // Deny all Storage access unless explicitly opened later.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
