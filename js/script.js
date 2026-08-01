@@ -10,7 +10,6 @@ import {
     normalizeJobCategory,
     normalizeJobRecord,
     escapeHTML,
-    isPubliclyVisible,
     IMAGE_FALLBACK
 } from "./job-utils.js";
 
@@ -28,6 +27,29 @@ let filteredJobs = [];
 
 const currentDate = new Date();
 const todayString = currentDate.toISOString().split("T")[0];
+
+/**
+ * Homepage-only visibility: Active/Upcoming jobs always render.
+ * Draft/Closed/Scheduled/Expired stay hidden.
+ */
+function isHomepageJobVisible(job = {}) {
+    const status = String(job.status || "").toLowerCase();
+
+    if (
+        status === "draft" ||
+        status === "scheduled" ||
+        status === "expired" ||
+        status === "closed"
+    ) {
+        return false;
+    }
+
+    if (status === "active" || status === "upcoming") {
+        return true;
+    }
+
+    return job.published !== false;
+}
 
 // Load Jobs
 
@@ -131,7 +153,7 @@ async function loadJobs() {
                 ...doc.data()
             });
 
-            if (isPubliclyVisible(record)) {
+            if (isHomepageJobVisible(record)) {
                 jobs.push(record);
             }
 
@@ -157,6 +179,8 @@ async function loadJobs() {
         loadClosingSoonJobs();
 
         showTodayJobs();
+
+        applyCategoryFromHash();
 
     }
 
@@ -194,6 +218,7 @@ function removeExpiredJobs() {
         if (!job.lastDate) return true;
 
         const lastDate = new Date(job.lastDate);
+        if (Number.isNaN(lastDate.getTime())) return true;
         lastDate.setHours(23, 59, 59, 999);
 
         return lastDate >= today;
@@ -422,7 +447,9 @@ function runJobSearch() {
 
         (job.category || "").toLowerCase().includes(value) ||
 
-        (job.categoryRaw || "").toLowerCase().includes(value)
+        (job.categoryRaw || "").toLowerCase().includes(value) ||
+
+        (job.state || "").toLowerCase().includes(value)
 
     );
 
@@ -497,6 +524,21 @@ function applyCategoryFromHash() {
     const hash = window.location.hash.replace("#", "");
 
     if (!hash) return;
+
+    if (hash === "jobContainer" || hash === "todayContainer" || hash === "latestJobs") {
+        const allBtn = document.getElementById("latestJobs")
+            || document.querySelector('.category-btn[data-category="all"]');
+        if (allBtn) {
+            document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
+            allBtn.classList.add("active");
+            displayJobs(jobs);
+        }
+        const jobSection = document.getElementById("jobContainer");
+        if (jobSection) {
+            jobSection.scrollIntoView({ behavior: "smooth" });
+        }
+        return;
+    }
 
     const targetBtn = document.getElementById(hash);
 
@@ -875,13 +917,18 @@ const news=document.getElementById("breakingNews");
 
 if(!news) return;
 
+if (!jobs.length) {
+    news.textContent = "No latest jobs available right now.";
+    return;
+}
+
 news.innerHTML=
 
 jobs
 
 .slice(0,10)
 
-.map(job=>`🔥 ${job.title} | Last Date: ${job.lastDate}`)
+.map(job=>`🔥 ${escapeHTML(job.title || "Job")} | Last Date: ${escapeHTML(job.lastDate || "-")}`)
 
 .join(" ⭐ ");
 
@@ -1090,8 +1137,6 @@ View Details
 // =========================================
 // MODULE PREVIEWS (Results / Hall Tickets / Schemes)
 // =========================================
-
-const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Arna+Jobs";
 
 function previewCard(options) {
     return `
