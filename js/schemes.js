@@ -36,6 +36,33 @@ let filteredSchemes = [];
 const SCHEMES_PER_PAGE = 9;
 let currentPage = 1;
 
+const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Scheme";
+
+function getSchemeTitle(scheme) {
+    return scheme.title || scheme.schemeName || "Government Scheme";
+}
+
+function getSchemeDate(scheme) {
+    return scheme.date || scheme.publishedDate || "-";
+}
+
+function getSchemeApplyLink(scheme) {
+    return scheme.applyLink || scheme.officialLink || scheme.officialWebsite || "#";
+}
+
+function getSchemeOfficialLink(scheme) {
+    return scheme.officialWebsite || scheme.officialLink || scheme.applyLink || "#";
+}
+
+function getSchemeThumbnail(scheme) {
+    return scheme.thumbnail || IMAGE_FALLBACK;
+}
+
+function isActiveScheme(scheme) {
+    const status = (scheme.status || "active").toLowerCase();
+    return status !== "closed" && status !== "expired" && scheme.published !== false;
+}
+
 // ==========================================
 // LOAD SCHEMES
 // ==========================================
@@ -60,12 +87,14 @@ async function loadSchemes() {
 
         snapshot.forEach(doc => {
 
-            allSchemes.push({
-
+            const scheme = {
                 id: doc.id,
                 ...doc.data()
+            };
 
-            });
+            if (isActiveScheme(scheme)) {
+                allSchemes.push(scheme);
+            }
 
         });
 
@@ -140,9 +169,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
-src="${scheme.thumbnail || "assets/images/no-image.png"}"
-alt="${scheme.title || "Government Scheme"}"
-class="job-image">
+src="${getSchemeThumbnail(scheme)}"
+alt="${getSchemeTitle(scheme)}"
+class="job-image"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 </div>
 
@@ -150,7 +180,7 @@ class="job-image">
 
 <h5 class="job-title">
 
-${scheme.title || "Untitled Scheme"}
+${getSchemeTitle(scheme)}
 
 </h5>
 
@@ -164,7 +194,7 @@ ${scheme.title || "Untitled Scheme"}
 
 <span>
 
-📅 ${scheme.date || "-"}
+📅 ${getSchemeDate(scheme)}
 
 </span>
 
@@ -210,7 +240,7 @@ function filterSchemes() {
     filteredSchemes = allSchemes.filter((scheme) => {
 
         const title =
-            (scheme.title || "").toLowerCase();
+            getSchemeTitle(scheme).toLowerCase();
 
         const schemeState =
             (scheme.state || "").toLowerCase();
@@ -218,10 +248,18 @@ function filterSchemes() {
         const description =
             (scheme.description || "").toLowerCase();
 
+        const department =
+            (scheme.department || "").toLowerCase();
+
+        const category =
+            (scheme.category || "").toLowerCase();
+
         const matchesKeyword =
             title.includes(keyword) ||
             schemeState.includes(keyword) ||
-            description.includes(keyword);
+            description.includes(keyword) ||
+            department.includes(keyword) ||
+            category.includes(keyword);
 
         const matchesState =
             state === "" ||

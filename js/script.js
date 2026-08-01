@@ -1,7 +1,10 @@
 import {
     db,
     collection,
-    getDocs
+    getDocs,
+    query,
+    orderBy,
+    limit
 } from "./firebase.js";
 import {
     normalizeJobCategory,
@@ -428,6 +431,13 @@ const categoryButtons = document.querySelectorAll(".category-btn");
 categoryButtons.forEach(button => {
 
     button.addEventListener("click", () => {
+
+        const link = button.dataset.link;
+
+        if (link) {
+            window.location.href = link;
+            return;
+        }
 
         categoryButtons.forEach(btn => {
 
@@ -995,3 +1005,124 @@ View Details
 });
 
 }
+
+// =========================================
+// MODULE PREVIEWS (Results / Hall Tickets / Schemes)
+// =========================================
+
+const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Arna+Jobs";
+
+function previewCard(options) {
+    return `
+<div class="col-12 mb-3">
+<div class="job-card">
+<div class="job-content">
+<h5 class="job-title mb-2">${options.title}</h5>
+<p class="mb-2">${options.meta}</p>
+<a href="${options.href}" class="btn ${options.btnClass} w-100">View Details</a>
+</div>
+</div>
+</div>`;
+}
+
+async function loadHomeResultsPreview() {
+    const container = document.getElementById("homeResultsPreview");
+    if (!container) return;
+
+    try {
+        const snapshot = await getDocs(
+            query(collection(db, "results"), orderBy("createdAt", "desc"), limit(3))
+        );
+
+        const items = snapshot.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => item.published !== false);
+
+        if (items.length === 0) {
+            container.innerHTML = `<div class="col-12 text-muted">No results yet.</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map((item) => previewCard({
+            title: item.title || item.resultName || "Result",
+            meta: `🏛 ${item.department || "-"} · 📅 ${item.resultDate || item.date || "-"}`,
+            href: `result-details.html?id=${encodeURIComponent(item.id)}`,
+            btnClass: "btn-primary"
+        })).join("");
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = `<div class="col-12 text-danger">Unable to load results.</div>`;
+    }
+}
+
+async function loadHomeHallTicketsPreview() {
+    const container = document.getElementById("homeHallTicketsPreview");
+    if (!container) return;
+
+    try {
+        const snapshot = await getDocs(
+            query(collection(db, "halltickets"), orderBy("createdAt", "desc"), limit(6))
+        );
+
+        const items = snapshot.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => {
+                const status = (item.status || "active").toLowerCase();
+                return status !== "expired" && status !== "closed";
+            })
+            .slice(0, 3);
+
+        if (items.length === 0) {
+            container.innerHTML = `<div class="col-12 text-muted">No hall tickets yet.</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map((item) => previewCard({
+            title: item.title || item.examName || "Hall Ticket",
+            meta: `🏛 ${item.department || "-"} · 📅 ${item.date || item.hallTicketDate || item.examDate || "-"}`,
+            href: `hallticket-details.html?id=${encodeURIComponent(item.id)}`,
+            btnClass: "btn-success"
+        })).join("");
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = `<div class="col-12 text-danger">Unable to load hall tickets.</div>`;
+    }
+}
+
+async function loadHomeSchemesPreview() {
+    const container = document.getElementById("homeSchemesPreview");
+    if (!container) return;
+
+    try {
+        const snapshot = await getDocs(
+            query(collection(db, "schemes"), orderBy("createdAt", "desc"), limit(6))
+        );
+
+        const items = snapshot.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => {
+                const status = (item.status || "active").toLowerCase();
+                return status !== "closed" && status !== "expired" && item.published !== false;
+            })
+            .slice(0, 3);
+
+        if (items.length === 0) {
+            container.innerHTML = `<div class="col-12 text-muted">No schemes yet.</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map((item) => previewCard({
+            title: item.title || item.schemeName || "Scheme",
+            meta: `📍 ${item.state || "-"} · 📅 ${item.date || item.publishedDate || "-"}`,
+            href: `scheme-details.html?id=${encodeURIComponent(item.id)}`,
+            btnClass: "btn-warning"
+        })).join("");
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = `<div class="col-12 text-danger">Unable to load schemes.</div>`;
+    }
+}
+
+loadHomeResultsPreview();
+loadHomeHallTicketsPreview();
+loadHomeSchemesPreview();

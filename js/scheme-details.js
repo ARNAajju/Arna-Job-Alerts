@@ -14,6 +14,28 @@ import {
 // PART 1
 // ==========================================
 
+const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Scheme";
+
+function getSchemeTitle(scheme) {
+    return scheme.title || scheme.schemeName || "Government Scheme";
+}
+
+function getSchemeDate(scheme) {
+    return scheme.date || scheme.publishedDate || "-";
+}
+
+function getSchemeApplyLink(scheme) {
+    return scheme.applyLink || scheme.officialLink || scheme.officialWebsite || "#";
+}
+
+function getSchemeOfficialLink(scheme) {
+    return scheme.officialWebsite || scheme.officialLink || scheme.applyLink || "#";
+}
+
+function getSchemeThumbnail(scheme) {
+    return scheme.thumbnail || IMAGE_FALLBACK;
+}
+
 const params = new URLSearchParams(window.location.search);
 const schemeId = params.get("id");
 
@@ -76,25 +98,26 @@ Government Scheme Not Found.
         }
 
         const scheme = snap.data();
+        const schemeTitle = getSchemeTitle(scheme);
 
         document.title =
-            `${scheme.title || "Government Scheme"} | Arna Job Alerts`;
+            `${schemeTitle} | Arna Job Alerts`;
 
-        thumbnail.src =
-            scheme.thumbnail ||
-            "assets/images/no-image.png";
+        thumbnail.src = getSchemeThumbnail(scheme);
+        thumbnail.onerror = () => {
+            thumbnail.onerror = null;
+            thumbnail.src = IMAGE_FALLBACK;
+        };
 
-        thumbnail.alt =
-            scheme.title || "Government Scheme";
+        thumbnail.alt = schemeTitle;
 
-        title.textContent =
-            scheme.title || "-";
+        title.textContent = schemeTitle;
 
         state.textContent =
             scheme.state || "-";
 
         date.textContent =
-            scheme.date || "-";
+            getSchemeDate(scheme);
 
         eligibility.textContent =
             scheme.eligibility || "-";
@@ -119,10 +142,10 @@ Government Scheme Not Found.
             "<p>-</p>";
 
         applyBtn.href =
-            scheme.applyLink || "#";
+            getSchemeApplyLink(scheme);
 
         officialBtn.href =
-            scheme.officialWebsite || "#";
+            getSchemeOfficialLink(scheme);
 
         loadingState?.classList.add("d-none");
         schemeDetails?.classList.remove("d-none");
@@ -176,6 +199,8 @@ async function loadRelatedSchemes() {
 
             const item = docSnap.data();
 
+            if ((item.status || "").toLowerCase() === "closed") return;
+
             relatedSchemes.innerHTML += `
 
 <div class="col-lg-4 col-md-6 mb-4">
@@ -185,9 +210,10 @@ async function loadRelatedSchemes() {
 <div class="job-image-box">
 
 <img
-src="${item.thumbnail || "assets/images/no-image.png"}"
-alt="${item.title || "Scheme"}"
-class="job-image">
+src="${getSchemeThumbnail(item)}"
+alt="${getSchemeTitle(item)}"
+class="job-image"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 </div>
 
@@ -195,7 +221,7 @@ class="job-image">
 
 <h5 class="job-title">
 
-${item.title || "Untitled Scheme"}
+${getSchemeTitle(item)}
 
 </h5>
 
