@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.email == 'rkarjundev@gmail.com';
+    }
+
+    function isPubliclyReadable() {
+      return resource.data.published != false
+        && !(resource.data.status in ['draft', 'scheduled', 'expired', 'closed']);
+    }
+
+    match /jobs/{jobId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /results/{id} {
+      allow read: if resource == null || resource.data.published != false || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /halltickets/{id} {
+      allow read: if resource == null || resource.data.published != false || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /schemes/{id} {
+      allow read: if resource == null || resource.data.published != false || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /notifications/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /loginHistory/{id} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    match /activityLogs/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      // Public pages read website settings; only admin can write.
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
