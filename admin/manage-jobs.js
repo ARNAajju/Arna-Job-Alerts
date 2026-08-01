@@ -149,7 +149,7 @@ function renderTable() {
                 <a class="btn btn-sm btn-primary" href="../job.html?id=${job.id}">
                     View
                 </a>
-                <a class="btn btn-sm btn-warning" href="edit-job.html?id=${job.id}">
+                <a class="btn btn-sm btn-warning" href="add-job-card.html?edit=${encodeURIComponent(job.id)}">
                     Edit
                 </a>
                 <button class="btn btn-sm btn-danger" onclick="deleteJob('${job.id}')">

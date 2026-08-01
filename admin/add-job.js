@@ -144,9 +144,8 @@ form.addEventListener("submit", async (e) => {
             window.editingJobId = null;
             existingThumbnail = "";
 
-            if (submitBtn) {
-                submitBtn.textContent = "Publish Job";
-            }
+            window.location.href = "manage-jobs.html";
+            return;
         } else {
             const docRef = await addDoc(
                 collection(db, "jobs"),
@@ -217,6 +216,22 @@ async function loadEditJob(id) {
         }
         
         document.getElementById("district").value = job.district || "";
+
+        // Re-apply district after state options finish rebuilding.
+        requestAnimationFrame(() => {
+            const districtEl = document.getElementById("district");
+            if (!districtEl) return;
+
+            const wanted = job.district || "";
+            if (wanted && ![...districtEl.options].some((opt) => opt.value === wanted || opt.text === wanted)) {
+                const option = document.createElement("option");
+                option.value = wanted;
+                option.textContent = wanted;
+                districtEl.appendChild(option);
+            }
+            districtEl.value = wanted;
+        });
+
         document.getElementById("qualification").value = job.qualification || "";
         document.getElementById("salary").value = job.salary || "";
         document.getElementById("lastDate").value = job.lastDate || "";
@@ -251,6 +266,11 @@ async function loadEditJob(id) {
         const btn = form.querySelector("button[type='submit']");
         if (btn) {
             btn.textContent = "Update Job";
+        }
+
+        const heading = document.querySelector("h2");
+        if (heading) {
+            heading.textContent = "✏️ Edit Job";
         }
     } catch (error) {
         console.error(error);
@@ -327,7 +347,7 @@ stateSelect?.addEventListener("change", () => {
 });
 
 const params = new URLSearchParams(window.location.search);
-const editId = params.get("edit");
+const editId = params.get("edit") || params.get("id");
 
 if (editId) {
     loadEditJob(editId);
