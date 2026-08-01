@@ -49,11 +49,11 @@
 type="text"
 id="searchJob"
 class="form-control"
-placeholder="🔍 Search Jobs">
+placeholder="🔍 Search title, dept, district, category">
 
 </div>
 
-<div class="col-md-3 mb-2">
+<div class="col-md-2 mb-2">
 
 <select
 id="filterState"
@@ -73,7 +73,7 @@ class="form-select">
 
 </div>
 
-<div class="col-md-3 mb-2">
+<div class="col-md-2 mb-2">
 
 <select
 id="filterCategory"
@@ -109,6 +109,27 @@ class="form-select">
 
 <option>Walk-in</option>
 
+</select>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<select id="filterStatus" class="form-select">
+<option value="">All Status</option>
+<option value="Active">Active</option>
+<option value="Upcoming">Upcoming</option>
+<option value="Closed">Closed</option>
+</select>
+
+</div>
+
+<div class="col-md-2 mb-2">
+
+<select id="filterPublished" class="form-select">
+<option value="">All Visibility</option>
+<option value="published">Published</option>
+<option value="unpublished">Unpublished</option>
 </select>
 
 </div>
