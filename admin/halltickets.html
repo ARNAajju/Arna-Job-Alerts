@@ -492,6 +492,33 @@
 
                             </button>
 
+                            <button
+                                class="btn btn-outline-danger"
+                                id="bulkDeleteBtn">
+
+                                <i class="fas fa-trash me-2"></i>
+                                Bulk Delete
+
+                            </button>
+
+                            <select
+                                class="form-select"
+                                id="bulkStatusSelect">
+
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+
+                            </select>
+
+                            <button
+                                class="btn btn-outline-secondary"
+                                id="bulkStatusBtn">
+
+                                <i class="fas fa-sync me-2"></i>
+                                Update Status
+
+                            </button>
+
                         </div>
 
                     </div>
@@ -581,6 +608,13 @@
 
                             <tr>
 
+                                <th style="width:40px;">
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        id="selectAllHallTickets">
+                                </th>
+
                                 <th style="width:70px;">#</th>
 
                                 <th>Title</th>
@@ -661,7 +695,7 @@
         class="toast-container position-fixed bottom-0 end-0 p-3"
         id="toastContainer">
 
-        <!-- Toasts will be added dynamically -->
+        <!-- Dynamic toasts -->
 
     </div>
 
@@ -828,6 +862,14 @@
                                     <option value="expired">Expired</option>
 
                                 </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Thumbnail URL</label>
+                                <input type="url"
+                                       class="form-control"
+                                       id="thumbnail"
+                                       placeholder="https://...">
                             </div>
 
                             <div class="col-12">

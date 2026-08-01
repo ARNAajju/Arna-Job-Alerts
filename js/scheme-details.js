@@ -7,12 +7,35 @@ import {
     query,
     orderBy
 } from "./firebase.js";
+import { escapeHTML, IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
 // SCHEME DETAILS
 // PART 1
 // ==========================================
+
+const IMAGE_FALLBACK = LOCAL_FB;
+
+function getSchemeTitle(scheme) {
+    return scheme.title || scheme.schemeName || "Government Scheme";
+}
+
+function getSchemeDate(scheme) {
+    return scheme.date || scheme.publishedDate || "-";
+}
+
+function getSchemeApplyLink(scheme) {
+    return scheme.applyLink || scheme.officialLink || scheme.officialWebsite || "#";
+}
+
+function getSchemeOfficialLink(scheme) {
+    return scheme.officialWebsite || scheme.officialLink || scheme.applyLink || "#";
+}
+
+function getSchemeThumbnail(scheme) {
+    return scheme.thumbnail || IMAGE_FALLBACK;
+}
 
 const params = new URLSearchParams(window.location.search);
 const schemeId = params.get("id");
@@ -76,25 +99,26 @@ Government Scheme Not Found.
         }
 
         const scheme = snap.data();
+        const schemeTitle = getSchemeTitle(scheme);
 
         document.title =
-            `${scheme.title || "Government Scheme"} | Arna Job Alerts`;
+            `${schemeTitle} | Arna Job Alerts`;
 
-        thumbnail.src =
-            scheme.thumbnail ||
-            "assets/images/no-image.png";
+        thumbnail.src = getSchemeThumbnail(scheme);
+        thumbnail.onerror = () => {
+            thumbnail.onerror = null;
+            thumbnail.src = IMAGE_FALLBACK;
+        };
 
-        thumbnail.alt =
-            scheme.title || "Government Scheme";
+        thumbnail.alt = schemeTitle;
 
-        title.textContent =
-            scheme.title || "-";
+        title.textContent = schemeTitle;
 
         state.textContent =
             scheme.state || "-";
 
         date.textContent =
-            scheme.date || "-";
+            getSchemeDate(scheme);
 
         eligibility.textContent =
             scheme.eligibility || "-";
@@ -103,26 +127,22 @@ Government Scheme Not Found.
             scheme.benefits || "-";
 
         description.innerHTML =
-            scheme.description ||
-            "No description available.";
+            escapeHTML(scheme.description || "No description available.").replace(/\n/g, "<br>");
 
         documents.innerHTML =
-            scheme.documents ||
-            "<p>-</p>";
+            escapeHTML(scheme.documents || "-").replace(/\n/g, "<br>");
 
         howToApply.innerHTML =
-            scheme.howToApply ||
-            "<p>-</p>";
+            escapeHTML(scheme.howToApply || "-").replace(/\n/g, "<br>");
 
         importantDates.innerHTML =
-            scheme.importantDates ||
-            "<p>-</p>";
+            escapeHTML(scheme.importantDates || "-").replace(/\n/g, "<br>");
 
         applyBtn.href =
-            scheme.applyLink || "#";
+            getSchemeApplyLink(scheme);
 
         officialBtn.href =
-            scheme.officialWebsite || "#";
+            getSchemeOfficialLink(scheme);
 
         loadingState?.classList.add("d-none");
         schemeDetails?.classList.remove("d-none");
@@ -176,6 +196,9 @@ async function loadRelatedSchemes() {
 
             const item = docSnap.data();
 
+            if (item.published === false) return;
+            if ((item.status || "").toLowerCase() === "closed") return;
+
             relatedSchemes.innerHTML += `
 
 <div class="col-lg-4 col-md-6 mb-4">
@@ -185,9 +208,10 @@ async function loadRelatedSchemes() {
 <div class="job-image-box">
 
 <img
-src="${item.thumbnail || "assets/images/no-image.png"}"
-alt="${item.title || "Scheme"}"
-class="job-image">
+src="${escapeHTML(getSchemeThumbnail(item))}"
+alt="${escapeHTML(getSchemeTitle(item))}"
+class="job-image"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 </div>
 
@@ -195,7 +219,7 @@ class="job-image">
 
 <h5 class="job-title">
 
-${item.title || "Untitled Scheme"}
+${escapeHTML(getSchemeTitle(item))}
 
 </h5>
 

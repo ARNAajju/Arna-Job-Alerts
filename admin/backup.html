@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Backup & Restore | Arna Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+<body class="bg-light">
+
+<div class="container py-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h2>Backup & Restore</h2>
+
+<a href="dashboard.html" class="btn btn-secondary">
+Dashboard
+</a>
+
+</div>
+
+<!-- Full Backup -->
+<div class="card shadow mb-4">
+<div class="card-header bg-primary text-white">
+Full Backup
+</div>
+<div class="card-body">
+<p class="text-muted mb-3">
+Download a JSON backup of jobs, results, halltickets, schemes, notifications, and settings.
+</p>
+<button type="button" id="backupAllBtn" class="btn btn-success">
+Backup All
+</button>
+<span id="backupStatus" class="ms-2 text-muted small"></span>
+</div>
+</div>
+
+<!-- Restore -->
+<div class="card shadow mb-4">
+<div class="card-header bg-primary text-white">
+Restore from JSON
+</div>
+<div class="card-body">
+<p class="text-muted mb-3">
+Upload a previously exported JSON file. Documents with an <code>id</code> are merged via <code>setDoc</code>; others are added.
+</p>
+<input type="file" id="restoreFile" class="form-control mb-3" accept=".json,application/json">
+<button type="button" id="restoreBtn" class="btn btn-warning">
+Restore
+</button>
+<span id="restoreStatus" class="ms-2 text-muted small"></span>
+</div>
+</div>
+
+<!-- Import Jobs CSV -->
+<div class="card shadow mb-4">
+<div class="card-header bg-primary text-white">
+Import Jobs CSV
+</div>
+<div class="card-body">
+<p class="text-muted mb-3">
+Expected columns: title, department, category, district, state, qualification, salary, lastDate, status
+</p>
+<input type="file" id="importJobsCsv" class="form-control mb-3" accept=".csv,text/csv">
+<button type="button" id="importJobsBtn" class="btn btn-primary">
+Import Jobs
+</button>
+<span id="importStatus" class="ms-2 text-muted small"></span>
+</div>
+</div>
+
+<!-- Export individual -->
+<div class="card shadow mb-4">
+<div class="card-header bg-primary text-white">
+Export Collection JSON
+</div>
+<div class="card-body">
+<div class="d-flex flex-wrap gap-2">
+<button type="button" class="btn btn-outline-primary export-collection" data-collection="jobs">Export Jobs</button>
+<button type="button" class="btn btn-outline-primary export-collection" data-collection="results">Export Results</button>
+<button type="button" class="btn btn-outline-primary export-collection" data-collection="halltickets">Export Hall Tickets</button>
+<button type="button" class="btn btn-outline-primary export-collection" data-collection="schemes">Export Schemes</button>
+<button type="button" class="btn btn-outline-primary export-collection" data-collection="notifications">Export Notifications</button>
+<button type="button" class="btn btn-outline-primary export-collection" data-collection="settings">Export Settings</button>
+</div>
+</div>
+</div>
+
+</div>
+
+<script type="module" src="backup.js"></script>
+<script type="module" src="auth.js"></script>
+
+</body>
+</html>

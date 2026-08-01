@@ -24,7 +24,7 @@
 
 <div class="row mb-4">
 
-<div class="col-md-4 mb-2">
+<div class="col-md-3 mb-2">
 
 <input
 type="text"
@@ -34,7 +34,7 @@ placeholder="🔍 Search Jobs">
 
 </div>
 
-<div class="col-md-4 mb-2">
+<div class="col-md-3 mb-2">
 
 <select
 id="filterState"
@@ -54,7 +54,7 @@ class="form-select">
 
 </div>
 
-<div class="col-md-4 mb-2">
+<div class="col-md-3 mb-2">
 
 <select
 id="filterCategory"
@@ -62,11 +62,11 @@ class="form-select">
 
 <option value="">All Categories</option>
 
-<option>AP Government</option>
+<option>AP Jobs</option>
 
-<option>TS Government</option>
+<option>TS Jobs</option>
 
-<option>Central Government</option>
+<option>Central Jobs</option>
 
 <option>Railway</option>
 
@@ -84,6 +84,36 @@ class="form-select">
 
 </div>
 
+<div class="col-md-2 mb-2">
+
+<select id="sortJobs" class="form-select">
+<option value="newest">Newest First</option>
+<option value="title-asc">Title A-Z</option>
+<option value="title-desc">Title Z-A</option>
+<option value="lastDate">Last Date</option>
+</select>
+
+</div>
+
+<div class="col-md-1 mb-2">
+
+<button id="refreshJobs" class="btn btn-outline-secondary w-100" type="button">
+↻
+</button>
+
+</div>
+
+</div>
+
+<div id="jobsBulkBar" class="d-none alert alert-light border d-flex flex-wrap align-items-center gap-2 mb-3">
+    <strong>Bulk Actions:</strong>
+    <select id="bulkJobStatus" class="form-select form-select-sm" style="width:auto;">
+        <option value="Active">Active</option>
+        <option value="Upcoming">Upcoming</option>
+        <option value="Closed">Closed</option>
+    </select>
+    <button id="bulkUpdateJobs" class="btn btn-sm btn-primary" type="button">Update Status</button>
+    <button id="bulkDeleteJobs" class="btn btn-sm btn-danger" type="button">Delete Selected</button>
 </div>
 
 <div class="card shadow">
@@ -95,6 +125,10 @@ class="form-select">
 <thead class="table-primary">
 
 <tr>
+
+<th>
+<input type="checkbox" id="selectAllJobs" class="form-check-input">
+</th>
 
 <th>Thumbnail</th>
 
@@ -151,8 +185,6 @@ Next ➡
 </div>
 
 </div>
-
-<script type="module" src="dashboard.js"></script>
 
 <script type="module" src="auth.js"></script>
 

@@ -21,8 +21,6 @@ export async function uploadThumbnail(file) {
         throw new Error("Image upload failed. Invalid response from Cloudinary.");
     }
 
-    console.log(data); // Keep this for testing
-
     if (!response.ok || !data || !data.secure_url) {
         const message =
             data?.error?.message ||

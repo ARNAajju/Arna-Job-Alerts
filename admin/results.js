@@ -7,25 +7,26 @@ import {
     db,
     collection,
     addDoc,
-    getDocs,
     getDoc,
     updateDoc,
     deleteDoc,
     doc,
     query,
     orderBy,
+    onSnapshot,
     serverTimestamp
 } from "../js/firebase.js";
 
 const COLLECTION_NAME = "results";
 const RESULTS_PER_PAGE = 10;
-const STATE_ROW_COLSPAN = 7;
+const STATE_ROW_COLSPAN = 8;
 
 let results = [];
 let filteredResults = [];
 let currentPage = 1;
 let currentEditId = null;
 let currentDeleteId = null;
+let unsubscribeResults = null;
 
 const tableBody =
     document.getElementById("resultsTableBody") ||
@@ -97,6 +98,18 @@ const addResultBtn =
 
 const confirmDeleteBtn =
     document.getElementById("confirmDeleteBtn");
+
+const bulkActionsBar =
+    document.getElementById("bulkActionsBar");
+
+const bulkDeleteBtn =
+    document.getElementById("bulkDeleteBtn");
+
+const bulkStatusSelect =
+    document.getElementById("bulkStatusSelect");
+
+const bulkStatusBtn =
+    document.getElementById("bulkStatusBtn");
 
 const toastContainer =
     document.getElementById("toastContainer") ||
@@ -244,7 +257,7 @@ function getResultDescription(item) {
 }
 
 function getResultThumbnail(item) {
-    return item.thumbnail || "../assets/no-image.png";
+    return item.thumbnail || "../assets/images/no-image.png";
 }
 
 function getNotificationPdfUrl(item) {
@@ -631,6 +644,12 @@ function renderTable() {
         if (pagination) {
             pagination.innerHTML = "";
         }
+        const selectAllResults = document.getElementById("selectAllResults");
+        if (selectAllResults) {
+            selectAllResults.checked = false;
+            selectAllResults.indeterminate = false;
+        }
+        updateBulkActionsBar();
         renderStateRow("empty");
         return;
     }
@@ -689,11 +708,14 @@ function renderTable() {
             `
             <tr>
                 <td class="text-center">
+                    <input type="checkbox" class="form-check-input row-select" data-id="${item.id}" aria-label="Select result">
+                </td>
+                <td class="text-center">
                     <img
                         src="${escapeHTML(getResultThumbnail(item))}"
                         alt="${escapeHTML(getResultTitle(item))}"
                         class="result-thumbnail"
-                        onerror="this.onerror=null; this.src='../assets/no-image.png';">
+                        onerror="this.onerror=null; this.src='../assets/images/no-image.png';">
                 </td>
                 <td>
                     <strong>${escapeHTML(getResultTitle(item))}</strong>
@@ -746,7 +768,127 @@ function renderTable() {
 
     });
 
+    const selectAllResults = document.getElementById("selectAllResults");
+    if (selectAllResults) {
+        selectAllResults.checked = false;
+        selectAllResults.indeterminate = false;
+    }
+
+    updateBulkActionsBar();
     updatePagination(totalRecords);
+
+}
+
+function getSelectedResultIds() {
+    return [...document.querySelectorAll(".row-select:checked")]
+        .map((checkbox) => checkbox.dataset.id)
+        .filter(Boolean);
+}
+
+function updateBulkActionsBar() {
+
+    const selectedCount = getSelectedResultIds().length;
+    const selectAllResults = document.getElementById("selectAllResults");
+    const rowCheckboxes = document.querySelectorAll(".row-select");
+
+    if (bulkActionsBar) {
+        if (selectedCount > 0) {
+            bulkActionsBar.classList.remove("d-none");
+        } else {
+            bulkActionsBar.classList.add("d-none");
+        }
+    }
+
+    if (selectAllResults) {
+        selectAllResults.checked =
+            rowCheckboxes.length > 0 &&
+            selectedCount === rowCheckboxes.length;
+        selectAllResults.indeterminate =
+            selectedCount > 0 &&
+            selectedCount < rowCheckboxes.length;
+    }
+
+}
+
+async function handleBulkDelete() {
+
+    const selectedIds = getSelectedResultIds();
+
+    if (!selectedIds.length) {
+        showToast("No results selected.", "warning");
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Delete ${selectedIds.length} selected result${selectedIds.length === 1 ? "" : "s"}? This cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+        await Promise.all(
+            selectedIds.map((resultId) => {
+                return deleteDoc(doc(db, COLLECTION_NAME, resultId));
+            })
+        );
+
+        notifyResultsUpdated();
+        showToast(
+            `${selectedIds.length} result${selectedIds.length === 1 ? "" : "s"} deleted successfully.`,
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+        showToast(error.message, "danger");
+
+    }
+
+}
+
+async function handleBulkStatusUpdate() {
+
+    const selectedIds = getSelectedResultIds();
+    const status = normalizeStatus(bulkStatusSelect?.value || "");
+
+    if (!selectedIds.length) {
+        showToast("No results selected.", "warning");
+        return;
+    }
+
+    if (!status) {
+        showToast("Please select a status.", "warning");
+        return;
+    }
+
+    try {
+
+        await Promise.all(
+            selectedIds.map((resultId) => {
+                return updateDoc(
+                    doc(db, COLLECTION_NAME, resultId),
+                    {
+                        status,
+                        updatedAt: serverTimestamp()
+                    }
+                );
+            })
+        );
+
+        notifyResultsUpdated();
+        showToast(
+            `Status updated to ${status} for ${selectedIds.length} result${selectedIds.length === 1 ? "" : "s"}.`,
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+        showToast(error.message, "danger");
+
+    }
 
 }
 
@@ -944,30 +1086,47 @@ function collectResultFormData() {
 
 }
 
-async function loadResults() {
+function loadResults() {
 
     try {
 
         renderStateRow("loading");
+
+        if (unsubscribeResults) {
+            unsubscribeResults();
+            unsubscribeResults = null;
+        }
 
         const resultsQuery = query(
             collection(db, COLLECTION_NAME),
             orderBy("createdAt", "desc")
         );
 
-        const snapshot = await getDocs(resultsQuery);
+        unsubscribeResults = onSnapshot(
+            resultsQuery,
+            (snapshot) => {
 
-        results = snapshot.docs.map((snapshotDoc) => {
-            return {
-                id: snapshotDoc.id,
-                ...snapshotDoc.data()
-            };
-        });
+                results = snapshot.docs.map((snapshotDoc) => {
+                    return {
+                        id: snapshotDoc.id,
+                        ...snapshotDoc.data()
+                    };
+                });
 
-        updateStatistics();
-        populateDepartmentFilter();
-        populateCategoryFilter();
-        applyFilters();
+                updateStatistics();
+                populateDepartmentFilter();
+                populateCategoryFilter();
+                applyFilters();
+
+            },
+            (error) => {
+
+                console.error("Firestore Error:", error);
+                renderStateRow("error", `Firestore Error: ${error.message}`);
+                showToast(`Firestore Error: ${error.message}`, "danger");
+
+            }
+        );
 
     } catch (error) {
 
@@ -1026,8 +1185,6 @@ async function handleTogglePublish(resultId, currentlyPublished) {
             "success"
         );
 
-        await loadResults();
-
     } catch (error) {
 
         console.error(error);
@@ -1081,8 +1238,8 @@ function bindEvents() {
     statusFilter?.addEventListener("change", applyFilters);
     dateFilter?.addEventListener("change", applyFilters);
 
-    refreshBtn?.addEventListener("click", async () => {
-        await loadResults();
+    refreshBtn?.addEventListener("click", () => {
+        loadResults();
         showToast("Results refreshed successfully.", "success");
     });
 
@@ -1107,6 +1264,29 @@ function bindEvents() {
 
     addResultBtn?.addEventListener("click", () => {
         openCreateModal();
+    });
+
+    bulkDeleteBtn?.addEventListener("click", () => {
+        handleBulkDelete();
+    });
+
+    bulkStatusBtn?.addEventListener("click", () => {
+        handleBulkStatusUpdate();
+    });
+
+    document.getElementById("selectAllResults")
+        ?.addEventListener("change", (event) => {
+            const checked = event.target.checked;
+            document.querySelectorAll(".row-select").forEach((checkbox) => {
+                checkbox.checked = checked;
+            });
+            updateBulkActionsBar();
+        });
+
+    tableBody?.addEventListener("change", (event) => {
+        if (event.target.classList.contains("row-select")) {
+            updateBulkActionsBar();
+        }
     });
 
     resultForm?.addEventListener("submit", async (event) => {
@@ -1150,7 +1330,6 @@ function bindEvents() {
             notifyResultsUpdated();
             addResultModal?.hide();
             resetResultForm();
-            await loadResults();
 
         } catch (error) {
 
@@ -1219,7 +1398,6 @@ function bindEvents() {
 
             notifyResultsUpdated();
             showToast("Result deleted successfully.", "success");
-            await loadResults();
 
         } catch (error) {
 
@@ -1243,12 +1421,15 @@ function bindEvents() {
 
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
 
     bindEvents();
     setModalMode("create");
-    await loadResults();
+    loadResults();
 
-    console.log("Results admin loaded successfully.");
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("add") === "1") {
+        openCreateModal();
+    }
 
 });

@@ -8,14 +8,14 @@ import {
     db,
     collection,
     addDoc,
-    getDocs,
     getDoc,
     updateDoc,
     deleteDoc,
     doc,
     serverTimestamp,
     query,
-    orderBy
+    orderBy,
+    onSnapshot
 } from "../js/firebase.js";
 
 /* =========================================================
@@ -37,6 +37,9 @@ const recordsPerPage = 10;
 let currentDeleteId = null;
 let currentEditId = null;
 
+let unsubscribeHallTickets = null;
+let isFirstLoad = true;
+
 /* =========================================================
    DOM Elements
 ========================================================= */
@@ -56,6 +59,11 @@ const sortFilter = document.getElementById("sortFilter");
 const refreshBtn = document.getElementById("refreshBtn");
 const exportBtn = document.getElementById("exportBtn");
 const retryBtn = document.getElementById("retryBtn");
+
+const bulkDeleteBtn = document.getElementById("bulkDeleteBtn");
+const bulkStatusSelect = document.getElementById("bulkStatusSelect");
+const bulkStatusBtn = document.getElementById("bulkStatusBtn");
+const selectAllHallTickets = document.getElementById("selectAllHallTickets");
 
 const pageInfo = document.getElementById("pageInfo");
 const pagination = document.getElementById("pagination");
@@ -212,39 +220,88 @@ function escapeHTML(text) {
         .replace(/'/g, "&#039;");
 
 }
+
+function getSelectedIds() {
+
+    return [...document.querySelectorAll(".row-checkbox:checked")]
+        .map((checkbox) => checkbox.value);
+
+}
+
+function syncSelectAllCheckbox() {
+
+    if (!selectAllHallTickets) return;
+
+    const checkboxes = document.querySelectorAll(".row-checkbox");
+
+    if (!checkboxes.length) {
+
+        selectAllHallTickets.checked = false;
+        selectAllHallTickets.indeterminate = false;
+        return;
+
+    }
+
+    const checkedCount = document.querySelectorAll(".row-checkbox:checked").length;
+
+    selectAllHallTickets.checked = checkedCount === checkboxes.length;
+    selectAllHallTickets.indeterminate =
+        checkedCount > 0 && checkedCount < checkboxes.length;
+
+}
+
 /* =========================================================
-   Load Hall Tickets From Firestore
+   Load Hall Tickets From Firestore (Realtime)
 ========================================================= */
 
-async function loadHallTickets() {
+function loadHallTickets() {
 
     try {
 
-        showLoading();
+        if (isFirstLoad) {
+            showLoading();
+        }
+
+        if (unsubscribeHallTickets) {
+            unsubscribeHallTickets();
+            unsubscribeHallTickets = null;
+        }
 
         const q = query(
             collection(db, COLLECTION_NAME),
             orderBy("createdAt", "desc")
         );
 
-        const snapshot = await getDocs(q);
+        unsubscribeHallTickets = onSnapshot(
+            q,
+            (snapshot) => {
 
-        hallTickets = [];
+                hallTickets = [];
 
-        snapshot.forEach((document) => {
+                snapshot.forEach((document) => {
 
-            hallTickets.push({
-                id: document.id,
-                ...document.data()
-            });
+                    hallTickets.push({
+                        id: document.id,
+                        ...document.data()
+                    });
 
-        });
+                });
 
-        filteredHallTickets = [...hallTickets];
+                updateStatistics();
+                populateDepartmentFilter();
+                applyFilters({ resetPage: isFirstLoad });
 
-        updateStatistics();
-        populateDepartmentFilter();
-        renderTable();
+                isFirstLoad = false;
+
+            },
+            (error) => {
+
+                console.error("Firestore Error:", error);
+
+                showError(`Firestore Error: ${error.message}`);
+
+            }
+        );
 
     } catch (error) {
 
@@ -302,6 +359,8 @@ function updateStatistics() {
 
 function populateDepartmentFilter() {
 
+    const currentValue = departmentFilter.value;
+
     const departments = [
         ...new Set(
             hallTickets
@@ -327,13 +386,17 @@ function populateDepartmentFilter() {
 
     });
 
+    if (currentValue && departments.includes(currentValue)) {
+        departmentFilter.value = currentValue;
+    }
+
 }
 
 /* =========================================================
    Search, Filters & Sorting
 ========================================================= */
 
-function applyFilters() {
+function applyFilters({ resetPage = true } = {}) {
 
     const search = searchInput.value.trim().toLowerCase();
     const department = departmentFilter.value;
@@ -406,9 +469,172 @@ function applyFilters() {
 
     }
 
-    currentPage = 1;
+    if (resetPage) {
+        currentPage = 1;
+    }
+
+    const totalPages = Math.max(
+        1,
+        Math.ceil(filteredHallTickets.length / recordsPerPage)
+    );
+
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
 
     renderTable();
+
+}
+
+/* =========================================================
+   CSV Export
+========================================================= */
+
+function exportHallTicketsCSV() {
+
+    if (!filteredHallTickets.length) {
+
+        showToast("No records available to export.", "warning");
+        return;
+
+    }
+
+    const rows = [[
+        "title",
+        "department",
+        "examName",
+        "organisation",
+        "hallTicketDate",
+        "examDate",
+        "lastDate",
+        "status",
+        "hallTicketLink"
+    ]];
+
+    filteredHallTickets.forEach((item) => {
+
+        rows.push([
+            item.title || "",
+            item.department || "",
+            item.examName || "",
+            item.organisation || "",
+            item.hallTicketDate || "",
+            item.examDate || "",
+            item.lastDate || "",
+            item.status || "",
+            item.hallTicketLink || ""
+        ]);
+
+    });
+
+    const csvContent = rows
+        .map((row) => {
+            return row
+                .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+                .join(",");
+        })
+        .join("\n");
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "halltickets.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    showToast("CSV exported successfully.", "success");
+
+}
+
+/* =========================================================
+   Bulk Actions
+========================================================= */
+
+async function bulkDeleteHallTickets() {
+
+    const ids = getSelectedIds();
+
+    if (!ids.length) {
+
+        showToast("Select at least one hall ticket.", "warning");
+        return;
+
+    }
+
+    const confirmed = confirm(
+        `Are you sure you want to delete ${ids.length} hall ticket(s)?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+        await Promise.all(
+            ids.map((id) => deleteDoc(doc(db, COLLECTION_NAME, id)))
+        );
+
+        if (selectAllHallTickets) {
+            selectAllHallTickets.checked = false;
+            selectAllHallTickets.indeterminate = false;
+        }
+
+        showToast(`${ids.length} hall ticket(s) deleted successfully.`);
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(error.message, "danger");
+
+    }
+
+}
+
+async function bulkUpdateHallTicketStatus() {
+
+    const ids = getSelectedIds();
+    const status = bulkStatusSelect?.value || "active";
+
+    if (!ids.length) {
+
+        showToast("Select at least one hall ticket.", "warning");
+        return;
+
+    }
+
+    try {
+
+        await Promise.all(
+            ids.map((id) =>
+                updateDoc(doc(db, COLLECTION_NAME, id), { status })
+            )
+        );
+
+        if (selectAllHallTickets) {
+            selectAllHallTickets.checked = false;
+            selectAllHallTickets.indeterminate = false;
+        }
+
+        showToast(
+            `Status updated to "${status}" for ${ids.length} hall ticket(s).`
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(error.message, "danger");
+
+    }
 
 }
 
@@ -416,13 +642,13 @@ function applyFilters() {
    Event Listeners
 ========================================================= */
 
-searchInput.addEventListener("input", applyFilters);
+searchInput.addEventListener("input", () => applyFilters());
 
-departmentFilter.addEventListener("change", applyFilters);
+departmentFilter.addEventListener("change", () => applyFilters());
 
-statusFilter.addEventListener("change", applyFilters);
+statusFilter.addEventListener("change", () => applyFilters());
 
-sortFilter.addEventListener("change", applyFilters);
+sortFilter.addEventListener("change", () => applyFilters());
 
 refreshBtn.addEventListener("click", () => {
 
@@ -434,16 +660,32 @@ refreshBtn.addEventListener("click", () => {
 
 retryBtn.addEventListener("click", () => {
 
+    isFirstLoad = true;
     loadHallTickets();
 
 });
 
-exportBtn.addEventListener("click", () => {
+exportBtn.addEventListener("click", exportHallTicketsCSV);
 
-    showToast(
-        "Export feature will be added in the next update.",
-        "info"
-    );
+bulkDeleteBtn?.addEventListener("click", bulkDeleteHallTickets);
+
+bulkStatusBtn?.addEventListener("click", bulkUpdateHallTicketStatus);
+
+selectAllHallTickets?.addEventListener("change", (e) => {
+
+    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+
+        checkbox.checked = e.target.checked;
+
+    });
+
+});
+
+tableBody?.addEventListener("change", (e) => {
+
+    if (e.target.classList.contains("row-checkbox")) {
+        syncSelectAllCheckbox();
+    }
 
 });
 /* =========================================================
@@ -480,6 +722,13 @@ function renderTable() {
 
         const row = `
             <tr>
+
+                <td>
+                    <input
+                        type="checkbox"
+                        class="form-check-input row-checkbox"
+                        value="${item.id}">
+                </td>
 
                 <td>${startIndex + index + 1}</td>
 
@@ -542,6 +791,7 @@ function renderTable() {
 
     });
 
+    syncSelectAllCheckbox();
     updatePagination(totalRecords);
 
 }
@@ -675,12 +925,16 @@ hallTicketForm.addEventListener("submit", async (e) => {
             examName: document.getElementById("examName").value.trim(),
             organisation: document.getElementById("organisation").value.trim(),
             hallTicketDate: document.getElementById("hallTicketDate").value,
+            date: document.getElementById("hallTicketDate").value,
             examDate: document.getElementById("examDate").value,
             lastDate: document.getElementById("lastDate").value,
             status: document.getElementById("status").value,
             notificationLink: document.getElementById("notificationLink").value.trim(),
             hallTicketLink: document.getElementById("hallTicketLink").value.trim(),
-            description: document.getElementById("description").value.trim()
+            downloadLink: document.getElementById("hallTicketLink").value.trim(),
+            thumbnail: (document.getElementById("thumbnail")?.value || "").trim(),
+            description: document.getElementById("description").value.trim(),
+            published: document.getElementById("status").value !== "expired"
         };
 
         if (currentEditId) {
@@ -710,8 +964,6 @@ hallTicketForm.addEventListener("submit", async (e) => {
         currentEditId = null;
 
         addHallTicketModal.hide();
-
-        loadHallTickets();
 
     } catch (error) {
 
@@ -767,7 +1019,10 @@ tableBody.addEventListener("click", async (e) => {
         document.getElementById("lastDate").value = item.lastDate || "";
         document.getElementById("status").value = item.status || "active";
         document.getElementById("notificationLink").value = item.notificationLink || "";
-        document.getElementById("hallTicketLink").value = item.hallTicketLink || "";
+        document.getElementById("hallTicketLink").value = item.hallTicketLink || item.downloadLink || "";
+        if (document.getElementById("thumbnail")) {
+            document.getElementById("thumbnail").value = item.thumbnail || "";
+        }
         document.getElementById("description").value = item.description || "";
 
         addHallTicketModal.show();
@@ -813,8 +1068,6 @@ confirmDeleteBtn.addEventListener("click", async () => {
         showToast("Hall Ticket deleted successfully.");
 
         currentDeleteId = null;
-
-        loadHallTickets();
 
     } catch (error) {
 
@@ -875,12 +1128,15 @@ if (modalElement) {
    Mobile Sidebar
 ========================================================= */
 
-const menuBtn = document.getElementById("menuBtn");
+const sidebarToggle =
+    document.getElementById("sidebarToggle") ||
+    document.getElementById("menuBtn");
+
 const sidebar = document.getElementById("sidebar");
 
-if (menuBtn && sidebar) {
+if (sidebarToggle && sidebar) {
 
-    menuBtn.addEventListener("click", () => {
+    sidebarToggle.addEventListener("click", () => {
 
         sidebar.classList.toggle("show");
 
@@ -931,13 +1187,20 @@ document.addEventListener("keydown", (e) => {
    Initialize Page
 ========================================================= */
 
-async function initializePage() {
+function initializePage() {
 
     try {
 
-        await loadHallTickets();
+        loadHallTickets();
 
-        showToast("Hall Tickets loaded successfully.", "success");
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get("add") === "1") {
+
+            resetForm();
+            addHallTicketModal.show();
+
+        }
 
     } catch (error) {
 

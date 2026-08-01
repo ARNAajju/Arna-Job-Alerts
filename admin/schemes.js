@@ -8,14 +8,14 @@ import {
     db,
     collection,
     addDoc,
-    getDocs,
     getDoc,
     updateDoc,
     deleteDoc,
     doc,
     serverTimestamp,
     query,
-    orderBy
+    orderBy,
+    onSnapshot
 } from "../js/firebase.js";
 
 /* =========================================================
@@ -37,6 +37,9 @@ const recordsPerPage = 10;
 let currentDeleteId = null;
 let currentEditId = null;
 
+let unsubscribeSchemes = null;
+let isFirstLoad = true;
+
 /* =========================================================
    DOM Elements
 ========================================================= */
@@ -56,6 +59,11 @@ const statusFilter = document.getElementById("statusFilter");
 const refreshBtn = document.getElementById("refreshBtn");
 const exportBtn = document.getElementById("exportBtn");
 const retryBtn = document.getElementById("retryBtn");
+
+const bulkDeleteBtn = document.getElementById("bulkDeleteBtn");
+const bulkStatusSelect = document.getElementById("bulkStatusSelect");
+const bulkStatusBtn = document.getElementById("bulkStatusBtn");
+const selectAllSchemes = document.getElementById("selectAllSchemes");
 
 const pageInfo = document.getElementById("pageInfo");
 const pagination = document.getElementById("pagination");
@@ -213,41 +221,89 @@ function escapeHTML(text) {
         .replace(/'/g, "&#039;");
 
 }
+
+function getSelectedIds() {
+
+    return [...document.querySelectorAll(".row-checkbox:checked")]
+        .map((checkbox) => checkbox.value);
+
+}
+
+function syncSelectAllCheckbox() {
+
+    if (!selectAllSchemes) return;
+
+    const checkboxes = document.querySelectorAll(".row-checkbox");
+
+    if (!checkboxes.length) {
+
+        selectAllSchemes.checked = false;
+        selectAllSchemes.indeterminate = false;
+        return;
+
+    }
+
+    const checkedCount = document.querySelectorAll(".row-checkbox:checked").length;
+
+    selectAllSchemes.checked = checkedCount === checkboxes.length;
+    selectAllSchemes.indeterminate =
+        checkedCount > 0 && checkedCount < checkboxes.length;
+
+}
+
 /* =========================================================
-   Load Schemes From Firestore
+   Load Schemes From Firestore (Realtime)
 ========================================================= */
 
-async function loadSchemes() {
+function loadSchemes() {
 
     try {
 
-        showLoading();
+        if (isFirstLoad) {
+            showLoading();
+        }
+
+        if (unsubscribeSchemes) {
+            unsubscribeSchemes();
+            unsubscribeSchemes = null;
+        }
 
         const q = query(
             collection(db, COLLECTION_NAME),
             orderBy("createdAt", "desc")
         );
 
-        const snapshot = await getDocs(q);
+        unsubscribeSchemes = onSnapshot(
+            q,
+            (snapshot) => {
 
-        schemes = [];
+                schemes = [];
 
-        snapshot.forEach((document) => {
+                snapshot.forEach((document) => {
 
-            schemes.push({
-                id: document.id,
-                ...document.data()
-            });
+                    schemes.push({
+                        id: document.id,
+                        ...document.data()
+                    });
 
-        });
+                });
 
-        filteredSchemes = [...schemes];
+                updateStatistics();
+                populateStateFilter();
+                populateCategoryFilter();
+                applyFilters({ resetPage: isFirstLoad });
 
-        updateStatistics();
+                isFirstLoad = false;
 
-        populateStateFilter();
+            },
+            (error) => {
 
-        renderTable();
+                console.error("Firestore Error:", error);
+
+                showError(`Firestore Error: ${error.message}`);
+
+            }
+        );
 
     } catch (error) {
 
@@ -284,6 +340,8 @@ function updateStatistics() {
 
 function populateStateFilter() {
 
+    const currentValue = stateFilter.value;
+
     const states = [
         ...new Set(
             schemes
@@ -308,6 +366,10 @@ function populateStateFilter() {
 
     });
 
+    if (currentValue && states.includes(currentValue)) {
+        stateFilter.value = currentValue;
+    }
+
 }
 
 /* =========================================================
@@ -315,6 +377,8 @@ function populateStateFilter() {
 ========================================================= */
 
 function populateCategoryFilter() {
+
+    const currentValue = categoryFilter.value;
 
     const categories = [
         ...new Set(
@@ -340,12 +404,16 @@ function populateCategoryFilter() {
 
     });
 
+    if (currentValue && categories.includes(currentValue)) {
+        categoryFilter.value = currentValue;
+    }
+
 }
 /* =========================================================
    Search + Filters + Sorting
 ========================================================= */
 
-function applyFilters() {
+function applyFilters({ resetPage = true } = {}) {
 
     const search = searchInput.value.trim().toLowerCase();
     const state = stateFilter.value;
@@ -390,9 +458,168 @@ function applyFilters() {
 
     });
 
-    currentPage = 1;
+    if (resetPage) {
+        currentPage = 1;
+    }
+
+    const totalPages = Math.max(
+        1,
+        Math.ceil(filteredSchemes.length / recordsPerPage)
+    );
+
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
 
     renderTable();
+
+}
+
+/* =========================================================
+   CSV Export
+========================================================= */
+
+function exportSchemesCSV() {
+
+    if (!filteredSchemes.length) {
+
+        showToast("No records available to export.", "warning");
+        return;
+
+    }
+
+    const rows = [[
+        "schemeName",
+        "department",
+        "state",
+        "category",
+        "status",
+        "publishedDate",
+        "officialLink"
+    ]];
+
+    filteredSchemes.forEach((item) => {
+
+        rows.push([
+            item.schemeName || item.title || "",
+            item.department || "",
+            item.state || "",
+            item.category || "",
+            item.status || "",
+            item.publishedDate || "",
+            item.officialLink || ""
+        ]);
+
+    });
+
+    const csvContent = rows
+        .map((row) => {
+            return row
+                .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+                .join(",");
+        })
+        .join("\n");
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "schemes.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    showToast("CSV exported successfully.", "success");
+
+}
+
+/* =========================================================
+   Bulk Actions
+========================================================= */
+
+async function bulkDeleteSchemes() {
+
+    const ids = getSelectedIds();
+
+    if (!ids.length) {
+
+        showToast("Select at least one scheme.", "warning");
+        return;
+
+    }
+
+    const confirmed = confirm(
+        `Are you sure you want to delete ${ids.length} scheme(s)?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+        await Promise.all(
+            ids.map((id) => deleteDoc(doc(db, COLLECTION_NAME, id)))
+        );
+
+        if (selectAllSchemes) {
+            selectAllSchemes.checked = false;
+            selectAllSchemes.indeterminate = false;
+        }
+
+        showToast(`${ids.length} scheme(s) deleted successfully.`);
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(error.message, "danger");
+
+    }
+
+}
+
+async function bulkUpdateSchemeStatus() {
+
+    const ids = getSelectedIds();
+    const status = bulkStatusSelect?.value || "active";
+
+    if (!ids.length) {
+
+        showToast("Select at least one scheme.", "warning");
+        return;
+
+    }
+
+    try {
+
+        await Promise.all(
+            ids.map((id) =>
+                updateDoc(doc(db, COLLECTION_NAME, id), { status })
+            )
+        );
+
+        if (selectAllSchemes) {
+            selectAllSchemes.checked = false;
+            selectAllSchemes.indeterminate = false;
+        }
+
+        showToast(
+            `Status updated to "${status}" for ${ids.length} scheme(s).`
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(error.message, "danger");
+
+    }
 
 }
 
@@ -400,17 +627,17 @@ function applyFilters() {
    Search Event
 ========================================================= */
 
-searchInput.addEventListener("input", applyFilters);
+searchInput.addEventListener("input", () => applyFilters());
 
 /* =========================================================
    Filter Events
 ========================================================= */
 
-stateFilter.addEventListener("change", applyFilters);
+stateFilter.addEventListener("change", () => applyFilters());
 
-categoryFilter.addEventListener("change", applyFilters);
+categoryFilter.addEventListener("change", () => applyFilters());
 
-statusFilter.addEventListener("change", applyFilters);
+statusFilter.addEventListener("change", () => applyFilters());
 
 /* =========================================================
    Refresh
@@ -433,6 +660,7 @@ refreshBtn.addEventListener("click", () => {
 
 retryBtn.addEventListener("click", () => {
 
+    isFirstLoad = true;
     loadSchemes();
 
 });
@@ -441,12 +669,27 @@ retryBtn.addEventListener("click", () => {
    Export
 ========================================================= */
 
-exportBtn.addEventListener("click", () => {
+exportBtn.addEventListener("click", exportSchemesCSV);
 
-    showToast(
-        "Export feature will be available soon.",
-        "info"
-    );
+bulkDeleteBtn?.addEventListener("click", bulkDeleteSchemes);
+
+bulkStatusBtn?.addEventListener("click", bulkUpdateSchemeStatus);
+
+selectAllSchemes?.addEventListener("change", (e) => {
+
+    document.querySelectorAll(".row-checkbox").forEach((checkbox) => {
+
+        checkbox.checked = e.target.checked;
+
+    });
+
+});
+
+tableBody?.addEventListener("change", (e) => {
+
+    if (e.target.classList.contains("row-checkbox")) {
+        syncSelectAllCheckbox();
+    }
 
 });
 
@@ -493,13 +736,20 @@ function renderTable() {
 
         const thumbnail =
             item.thumbnail ||
-            "../assets/no-image.png";
+            "../assets/images/no-image.png";
 
         tableBody.insertAdjacentHTML(
             "beforeend",
 
             `
             <tr>
+
+                <td>
+                    <input
+                        type="checkbox"
+                        class="form-check-input row-checkbox"
+                        value="${item.id}">
+                </td>
 
                 <td>
                     ${startIndex + index + 1}
@@ -604,6 +854,7 @@ function renderTable() {
 
     });
 
+    syncSelectAllCheckbox();
     updatePagination(filteredSchemes.length);
 
 }
@@ -739,6 +990,7 @@ schemeForm.addEventListener("submit", async (e) => {
         const data = {
 
             schemeName: document.getElementById("schemeName").value.trim(),
+            title: document.getElementById("schemeName").value.trim(),
 
             department: document.getElementById("department").value.trim(),
 
@@ -749,12 +1001,16 @@ schemeForm.addEventListener("submit", async (e) => {
             status: document.getElementById("status").value,
 
             publishedDate: document.getElementById("publishedDate").value,
+            date: document.getElementById("publishedDate").value,
 
             thumbnail: document.getElementById("thumbnail").value.trim(),
 
             officialLink: document.getElementById("officialLink").value.trim(),
+            officialWebsite: document.getElementById("officialLink").value.trim(),
+            applyLink: document.getElementById("officialLink").value.trim(),
 
-            description: document.getElementById("description").value.trim()
+            description: document.getElementById("description").value.trim(),
+            published: document.getElementById("status").value !== "closed"
 
         };
 
@@ -786,8 +1042,6 @@ schemeForm.addEventListener("submit", async (e) => {
         currentEditId = null;
 
         addSchemeModal.hide();
-
-        loadSchemes();
 
     } catch (error) {
 
@@ -896,8 +1150,6 @@ confirmDeleteBtn.addEventListener("click", async () => {
 
         showToast("Scheme deleted successfully.");
 
-        loadSchemes();
-
     } catch (error) {
 
         console.error(error);
@@ -926,13 +1178,15 @@ document.getElementById("addSchemeModal").addEventListener("hidden.bs.modal", ()
    Add New Scheme
 ========================================================= */
 
-document.getElementById("addNewBtn")?.addEventListener("click", () => {
+const addSchemeBtn =
+    document.getElementById("addSchemeBtn") ||
+    document.getElementById("addNewBtn");
+
+addSchemeBtn?.addEventListener("click", () => {
 
     currentEditId = null;
 
     schemeForm.reset();
-
-    addSchemeModal.show();
 
 });
 
@@ -944,7 +1198,10 @@ document.getElementById("logoutBtn")?.addEventListener("click", () => {
 
     if (confirm("Are you sure you want to logout?")) {
 
-        window.location.href = "../login.html";
+        localStorage.removeItem("adminUser");
+        localStorage.removeItem("adminToken");
+
+        window.location.href = "login.html";
 
     }
 
@@ -954,12 +1211,15 @@ document.getElementById("logoutBtn")?.addEventListener("click", () => {
    Sidebar Toggle
 ========================================================= */
 
-const sidebarToggle = document.getElementById("sidebarToggle");
+const sidebarToggle =
+    document.getElementById("sidebarToggle") ||
+    document.getElementById("menuBtn");
+
 const sidebar = document.getElementById("sidebar");
 
 sidebarToggle?.addEventListener("click", () => {
 
-    sidebar.classList.toggle("show");
+    sidebar?.classList.toggle("show");
 
 });
 
@@ -972,6 +1232,7 @@ document.addEventListener("click", (e) => {
     if (
         window.innerWidth <= 992 &&
         sidebar &&
+        sidebarToggle &&
         sidebar.classList.contains("show") &&
         !sidebar.contains(e.target) &&
         !sidebarToggle.contains(e.target)
@@ -1005,8 +1266,18 @@ document.addEventListener("keydown", (e) => {
    Initial Page Load
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-    await loadSchemes();
+    loadSchemes();
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("add") === "1") {
+
+        currentEditId = null;
+        schemeForm.reset();
+        addSchemeModal.show();
+
+    }
 
 });

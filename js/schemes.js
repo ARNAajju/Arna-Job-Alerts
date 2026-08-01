@@ -5,6 +5,12 @@ import {
     query,
     orderBy
 } from "./firebase.js";
+import {
+    escapeHTML,
+    IMAGE_FALLBACK as LOCAL_IMAGE_FALLBACK,
+    matchesStateFilter,
+    toSortableTime
+} from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
@@ -36,6 +42,33 @@ let filteredSchemes = [];
 const SCHEMES_PER_PAGE = 9;
 let currentPage = 1;
 
+const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
+
+function getSchemeTitle(scheme) {
+    return scheme.title || scheme.schemeName || "Government Scheme";
+}
+
+function getSchemeDate(scheme) {
+    return scheme.date || scheme.publishedDate || "-";
+}
+
+function getSchemeApplyLink(scheme) {
+    return scheme.applyLink || scheme.officialLink || scheme.officialWebsite || "#";
+}
+
+function getSchemeOfficialLink(scheme) {
+    return scheme.officialWebsite || scheme.officialLink || scheme.applyLink || "#";
+}
+
+function getSchemeThumbnail(scheme) {
+    return scheme.thumbnail || IMAGE_FALLBACK;
+}
+
+function isActiveScheme(scheme) {
+    const status = (scheme.status || "active").toLowerCase();
+    return status !== "closed" && status !== "expired" && scheme.published !== false;
+}
+
 // ==========================================
 // LOAD SCHEMES
 // ==========================================
@@ -60,12 +93,14 @@ async function loadSchemes() {
 
         snapshot.forEach(doc => {
 
-            allSchemes.push({
-
+            const scheme = {
                 id: doc.id,
                 ...doc.data()
+            };
 
-            });
+            if (isActiveScheme(scheme)) {
+                allSchemes.push(scheme);
+            }
 
         });
 
@@ -140,9 +175,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
-src="${scheme.thumbnail || "assets/images/no-image.png"}"
-alt="${scheme.title || "Government Scheme"}"
-class="job-image">
+src="${escapeHTML(getSchemeThumbnail(scheme))}"
+alt="${escapeHTML(getSchemeTitle(scheme))}"
+class="job-image"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 </div>
 
@@ -150,7 +186,7 @@ class="job-image">
 
 <h5 class="job-title">
 
-${scheme.title || "Untitled Scheme"}
+${escapeHTML(getSchemeTitle(scheme))}
 
 </h5>
 
@@ -158,13 +194,13 @@ ${scheme.title || "Untitled Scheme"}
 
 <span>
 
-📍 ${scheme.state || "-"}
+📍 ${escapeHTML(scheme.state || "-")}
 
 </span>
 
 <span>
 
-📅 ${scheme.date || "-"}
+📅 ${escapeHTML(getSchemeDate(scheme))}
 
 </span>
 
@@ -173,7 +209,7 @@ ${scheme.title || "Untitled Scheme"}
 <div class="mt-3 d-grid">
 
 <a
-href="scheme-details.html?id=${scheme.id}"
+href="scheme-details.html?id=${encodeURIComponent(scheme.id)}"
 class="btn btn-warning">
 
 View Details
@@ -210,7 +246,7 @@ function filterSchemes() {
     filteredSchemes = allSchemes.filter((scheme) => {
 
         const title =
-            (scheme.title || "").toLowerCase();
+            getSchemeTitle(scheme).toLowerCase();
 
         const schemeState =
             (scheme.state || "").toLowerCase();
@@ -218,14 +254,22 @@ function filterSchemes() {
         const description =
             (scheme.description || "").toLowerCase();
 
+        const department =
+            (scheme.department || "").toLowerCase();
+
+        const category =
+            (scheme.category || "").toLowerCase();
+
         const matchesKeyword =
             title.includes(keyword) ||
             schemeState.includes(keyword) ||
-            description.includes(keyword);
+            description.includes(keyword) ||
+            department.includes(keyword) ||
+            category.includes(keyword);
 
         const matchesState =
             state === "" ||
-            scheme.state === state;
+            matchesStateFilter(scheme.state, state);
 
         return matchesKeyword && matchesState;
 
@@ -254,8 +298,8 @@ function applySorting() {
 
             filteredSchemes.sort((a, b) => {
 
-                return new Date(a.createdAt || 0) -
-                       new Date(b.createdAt || 0);
+                return toSortableTime(a.createdAt) -
+                       toSortableTime(b.createdAt);
 
             });
 
@@ -277,8 +321,8 @@ function applySorting() {
 
             filteredSchemes.sort((a, b) => {
 
-                return new Date(b.createdAt || 0) -
-                       new Date(a.createdAt || 0);
+                return toSortableTime(b.createdAt) -
+                       toSortableTime(a.createdAt);
 
             });
 

@@ -19,6 +19,7 @@ content="Saved Jobs, Government Jobs, AP Jobs, TS Jobs, Central Jobs">
 content="Arna Job Alerts">
 
 <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="favicon.png" type="image/png">
 
 <!-- Bootstrap -->
 
@@ -49,6 +50,19 @@ href="style.css">
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d6efd">
+
+
+    <link rel="canonical" href="https://arna-jobs.web.app/saved.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Arna Job Alerts">
+    <meta property="og:title" content="Saved Jobs | Arna Job Alerts">
+    <meta property="og:description" content="View and manage your saved government job alerts.">
+    <meta property="og:url" content="https://arna-jobs.web.app/saved.html">
+    <meta property="og:image" content="https://arna-jobs.web.app/assets/logo.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Saved Jobs | Arna Job Alerts">
+    <meta name="twitter:description" content="View and manage your saved government job alerts.">
+    <meta name="twitter:image" content="https://arna-jobs.web.app/assets/logo.png">
 
 </head>
 
@@ -94,6 +108,39 @@ id="navbar">
 href="index.html">
 
 Home
+
+</a>
+
+</li>
+
+<li class="nav-item">
+
+<a class="nav-link"
+href="results.html">
+
+Results
+
+</a>
+
+</li>
+
+<li class="nav-item">
+
+<a class="nav-link"
+href="halltickets.html">
+
+Hall Tickets
+
+</a>
+
+</li>
+
+<li class="nav-item">
+
+<a class="nav-link"
+href="schemes.html">
+
+Schemes
 
 </a>
 
@@ -434,22 +481,6 @@ BOTTOM NAVIGATION
 
 </a>
 
-<a href="saved.html" class="bottom-item active">
-
-<i class="fa-solid fa-heart"></i>
-
-<span>Saved</span>
-
-</a>
-
-<a href="index.html#searchInput" class="bottom-item">
-
-<i class="fa-solid fa-magnifying-glass"></i>
-
-<span>Search</span>
-
-</a>
-
 <a href="results.html" class="bottom-item">
 
 <i class="fa-solid fa-award"></i>
@@ -462,7 +493,23 @@ BOTTOM NAVIGATION
 
 <i class="fa-solid fa-ticket"></i>
 
-<span>Hall Tickets</span>
+<span>Tickets</span>
+
+</a>
+
+<a href="schemes.html" class="bottom-item">
+
+<i class="fa-solid fa-bullhorn"></i>
+
+<span>Schemes</span>
+
+</a>
+
+<a href="saved.html" class="bottom-item active">
+
+<i class="fa-solid fa-heart"></i>
+
+<span>Saved</span>
 
 </a>
 
@@ -485,7 +532,7 @@ if ("serviceWorker" in navigator) {
             .register("./sw.js")
             .then(() => {
 
-                console.log("Service Worker Registered");
+                
 
             })
             .catch((error) => {
@@ -499,6 +546,8 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+<script type="module" src="js/site-settings.js"></script>
+<script type="module" src="js/monetization.js"></script>
 </body>
 
 </html>

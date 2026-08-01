@@ -678,6 +678,35 @@
 
                             </button>
 
+                            <button
+                                class="btn btn-outline-danger"
+                                id="bulkDeleteBtn">
+
+                                <i class="fas fa-trash me-2"></i>
+
+                                Bulk Delete
+
+                            </button>
+
+                            <select
+                                class="form-select"
+                                id="bulkStatusSelect">
+
+                                <option value="active">Active</option>
+                                <option value="closed">Closed</option>
+
+                            </select>
+
+                            <button
+                                class="btn btn-outline-secondary"
+                                id="bulkStatusBtn">
+
+                                <i class="fas fa-sync me-2"></i>
+
+                                Update Status
+
+                            </button>
+
                         </div>
 
                     </div>
@@ -775,6 +804,13 @@
                         <thead class="table-light">
 
                             <tr>
+
+                                <th style="width:40px;">
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        id="selectAllSchemes">
+                                </th>
 
                                 <th style="width:70px;">#</th>
 

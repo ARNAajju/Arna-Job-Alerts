@@ -7,6 +7,45 @@ import {
     serverTimestamp
 } from "../js/firebase.js";
 
+function shortBrowser(ua) {
+
+    if (!ua) return "Other";
+
+    if (/Edg\//i.test(ua)) return "Edge";
+    if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua)) return "Chrome";
+    if (/Firefox\//i.test(ua)) return "Firefox";
+    if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) return "Safari";
+
+    return "Other";
+
+}
+
+function detectDevice(ua) {
+
+    if (/Mobi|Android|iPhone|iPad|iPod/i.test(ua || "")) {
+        return "mobile";
+    }
+
+    return "desktop";
+
+}
+
+function getOrCreateSessionId() {
+
+    const key = "adminSessionId";
+    let sid = sessionStorage.getItem(key);
+
+    if (!sid) {
+
+        sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        sessionStorage.setItem(key, sid);
+
+    }
+
+    return sid;
+
+}
+
 const loginForm = document.getElementById("loginForm");
 
 if (loginForm) {
@@ -36,13 +75,24 @@ if (loginForm) {
                 password
             );
 
+            const ua = navigator.userAgent;
+            const sessionId = getOrCreateSessionId();
+
             await addDoc(collection(db, "loginHistory"), {
 
                 email: userCredential.user.email,
 
+                event: "Login",
+
                 loginTime: serverTimestamp(),
 
-                browser: navigator.userAgent,
+                device: detectDevice(ua),
+
+                sessionId,
+
+                userAgent: ua,
+
+                browser: shortBrowser(ua),
 
                 platform: navigator.platform,
 

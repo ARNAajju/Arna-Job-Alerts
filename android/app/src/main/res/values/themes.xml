@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ArnaJobAlerts" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#0d6efd</item>
+        <item name="colorPrimaryVariant">#0a58ca</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:statusBarColor">#0a58ca</item>
+    </style>
+</resources>

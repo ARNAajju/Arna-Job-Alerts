@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Arna Job Alerts</title>
+    <link>https://arna-jobs.web.app/</link>
+    <description>Latest Government Jobs, Results, Hall Tickets and Schemes from Arna Job Alerts</description>
+    <language>en-in</language>
+    <lastBuildDate>Sat, 01 Aug 2026 00:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Arna Job Alerts — Latest Notifications</title>
+      <link>https://arna-jobs.web.app/index.html</link>
+      <guid isPermaLink="true">https://arna-jobs.web.app/index.html</guid>
+      <description>Visit Arna Job Alerts for the latest government job notifications. Use Admin → Auto Post to regenerate this feed from live Firestore data.</description>
+      <category>Jobs</category>
+    </item>
+  </channel>
+</rss>

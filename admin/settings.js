@@ -33,6 +33,12 @@ async function loadSettings() {
         document.getElementById("contactPhone").value = data.contactPhone || "";
         document.getElementById("whatsapp").value = data.whatsapp || "";
 
+        const supportUrl = document.getElementById("supportUrl");
+        if (supportUrl) supportUrl.value = data.supportUrl || "";
+
+        const contactAddress = document.getElementById("contactAddress");
+        if (contactAddress) contactAddress.value = data.contactAddress || "";
+
         document.getElementById("themeColor").value =
             data.themeColor || "#0d6efd";
 
@@ -58,6 +64,17 @@ async function loadSettings() {
 
         document.getElementById("adsense").value =
             data.adsense || "";
+
+        document.getElementById("bannerTop").value =
+            data.bannerTop || "";
+        document.getElementById("bannerSidebar").value =
+            data.bannerSidebar || "";
+        document.getElementById("bannerBottom").value =
+            data.bannerBottom || "";
+        document.getElementById("affiliateHtml").value =
+            data.affiliateHtml || "";
+        document.getElementById("showSponsored").checked =
+            data.showSponsored !== false;
 
         document.getElementById("robots").value =
             data.robots || "index,follow";
@@ -104,6 +121,8 @@ form.addEventListener("submit", async (e) => {
         contactEmail: document.getElementById("contactEmail").value.trim(),
         contactPhone: document.getElementById("contactPhone").value.trim(),
         whatsapp: document.getElementById("whatsapp").value.trim(),
+        supportUrl: document.getElementById("supportUrl")?.value.trim() || "",
+        contactAddress: document.getElementById("contactAddress")?.value.trim() || "",
 
         themeColor: document.getElementById("themeColor").value,
 
@@ -120,6 +139,11 @@ form.addEventListener("submit", async (e) => {
         analytics: document.getElementById("analytics").value.trim(),
         searchConsole: document.getElementById("searchConsole").value.trim(),
         adsense: document.getElementById("adsense").value.trim(),
+        bannerTop: document.getElementById("bannerTop").value.trim(),
+        bannerSidebar: document.getElementById("bannerSidebar").value.trim(),
+        bannerBottom: document.getElementById("bannerBottom").value.trim(),
+        affiliateHtml: document.getElementById("affiliateHtml").value.trim(),
+        showSponsored: document.getElementById("showSponsored").checked,
 
         robots: document.getElementById("robots").value,
 

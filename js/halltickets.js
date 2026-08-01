@@ -5,6 +5,7 @@ import {
     query,
     orderBy
 } from "./firebase.js";
+import { escapeHTML, IMAGE_FALLBACK as LOCAL_IMAGE_FALLBACK } from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
@@ -56,6 +57,30 @@ function matchesDepartmentFilter(item, filter) {
 const TICKETS_PER_PAGE = 9;
 let currentPage = 1;
 
+const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
+
+function getTicketTitle(ticket) {
+    return ticket.title || ticket.examName || "Hall Ticket";
+}
+
+function getTicketDate(ticket) {
+    return ticket.date || ticket.hallTicketDate || ticket.examDate || "-";
+}
+
+function getTicketDownloadLink(ticket) {
+    return ticket.downloadLink || ticket.hallTicketLink || ticket.notificationLink || "#";
+}
+
+function getTicketThumbnail(ticket) {
+    return ticket.thumbnail || IMAGE_FALLBACK;
+}
+
+function isActiveTicket(ticket) {
+    if (ticket.published === false) return false;
+    const status = (ticket.status || "active").toLowerCase();
+    return status !== "expired" && status !== "closed" && status !== "draft";
+}
+
 // ==========================================
 // LOAD HALL TICKETS
 // ==========================================
@@ -80,12 +105,14 @@ async function loadHallTickets() {
 
         snapshot.forEach(doc => {
 
-            allTickets.push({
-
+            const ticket = {
                 id: doc.id,
                 ...doc.data()
+            };
 
-            });
+            if (isActiveTicket(ticket)) {
+                allTickets.push(ticket);
+            }
 
         });
 
@@ -160,9 +187,10 @@ function renderPage(page) {
 <div class="job-image-box">
 
 <img
-src="${ticket.thumbnail || "assets/images/no-image.png"}"
-alt="${ticket.title || "Hall Ticket"}"
-class="job-image">
+src="${escapeHTML(getTicketThumbnail(ticket))}"
+alt="${escapeHTML(getTicketTitle(ticket))}"
+class="job-image"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}';">
 
 </div>
 
@@ -170,7 +198,7 @@ class="job-image">
 
 <h5 class="job-title">
 
-${ticket.title || "Untitled Hall Ticket"}
+${escapeHTML(getTicketTitle(ticket))}
 
 </h5>
 
@@ -178,13 +206,13 @@ ${ticket.title || "Untitled Hall Ticket"}
 
 <span>
 
-🏛 ${ticket.department || "-"}
+🏛 ${escapeHTML(ticket.department || "-")}
 
 </span>
 
 <span>
 
-📅 ${ticket.date || "-"}
+📅 ${escapeHTML(getTicketDate(ticket))}
 
 </span>
 
@@ -193,7 +221,7 @@ ${ticket.title || "Untitled Hall Ticket"}
 <div class="mt-3 d-grid">
 
 <a
-href="hallticket-details.html?id=${ticket.id}"
+href="hallticket-details.html?id=${encodeURIComponent(ticket.id)}"
 class="btn btn-success">
 
 View Details
@@ -231,7 +259,7 @@ function filterTickets() {
     filteredTickets = allTickets.filter(ticket => {
 
         const title =
-            (ticket.title || "").toLowerCase();
+            getTicketTitle(ticket).toLowerCase();
 
         const dept =
             (ticket.department || "").toLowerCase();
@@ -242,6 +270,9 @@ function filterTickets() {
         const state =
             (ticket.state || "").toLowerCase();
 
+        const examName =
+            (ticket.examName || "").toLowerCase();
+
         const keywordMatch =
 
             title.includes(keyword) ||
@@ -250,7 +281,9 @@ function filterTickets() {
 
             category.includes(keyword) ||
 
-            state.includes(keyword);
+            state.includes(keyword) ||
+
+            examName.includes(keyword);
 
         const departmentMatch =
 

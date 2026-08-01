@@ -26,7 +26,7 @@
 </h2>
 
 <a
-href="index.html"
+href="dashboard.html"
 class="btn btn-secondary">
 
 Dashboard
@@ -36,6 +36,8 @@ Dashboard
 </div>
 
 <form id="notificationForm">
+
+<input type="hidden" id="notificationId">
 
 <div class="card shadow">
 
@@ -129,6 +131,40 @@ Scheme Followers
 
 <label class="form-label">
 
+Priority
+
+</label>
+
+<select
+id="priority"
+class="form-select">
+
+<option value="low">
+
+Low
+
+</option>
+
+<option value="normal" selected>
+
+Normal
+
+</option>
+
+<option value="high">
+
+High
+
+</option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
 Notification Image (Optional)
 
 </label>
@@ -143,9 +179,10 @@ placeholder="https://...">
 
 <button
 type="submit"
+id="submitBtn"
 class="btn btn-success">
 
-🚀 Send Notification
+Send Notification
 
 </button>
 
@@ -179,9 +216,15 @@ Notification History
 
 <th>Target</th>
 
+<th>Priority</th>
+
+<th>Read</th>
+
 <th>Date</th>
 
 <th>Status</th>
+
+<th>Actions</th>
 
 </tr>
 
@@ -191,7 +234,7 @@ Notification History
 
 <tr>
 
-<td colspan="4" class="text-center">
+<td colspan="7" class="text-center">
 
 Loading...
 

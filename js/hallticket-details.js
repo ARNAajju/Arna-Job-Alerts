@@ -4,6 +4,29 @@ import {
     doc,
     getDoc
 } from "./firebase.js";
+import { IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
+
+const IMAGE_FALLBACK = LOCAL_FB;
+
+function getTicketTitle(ticket) {
+    return ticket.title || ticket.examName || "Hall Ticket";
+}
+
+function getTicketDate(ticket) {
+    return ticket.date || ticket.hallTicketDate || ticket.examDate || "-";
+}
+
+function getTicketDownloadLink(ticket) {
+    return ticket.downloadLink || ticket.hallTicketLink || ticket.notificationLink || "#";
+}
+
+function getTicketOfficialLink(ticket) {
+    return ticket.officialWebsite || ticket.notificationLink || ticket.hallTicketLink || "#";
+}
+
+function getTicketThumbnail(ticket) {
+    return ticket.thumbnail || IMAGE_FALLBACK;
+}
 
 // Get Hall Ticket ID
 const params = new URLSearchParams(window.location.search);
@@ -62,28 +85,45 @@ async function loadHallTicket() {
 
         const ticket = docSnap.data();
 
-        document.title = ticket.title + " | Arna Job Alerts";
+        if (ticket.published === false) {
+            document.body.innerHTML = `
+                <div class="container py-5 text-center">
+                    <h3>Hall Ticket Not Available</h3>
+                    <a href="halltickets.html" class="btn btn-primary mt-3">Back</a>
+                </div>`;
+            return;
+        }
 
-        document.getElementById("thumbnail").src =
-            ticket.thumbnail || "";
+        const titleText = getTicketTitle(ticket);
+
+        document.title = titleText + " | Arna Job Alerts";
+
+        const thumbnailEl = document.getElementById("thumbnail");
+        if (thumbnailEl) {
+            thumbnailEl.src = getTicketThumbnail(ticket);
+            thumbnailEl.onerror = () => {
+                thumbnailEl.onerror = null;
+                thumbnailEl.src = IMAGE_FALLBACK;
+            };
+        }
 
         document.getElementById("title").textContent =
-            ticket.title || "-";
+            titleText;
 
         document.getElementById("department").textContent =
-            ticket.department || "-";
+            ticket.department || ticket.organisation || "-";
 
         document.getElementById("date").textContent =
-            ticket.date || "-";
+            getTicketDate(ticket);
 
         document.getElementById("description").textContent =
             ticket.description || "No description available.";
 
         document.getElementById("downloadBtn").href =
-            ticket.downloadLink || "#";
+            getTicketDownloadLink(ticket);
 
         document.getElementById("officialBtn").href =
-            ticket.officialWebsite || "#";
+            getTicketOfficialLink(ticket);
 
     }
 

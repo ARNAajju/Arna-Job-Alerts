@@ -4,7 +4,10 @@ import {
     getDocs
 } from "./firebase.js";
 import {
-    normalizeJobRecord
+    normalizeJobRecord,
+    escapeHTML,
+    isPubliclyVisible,
+    IMAGE_FALLBACK
 } from "./job-utils.js";
 
 // ==========================================
@@ -71,7 +74,7 @@ async function loadSavedJobs() {
         });
 
         savedJobs = allJobs.filter(job =>
-            ids.includes(job.id)
+            ids.includes(job.id) && isPubliclyVisible(job)
         );
 
         renderJobs(savedJobs);
@@ -124,9 +127,10 @@ function renderJobs(jobs) {
 <div class="job-image-box">
 
 <img
-src="${job.thumbnail || "assets/images/no-image.png"}"
+src="${escapeHTML(job.thumbnail || IMAGE_FALLBACK)}"
 class="job-image"
-alt="${job.title}">
+alt="${escapeHTML(job.title || "")}"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}'">
 
 </div>
 
@@ -134,15 +138,15 @@ alt="${job.title}">
 
 <h5 class="job-title">
 
-${job.title}
+${escapeHTML(job.title || "")}
 
 </h5>
 
 <div class="job-info">
 
-<span>📍 ${job.district || "-"}</span>
+<span>📍 ${escapeHTML(job.district || "-")}</span>
 
-<span>🎓 ${job.qualification || "-"}</span>
+<span>🎓 ${escapeHTML(job.qualification || "-")}</span>
 
 </div>
 
@@ -150,13 +154,13 @@ ${job.title}
 
 <span class="salary">
 
-${job.salary || "-"}
+${escapeHTML(job.salary || "-")}
 
 </span>
 
 <span class="last-date">
 
-${job.lastDate || "-"}
+${escapeHTML(job.lastDate || "-")}
 
 </span>
 

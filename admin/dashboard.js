@@ -136,6 +136,18 @@ function setOnlineStatus() {
             "bg-success"
         );
 
+    const serverStatus = document.getElementById("serverStatus");
+    if (serverStatus) {
+        serverStatus.className = "badge bg-success";
+        serverStatus.textContent = "Realtime";
+    }
+
+    const storageStatus = document.getElementById("storageStatus");
+    if (storageStatus) {
+        storageStatus.className = "badge bg-primary";
+        storageStatus.textContent = "Active";
+    }
+
     updateSyncTime();
 
 }
@@ -153,6 +165,12 @@ function setOfflineStatus() {
             "bg-success",
             "bg-danger"
         );
+
+    const serverStatus = document.getElementById("serverStatus");
+    if (serverStatus) {
+        serverStatus.className = "badge bg-danger";
+        serverStatus.textContent = "Offline";
+    }
 
 }
 
@@ -332,6 +350,25 @@ setInterval(() => {
     updateSyncTime();
 
 }, 30000);
+function sortByNewest(items) {
+
+    return [...items].sort((a, b) => {
+
+        const aTime = a.createdAt?.seconds || 0;
+        const bTime = b.createdAt?.seconds || 0;
+
+        return bTime - aTime;
+
+    });
+
+}
+
+function getItemTitle(item) {
+
+    return item.title || item.resultName || item.schemeName || "-";
+
+}
+
 /* ==========================================================
    RENDER RECENT JOBS
 ========================================================== */
@@ -340,7 +377,9 @@ function renderRecentJobs() {
 
     if (!recentJobsBody) return;
 
-    if (jobs.length === 0) {
+    const latestJobs = sortByNewest(jobs).slice(0, 5);
+
+    if (latestJobs.length === 0) {
 
         recentJobsBody.innerHTML = `
             <tr>
@@ -354,9 +393,7 @@ function renderRecentJobs() {
 
     recentJobsBody.innerHTML = "";
 
-    jobs
-        .slice(0, 5)
-        .forEach(job => {
+    latestJobs.forEach(job => {
 
             recentJobsBody.innerHTML += `
 
@@ -374,7 +411,7 @@ function renderRecentJobs() {
 
                 <td>
 
-                    <strong>${job.title || "-"}</strong>
+                    <strong>${getItemTitle(job)}</strong>
 
                     <br>
 
@@ -412,7 +449,9 @@ function renderRecentResults() {
 
     if (!recentResultsBody) return;
 
-    if (results.length === 0) {
+    const latestResults = sortByNewest(results).slice(0, 5);
+
+    if (latestResults.length === 0) {
 
         recentResultsBody.innerHTML = `
         <tr>
@@ -430,9 +469,7 @@ function renderRecentResults() {
 
     recentResultsBody.innerHTML = "";
 
-    results
-        .slice(0,5)
-        .forEach(result=>{
+    latestResults.forEach(result=>{
 
         recentResultsBody.innerHTML += `
 
@@ -452,7 +489,7 @@ function renderRecentResults() {
 
                 <strong>
 
-                    ${result.title || "-"}
+                    ${getItemTitle(result)}
 
                 </strong>
 
@@ -492,7 +529,9 @@ function renderRecentHallTickets(){
 
     if(!recentHallTicketsBody) return;
 
-    if(hallTickets.length===0){
+    const latestHallTickets = sortByNewest(hallTickets).slice(0, 5);
+
+    if(latestHallTickets.length===0){
 
         recentHallTicketsBody.innerHTML=`
 
@@ -515,9 +554,7 @@ function renderRecentHallTickets(){
 
     recentHallTicketsBody.innerHTML="";
 
-    hallTickets
-    .slice(0,5)
-    .forEach(item=>{
+    latestHallTickets.forEach(item=>{
 
         recentHallTicketsBody.innerHTML += `
 
@@ -539,7 +576,7 @@ function renderRecentHallTickets(){
 
                 <strong>
 
-                    ${item.title || "-"}
+                    ${getItemTitle(item)}
 
                 </strong>
 
@@ -579,7 +616,9 @@ function renderRecentSchemes(){
 
     if(!recentSchemesBody) return;
 
-    if(schemes.length===0){
+    const latestSchemes = sortByNewest(schemes).slice(0, 5);
+
+    if(latestSchemes.length===0){
 
         recentSchemesBody.innerHTML=`
 
@@ -602,9 +641,7 @@ function renderRecentSchemes(){
 
     recentSchemesBody.innerHTML="";
 
-    schemes
-    .slice(0,5)
-    .forEach(item=>{
+    latestSchemes.forEach(item=>{
 
         recentSchemesBody.innerHTML += `
 
@@ -627,7 +664,7 @@ function renderRecentSchemes(){
 
                 <strong>
 
-                    ${item.title || "-"}
+                    ${getItemTitle(item)}
 
                 </strong>
 
@@ -731,38 +768,38 @@ function loadActivityTimeline() {
 
     const list = [];
 
-    jobs.slice(0, 3).forEach(item => {
+    sortByNewest(jobs).slice(0, 3).forEach(item => {
 
         list.push({
             type: "Job",
-            title: item.title
+            title: getItemTitle(item)
         });
 
     });
 
-    results.slice(0, 3).forEach(item => {
+    sortByNewest(results).slice(0, 3).forEach(item => {
 
         list.push({
             type: "Result",
-            title: item.title
+            title: getItemTitle(item)
         });
 
     });
 
-    hallTickets.slice(0, 2).forEach(item => {
+    sortByNewest(hallTickets).slice(0, 2).forEach(item => {
 
         list.push({
             type: "Hall Ticket",
-            title: item.title
+            title: getItemTitle(item)
         });
 
     });
 
-    schemes.slice(0, 2).forEach(item => {
+    sortByNewest(schemes).slice(0, 2).forEach(item => {
 
         list.push({
             type: "Scheme",
-            title: item.title
+            title: getItemTitle(item)
         });
 
     });
@@ -983,9 +1020,47 @@ function updateQuickStatistics() {
 
         todaySchemeCount.textContent =
             schemes.filter(x =>
-                (x.postedDate || "")
+                (x.postedDate || x.publishedDate || x.createdDate || "")
                 .startsWith(today)
             ).length;
+
+    }
+
+    const analyticsChartContainer =
+        document.getElementById("analyticsChartContainer");
+
+    if (analyticsChartContainer) {
+
+        analyticsChartContainer.innerHTML = `
+            <div class="w-100">
+                <div class="row g-3 text-center">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-white rounded-3 border">
+                            <div class="fw-bold fs-4 text-primary">${jobs.length}</div>
+                            <div class="small text-muted">Jobs</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-white rounded-3 border">
+                            <div class="fw-bold fs-4 text-success">${results.length}</div>
+                            <div class="small text-muted">Results</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-white rounded-3 border">
+                            <div class="fw-bold fs-4 text-warning">${hallTickets.length}</div>
+                            <div class="small text-muted">Hall Tickets</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-white rounded-3 border">
+                            <div class="fw-bold fs-4 text-info">${schemes.length}</div>
+                            <div class="small text-muted">Schemes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
     }
 
@@ -1051,7 +1126,5 @@ setInterval(() => {
 window.addEventListener("load", () => {
 
     initDashboard();
-
-    console.log("✅ Arna Dashboard V2 Loaded");
 
 });
