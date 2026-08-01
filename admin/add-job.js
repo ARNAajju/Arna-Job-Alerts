@@ -32,6 +32,7 @@ form.addEventListener("submit", async (e) => {
     const lastDate = document.getElementById("lastDate").value;
     let status = document.getElementById("status").value;
     const featured = document.getElementById("featured").value === "true";
+    const sponsored = document.getElementById("sponsored")?.value === "true";
     const urgent = document.getElementById("urgent").value === "true";
 
     const postedDate = new Date().toISOString().split("T")[0];
@@ -100,6 +101,7 @@ form.addEventListener("submit", async (e) => {
         salary,
         lastDate,
         featured,
+        sponsored,
         urgent,
         postedDate,
         thumbnail,
@@ -193,6 +195,9 @@ async function loadEditJob(id) {
         if (statusEl) statusEl.value = job.status || "Active";
 
         document.getElementById("featured").value = String(job.featured || false);
+
+        const sponsoredEl = document.getElementById("sponsored");
+        if (sponsoredEl) sponsoredEl.value = String(job.sponsored || false);
         
         const urgentEl = document.getElementById("urgent");
         if (urgentEl) urgentEl.value = String(job.urgent || false);

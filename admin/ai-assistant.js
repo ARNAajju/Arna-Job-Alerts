@@ -402,6 +402,7 @@ function collectJobPayload(overrides = {}) {
         apply: getValue("apply"),
         notification: getValue("notification"),
         featured: $("featured")?.value === "true",
+        sponsored: $("sponsored")?.value === "true",
         urgent: false,
         postedDate: todayISODate(),
         seoTitle: getValue("seoTitle"),
@@ -512,20 +513,31 @@ async function oneClickPublish() {
             status: "Active",
             published: true,
             featured: $("featured")?.value === "true",
+            sponsored: $("sponsored")?.value === "true",
             createdAt: serverTimestamp()
         });
 
         setValue("status", "Active");
         await addDoc(collection(db, "jobs"), payload);
+        await addDoc(collection(db, "notifications"), {
+            title: "New job published",
+            message: payload.title,
+            type: "publish",
+            priority: "high",
+            read: false,
+            createdAt: serverTimestamp()
+        });
         await logActivity({
             action: "published",
             module: "ai-assistant",
             title: payload.title
         });
-        setStatus("actionStatus", "Job published successfully.");
-        alert("Job published successfully!");
+        setStatus("actionStatus", "Job published. Homepage / feeds update automatically.");
+        alert("Job published successfully!\n\nWebsite modules update from Firestore automatically.\nUse Auto Post to download fresh RSS/Sitemap.");
 
-        if (confirm("Open Manage Jobs?")) {
+        if (confirm("Open Auto Post (RSS / Sitemap)?")) {
+            window.location.href = "auto-post.html";
+        } else if (confirm("Open Manage Jobs?")) {
             window.location.href = "manage-jobs.html";
         }
     } catch (error) {

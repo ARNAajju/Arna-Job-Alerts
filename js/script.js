@@ -8,7 +8,8 @@ import {
 } from "./firebase.js";
 import {
     normalizeJobCategory,
-    normalizeJobRecord
+    normalizeJobRecord,
+    escapeHTML
 } from "./job-utils.js";
 
 // =========================================
@@ -56,10 +57,10 @@ todayContainer.innerHTML+=`
 <div class="job-image-box">
 
 <img
-src="${job.thumbnail || 'assets/images/no-image.jpg'}"
+src="${escapeHTML(job.thumbnail || 'assets/images/no-image.jpg')}"
 class="job-image"
 loading="lazy"
-alt="${job.title}"
+alt="${escapeHTML(job.title || '')}"
 onerror="this.onerror=null;this.src='assets/images/no-image.jpg';">
 
 <span class="new-badge">
@@ -74,13 +75,13 @@ TODAY
 
 <h4 class="job-title">
 
-${job.title}
+${escapeHTML(job.title || '')}
 
 </h4>
 
 <p>
 
-📍 ${job.district}
+📍 ${escapeHTML(job.district || '')}
 
 </p>
 
@@ -141,6 +142,7 @@ async function loadJobs() {
         loadBreakingNews();
 
         showFeaturedJob();
+        showSponsoredJobs();
 
         loadStatistics();
 
@@ -240,6 +242,18 @@ function displayJobs(jobList){
 
         const today=job.postedDate===todayString;
 
+        const safeTitle = escapeHTML(job.title || "");
+        const safeDept = escapeHTML(job.department || "");
+        const safeDistrict = escapeHTML(job.district || "");
+        const safeQual = escapeHTML(job.qualification || "");
+        const safeSalary = escapeHTML(job.salary || "");
+        const safeLast = escapeHTML(job.lastDate || "");
+        const safeThumb = escapeHTML(job.thumbnail || "assets/images/no-image.jpg");
+        const safeIg = escapeHTML(job.instagram || "javascript:void(0)");
+        const safeYt = escapeHTML(job.youtube || "javascript:void(0)");
+        const safeApply = escapeHTML(job.apply || "#");
+        const safeId = escapeHTML(job.id);
+
         html += `
 
 <div class="col-lg-6 col-xl-4 mb-4">
@@ -249,9 +263,9 @@ function displayJobs(jobList){
 <div class="job-image-box">
 
 <img
-src="${job.thumbnail || 'assets/images/no-image.jpg'}"
+src="${safeThumb}"
 class="job-image"
-alt="${job.title}"
+alt="${safeTitle}"
 loading="lazy"
 onerror="this.onerror=null;this.src='assets/images/no-image.jpg';">
 
@@ -269,43 +283,43 @@ URGENT
 <div class="job-content">
 
 <h4 class="job-title">
-${job.title}
+${safeTitle}
 </h4>
 
 <div class="job-info">
 
-<span>🏢 ${job.department}</span>
+<span>🏢 ${safeDept}</span>
 
 </div>
 
 <div class="job-info">
 
-<span>📍 ${job.district}</span>
+<span>📍 ${safeDistrict}</span>
 
 </div>
 
 <div class="job-info">
 
-<span>🎓 ${job.qualification}</span>
+<span>🎓 ${safeQual}</span>
 
 </div>
 
 <div class="job-info">
 
-<span>💰 ${job.salary}</span>
+<span>💰 ${safeSalary}</span>
 
 </div>
 
 <div class="job-info">
 
-<span>📅 ${job.lastDate}</span>
+<span>📅 ${safeLast}</span>
 
 </div>
 
 <div class="social-row">
 
 <a
-href="${job.instagram || 'javascript:void(0)'}"
+href="${safeIg}"
 target="_blank"
 class="instagram">
 
@@ -314,7 +328,7 @@ class="instagram">
 </a>
 
 <a
-href="${job.youtube || 'javascript:void(0)'}"
+href="${safeYt}"
 target="_blank"
 class="youtube">
 
@@ -335,7 +349,7 @@ class="btn btn-primary">
 </a>
 
 <a
-href="${job.apply || '#'}"
+href="${safeApply}"
 target="_blank"
 rel="noopener noreferrer"
 class="btn btn-success ${job.apply ? '' : 'disabled'}"
@@ -345,7 +359,7 @@ ${job.apply ? '' : 'aria-disabled="true"'}>
 
 <button
 class="btn btn-outline-danger"
-onclick="saveJob('${job.id}')">
+onclick="saveJob('${safeId}')">
 
 ❤️ Save Job
 
@@ -353,7 +367,7 @@ onclick="saveJob('${job.id}')">
 
 <button
 class="btn btn-outline-primary"
-onclick="shareJob('${job.id}')">
+onclick="shareJob('${safeId}')">
 
 📤 Share Job
 
@@ -694,6 +708,10 @@ featured.style.display = "block";
 
 featuredJobs.forEach((job,index)=>{
 
+const safeTitle = escapeHTML(job.title || "Job");
+const safeDistrict = escapeHTML(job.district || "");
+const thumb = escapeHTML(job.thumbnail || "assets/images/no-image.jpg");
+
 featured.innerHTML+=`
 
 <div class="carousel-item ${index==0?'active':''}">
@@ -701,24 +719,24 @@ featured.innerHTML+=`
 <div class="featured-job">
 
 <img
-src="${job.thumbnail || 'assets/images/no-image.jpg'}"
+src="${thumb}"
 class="d-block w-100"
 style="height:350px;object-fit:cover;"
 loading="lazy"
-alt="${job.title}"
+alt="${safeTitle}"
 onerror="this.onerror=null;this.src='assets/images/no-image.jpg';">
 
 <div class="featured-overlay">
 
 <h2>
 
-${job.title}
+${safeTitle}
 
 </h2>
 
 <p>
 
-📍 ${job.district}
+📍 ${safeDistrict}
 
 </p>
 
@@ -740,6 +758,43 @@ View Details
 
 `;
 
+});
+
+}
+
+// ======================================
+// SPONSORED JOBS
+// ======================================
+
+function showSponsoredJobs(){
+
+const section = document.getElementById("sponsoredSection");
+const container = document.getElementById("sponsoredContainer");
+
+if (!section || !container) return;
+
+const sponsoredJobs = jobs.filter((job) => job.sponsored && job.published !== false);
+
+if (!sponsoredJobs.length) {
+    section.style.display = "none";
+    return;
+}
+
+section.style.display = "block";
+container.innerHTML = "";
+
+sponsoredJobs.slice(0, 6).forEach((job) => {
+    container.innerHTML += `
+<div class="col-md-4 mb-3">
+<div class="job-card">
+<div class="job-content">
+<span class="badge bg-warning text-dark mb-2">Sponsored</span>
+<h5 class="job-title">${escapeHTML(job.title || "Job")}</h5>
+<p class="mb-2">📍 ${escapeHTML(job.district || "-")} · 🏛 ${escapeHTML(job.department || "-")}</p>
+<a href="./job.html?id=${encodeURIComponent(job.id)}" class="btn btn-outline-primary w-100">View Details</a>
+</div>
+</div>
+</div>`;
 });
 
 }
@@ -1028,8 +1083,8 @@ function previewCard(options) {
 <div class="col-12 mb-3">
 <div class="job-card">
 <div class="job-content">
-<h5 class="job-title mb-2">${options.title}</h5>
-<p class="mb-2">${options.meta}</p>
+<h5 class="job-title mb-2">${escapeHTML(options.title)}</h5>
+<p class="mb-2">${escapeHTML(options.meta)}</p>
 <a href="${options.href}" class="btn ${options.btnClass} w-100">View Details</a>
 </div>
 </div>

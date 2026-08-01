@@ -4,7 +4,7 @@
 // VERSION 2.0.0
 // ==========================================
 
-const CACHE_NAME = "arna-job-alerts-v2";
+const CACHE_NAME = "arna-job-alerts-v2.1";
 
 const urlsToCache = [
     "/",
@@ -20,6 +20,8 @@ const urlsToCache = [
     "/js/firebase.js",
     "/js/firebase-config.js",
     "/js/job-utils.js",
+    "/js/site-settings.js",
+    "/js/monetization.js",
     "/js/script.js",
     "/js/job.js",
     "/js/saved.js",

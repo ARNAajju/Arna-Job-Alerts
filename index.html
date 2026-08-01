@@ -805,7 +805,7 @@ Categories
 
 <!-- Follow Us -->
 
-<div class="card shadow-sm">
+<div class="card shadow-sm mb-4">
 
 <div class="card-header bg-dark text-white">
 
@@ -815,25 +815,25 @@ Follow Us
 
 <div class="card-body text-center">
 
-<a href="#" class="btn btn-primary w-100 mb-2">
+<a href="#" class="btn btn-primary w-100 mb-2" data-social="facebook">
 
 📘 Facebook
 
 </a>
 
-<a href="#" class="btn btn-danger w-100 mb-2">
+<a href="#" class="btn btn-danger w-100 mb-2" data-social="instagram">
 
 📸 Instagram
 
 </a>
 
-<a href="#" class="btn btn-danger w-100 mb-2">
+<a href="#" class="btn btn-danger w-100 mb-2" data-social="youtube">
 
 ▶️ YouTube
 
 </a>
 
-<a href="#" class="btn btn-info w-100">
+<a href="#" class="btn btn-info w-100" data-social="telegram">
 
 📢 Telegram
 
@@ -842,6 +842,10 @@ Follow Us
 </div>
 
 </div>
+
+<div class="mb-4" data-ad-slot="sidebar" aria-label="Sidebar advertisement"></div>
+
+<div class="mb-4" data-ad-slot="affiliate" aria-label="Affiliate"></div>
 
 </div>
 
@@ -852,8 +856,33 @@ Follow Us
 </section>
 
 <!-- ==========================
+SPONSORED JOBS
+========================== -->
+
+<section class="py-4 bg-light" id="sponsoredSection" style="display:none;">
+
+<div class="container">
+
+<div class="section-header mb-3">
+
+<h2>Sponsored Jobs</h2>
+
+<p>Highlighted opportunities</p>
+
+</div>
+
+<div class="row" id="sponsoredContainer"></div>
+
+<div class="mt-3" data-ad-slot="top" aria-label="Top advertisement"></div>
+
+</div>
+
+</section>
+
+<!-- ==========================
 WEBSITE MODULE PREVIEWS
 ========================== -->
+
 
 <section class="py-5 bg-light" id="modulePreviews">
 
@@ -1035,6 +1064,8 @@ Follow Us
 
 <hr>
 
+<div class="container py-3" data-ad-slot="bottom" aria-label="Bottom advertisement"></div>
+
 <div class="footer-bottom text-center">
 
 © 2026 Arna Job Alerts | All Rights Reserved
@@ -1147,6 +1178,7 @@ if ("serviceWorker" in navigator) {
 </script>
 
 <script type="module" src="js/site-settings.js"></script>
+<script type="module" src="js/monetization.js"></script>
 </body>
 
 </html>

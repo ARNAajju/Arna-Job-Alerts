@@ -1,3 +1,18 @@
+/**
+ * Escape HTML for safe DOM insertion of untrusted Firestore text.
+ * @param {unknown} str
+ * @returns {string}
+ */
+export function escapeHTML(str) {
+    if (str == null) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 const CATEGORY_ALIASES = Object.freeze({
     "ap government": "AP Jobs",
     "ap jobs": "AP Jobs",

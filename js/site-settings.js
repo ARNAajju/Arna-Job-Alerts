@@ -123,17 +123,31 @@ async function applyWebsiteSettings() {
                 const a = i.closest("a");
                 if (a) a.href = data.facebook;
             });
+            document.querySelectorAll('[data-social="facebook"]').forEach((a) => {
+                a.href = data.facebook;
+            });
         }
         if (data.instagram) {
             document.querySelectorAll(".footer-social .fa-instagram").forEach((i) => {
                 const a = i.closest("a");
                 if (a) a.href = data.instagram;
             });
+            document.querySelectorAll('[data-social="instagram"]').forEach((a) => {
+                a.href = data.instagram;
+            });
         }
         if (data.youtube) {
             document.querySelectorAll(".footer-social .fa-youtube").forEach((i) => {
                 const a = i.closest("a");
                 if (a) a.href = data.youtube;
+            });
+            document.querySelectorAll('[data-social="youtube"]').forEach((a) => {
+                a.href = data.youtube;
+            });
+        }
+        if (data.telegram) {
+            document.querySelectorAll('[data-social="telegram"]').forEach((a) => {
+                a.href = data.telegram;
             });
         }
 

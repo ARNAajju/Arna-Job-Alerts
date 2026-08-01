@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "672430406782",
+    "project_id": "arna-jobs",
+    "storage_bucket": "arna-jobs.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672430406782:android:REPLACE_WITH_FIREBASE_ANDROID_APP_ID",
+        "android_client_info": {
+          "package_name": "com.arnajobalerts.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "REPLACE_WITH_ANDROID_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
