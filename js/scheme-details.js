@@ -15,6 +15,7 @@ import { escapeHTML, IMAGE_FALLBACK } from "./job-utils.js";
 // PART 1
 // ==========================================
 
+
 function getSchemeTitle(scheme) {
     return scheme.title || scheme.schemeName || "Government Scheme";
 }

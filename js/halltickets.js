@@ -57,6 +57,9 @@ function matchesDepartmentFilter(item, filter) {
 const TICKETS_PER_PAGE = 9;
 let currentPage = 1;
 
+
+
+
 function getTicketTitle(ticket) {
     return ticket.title || ticket.examName || "Hall Ticket";
 }

@@ -13,7 +13,7 @@ export function escapeHTML(str) {
         .replace(/'/g, "&#39;");
 }
 
-/** Local fallback image (offline-safe). */
+/** Local fallback image (offline-safe). Single source of truth. */
 export const IMAGE_FALLBACK = "assets/images/no-image.png";
 
 /**
@@ -71,26 +71,65 @@ export function matchesStateFilter(itemState, filterState) {
     return normalize(a) === normalize(b);
 }
 
+/** Canonical public category labels */
+export const JOB_CATEGORIES = Object.freeze([
+    "AP Government",
+    "TS Government",
+    "Central Government",
+    "Private Jobs",
+    "Railway",
+    "Bank",
+    "Police",
+    "Teaching",
+    "Medical",
+    "Engineering",
+    "Defence",
+    "Apprenticeship",
+    "Contract",
+    "Walk-in",
+    "Results",
+    "Hall Tickets",
+    "Schemes"
+]);
+
 const CATEGORY_ALIASES = Object.freeze({
-    "ap government": "AP Jobs",
-    "ap jobs": "AP Jobs",
-    "andhra pradesh": "AP Jobs",
-    "ts government": "TS Jobs",
-    "ts jobs": "TS Jobs",
-    "telangana": "TS Jobs",
-    "central government": "Central Jobs",
-    "central jobs": "Central Jobs",
-    "central": "Central Jobs",
+    "ap government": "AP Government",
+    "ap jobs": "AP Government",
+    "ap job": "AP Government",
+    "andhra pradesh": "AP Government",
+    "ts government": "TS Government",
+    "ts jobs": "TS Government",
+    "ts job": "TS Government",
+    "telangana": "TS Government",
+    "central government": "Central Government",
+    "central jobs": "Central Government",
+    "central job": "Central Government",
+    "central": "Central Government",
+    "private": "Private Jobs",
+    "private job": "Private Jobs",
+    "private jobs": "Private Jobs",
     "railway jobs": "Railway",
     "railway": "Railway",
     "bank jobs": "Bank",
     "bank": "Bank",
     "police jobs": "Police",
-    "police": "Police"
+    "police": "Police",
+    "teaching": "Teaching",
+    "medical": "Medical",
+    "engineering": "Engineering",
+    "defence": "Defence",
+    "defense": "Defence",
+    "apprenticeship": "Apprenticeship",
+    "contract": "Contract",
+    "walk-in": "Walk-in",
+    "walkin": "Walk-in",
+    "results": "Results",
+    "hall tickets": "Hall Tickets",
+    "halltickets": "Hall Tickets",
+    "schemes": "Schemes"
 });
 
 export function normalizeJobCategory(category) {
-
     const value =
         typeof category === "string"
             ? category.trim()
@@ -100,34 +139,20 @@ export function normalizeJobCategory(category) {
         return "";
     }
 
-    return CATEGORY_ALIASES[
-        value.toLowerCase()
-    ] || value;
-
+    return CATEGORY_ALIASES[value.toLowerCase()] || value;
 }
 
 export function getJobDescription(job = {}) {
-
-    if (
-        typeof job.description === "string" &&
-        job.description.trim()
-    ) {
+    if (typeof job.description === "string" && job.description.trim()) {
         return job.description.trim();
     }
-
-    if (
-        typeof job.about === "string" &&
-        job.about.trim()
-    ) {
+    if (typeof job.about === "string" && job.about.trim()) {
         return job.about.trim();
     }
-
     return "";
-
 }
 
 export function normalizeJobRecord(job = {}) {
-
     const categoryRaw =
         typeof job.category === "string"
             ? job.category.trim()
@@ -139,5 +164,16 @@ export function normalizeJobRecord(job = {}) {
         category: normalizeJobCategory(categoryRaw),
         description: getJobDescription(job)
     };
+}
 
+/**
+ * Build the only shareable job URL for a document id.
+ * @param {string} jobId
+ * @returns {string}
+ */
+export function getJobShareUrl(jobId) {
+    const origin = typeof window !== "undefined" && window.location?.origin
+        ? window.location.origin
+        : "https://arna-jobs.web.app";
+    return `${origin.replace(/\/$/, "")}/job.html?id=${encodeURIComponent(jobId)}`;
 }

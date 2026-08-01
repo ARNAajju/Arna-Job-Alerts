@@ -10,10 +10,7 @@ import {
     limit
 } from "../js/firebase.js";
 
-import {
-    sanitizeText,
-    logActivity
-} from "./admin-utils.js";
+import { sanitizeText } from "./admin-utils.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -37,14 +34,12 @@ function buildCaptions({ title, department, lastDate, applyUrl }) {
     const link = applyUrl || "https://arna-jobs.web.app/";
 
     return {
-        thumbnailPrompt: `Professional government job alert thumbnail, bold text "${t}", department ${dept}, last date ${ld}, clean blue and white design, high contrast, no logos of other brands, 1280x720`,
-        instagramCaption: `📢 ${t}\n\n🏛 ${dept}\n📅 Last Date: ${ld}\n\n✅ Apply / Details:\n${link}\n\n#ArnaJobAlerts #GovtJobs #Jobs #SarkariNaukri`,
+        thumbnailPrompt: `Professional job alert thumbnail, bold text "${t}", department ${dept}, last date ${ld}, clean blue and white design, high contrast, 1280x720`,
+        instagramCaption: `📢 ${t}\n\n🏛 ${dept}\n📅 Last Date: ${ld}\n\n✅ Details:\n${link}\n\n#ArnaJobAlerts #GovtJobs #Jobs`,
         telegramMessage: `🔔 *${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nApply: ${link}\n\n— Arna Job Alerts`,
         whatsappMessage: `*${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nDetails: ${link}\n\nArna Job Alerts`,
-        facebookPost: `${t}\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nRead full notification and apply:\n${link}\n\nFollow Arna Job Alerts for daily updates.`,
-        twitterPost: `${t} | ${dept} | Last Date: ${ld}\n${link}\n#GovtJobs #ArnaJobAlerts`,
-        youtubeTitle: `${t} | Notification, Eligibility & How to Apply`,
-        youtubeDescription: `${t}\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nFull details: ${link}\n\nSubscribe to Arna Job Alerts for daily government job updates.\n\n#GovtJobs #SarkariNaukri #JobAlert`
+        seoTitle: `${t} | Apply Online | Arna Job Alerts`,
+        seoDescription: `${t}. Department: ${dept}. Last date: ${ld}. Check eligibility, notification and apply online at Arna Job Alerts.`
     };
 }
 
@@ -86,16 +81,19 @@ async function loadSelectedJob() {
     setValue("title", job.title || "");
     setValue("department", job.department || "");
     setValue("lastDate", job.lastDate || "");
-    setValue("applyUrl", job.apply || job.applyLink || job.officialWebsite || `https://arna-jobs.web.app/job.html?id=${id}`);
+    setValue(
+        "applyUrl",
+        job.apply ||
+            job.applyLink ||
+            `https://arna-jobs.web.app/job.html?id=${id}`
+    );
 
     if (job.instagramCaption) setValue("instagramCaption", job.instagramCaption);
     if (job.telegramMessage) setValue("telegramMessage", job.telegramMessage);
     if (job.whatsappMessage) setValue("whatsappMessage", job.whatsappMessage);
-    if (job.facebookPost) setValue("facebookPost", job.facebookPost);
-    if (job.twitterPost) setValue("twitterPost", job.twitterPost);
-    if (job.youtubeTitle) setValue("youtubeTitle", job.youtubeTitle);
-    if (job.youtubeDescription) setValue("youtubeDescription", job.youtubeDescription);
     if (job.thumbnailPrompt) setValue("thumbnailPrompt", job.thumbnailPrompt);
+    if (job.seoTitle) setValue("seoTitle", job.seoTitle);
+    if (job.seoDescription) setValue("seoDescription", job.seoDescription);
 
     $("status").textContent = "Job loaded.";
 }
@@ -108,7 +106,7 @@ function generate() {
         applyUrl: getValue("applyUrl")
     });
     applyCaptions(captions);
-    $("status").textContent = "Captions generated. Edit before posting.";
+    $("status").textContent = "Generated. Edit before saving.";
 }
 
 function copyAll() {
@@ -117,11 +115,11 @@ function copyAll() {
         "instagramCaption",
         "telegramMessage",
         "whatsappMessage",
-        "facebookPost",
-        "twitterPost",
-        "youtubeTitle",
-        "youtubeDescription"
-    ].map((id) => `=== ${id} ===\n${getValue(id)}`).join("\n\n");
+        "seoTitle",
+        "seoDescription"
+    ]
+        .map((id) => `=== ${id} ===\n${getValue(id)}`)
+        .join("\n\n");
 
     navigator.clipboard.writeText(blocks).then(() => {
         $("status").textContent = "Copied to clipboard.";
@@ -142,20 +140,12 @@ async function saveToJob() {
         instagramCaption: getValue("instagramCaption"),
         telegramMessage: getValue("telegramMessage"),
         whatsappMessage: getValue("whatsappMessage"),
-        facebookPost: getValue("facebookPost"),
-        twitterPost: getValue("twitterPost"),
-        youtubeTitle: getValue("youtubeTitle"),
-        youtubeDescription: getValue("youtubeDescription")
+        seoTitle: getValue("seoTitle"),
+        seoDescription: getValue("seoDescription")
     };
 
     try {
         await updateDoc(doc(db, "jobs", id), payload);
-        await logActivity({
-            action: "updated",
-            module: "media-generator",
-            title: getValue("title") || id,
-            details: "media captions saved"
-        });
         $("status").textContent = "Saved to job document.";
         alert("Media fields saved.");
     } catch (error) {
