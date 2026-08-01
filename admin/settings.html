@@ -142,6 +142,26 @@
 <p class="small text-muted mb-0">Cloudinary upload in Add Job still uses <code>admin/cloudinary.js</code>. Values here are stored for admin reference and future wiring.</p>
 </div>
 
+<h5 class="mb-3">Arna AI Provider</h5>
+<div class="row g-3 mb-4">
+<div class="col-md-4">
+<label class="form-label">Provider</label>
+<select id="aiProvider" class="form-select">
+<option value="openai">OpenAI</option>
+<option value="gemini">Google Gemini</option>
+</select>
+</div>
+<div class="col-md-4">
+<label class="form-label">Model (optional)</label>
+<input type="text" id="aiModel" class="form-control" placeholder="gpt-4o-mini or gemini-1.5-flash">
+</div>
+<div class="col-md-4">
+<label class="form-label">API Key</label>
+<input type="password" id="aiApiKey" class="form-control" autocomplete="off" placeholder="Stored in Firestore settings/website">
+</div>
+<p class="small text-muted mb-0">Used only by Admin Arna AI Research Assistant. Never auto-publishes jobs.</p>
+</div>
+
 <button type="submit" class="btn btn-success">Save Settings</button>
 </div>
 </form>

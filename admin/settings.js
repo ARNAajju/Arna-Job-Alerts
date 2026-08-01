@@ -29,7 +29,10 @@ const FORM_FIELDS = [
     "bannerBottom",
     "affiliateHtml",
     "cloudinaryCloud",
-    "cloudinaryPreset"
+    "cloudinaryPreset",
+    "aiProvider",
+    "aiModel",
+    "aiApiKey"
 ];
 
 const form = document.getElementById("settingsForm");
