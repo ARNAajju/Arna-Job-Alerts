@@ -227,6 +227,31 @@ function setupMetricCards() {
    FIRESTORE REALTIME LISTENERS
 ========================================================== */
 
+function updateJobsCounters() {
+
+    if (totalJobs) totalJobs.textContent = jobs.length;
+    if (welcomeJobs) welcomeJobs.textContent = jobs.length;
+
+    const breakdown = document.getElementById("jobsCounterBreakdown");
+
+    if (breakdown) {
+        const active = jobs.filter((job) =>
+            String(job.status || "Active").toLowerCase() === "active"
+        ).length;
+        const upcoming = jobs.filter((job) =>
+            String(job.status || "").toLowerCase() === "upcoming"
+        ).length;
+        const closed = jobs.filter((job) =>
+            String(job.status || "").toLowerCase() === "closed"
+        ).length;
+        const published = jobs.filter((job) => job.published !== false).length;
+
+        breakdown.textContent =
+            `Active ${active} · Upcoming ${upcoming} · Closed ${closed} · Published ${published}`;
+    }
+
+}
+
 function loadCounts() {
 
     // Jobs
@@ -237,14 +262,26 @@ function loadCounts() {
             ...doc.data()
         }));
 
-        if (totalJobs) totalJobs.textContent = jobs.length;
-        if (welcomeJobs) welcomeJobs.textContent = jobs.length;
+        updateJobsCounters();
 
         renderRecentJobs();
         loadActivityTimeline();
         updateQuickStatistics();
 
         updateSyncTime();
+        setOnlineStatus();
+
+    }, (error) => {
+
+        console.error("Jobs counter sync failed:", error);
+        setOfflineStatus();
+
+        if (totalJobs) totalJobs.textContent = "—";
+
+        const breakdown = document.getElementById("jobsCounterBreakdown");
+        if (breakdown) {
+            breakdown.textContent = "Jobs sync failed — check Firebase connection";
+        }
 
     });
 
@@ -425,11 +462,21 @@ function renderRecentJobs() {
 
                 <td>
 
-                    <span class="badge bg-success">
+                    <span class="badge ${
+                        String(job.status || "Active").toLowerCase() === "closed"
+                            ? "bg-secondary"
+                            : String(job.status || "").toLowerCase() === "upcoming"
+                                ? "bg-info"
+                                : "bg-success"
+                    }">
 
                         ${job.status || "Active"}
 
                     </span>
+
+                    ${job.published === false
+                        ? '<span class="badge bg-warning text-dark ms-1">Unpublished</span>'
+                        : ""}
 
                 </td>
 
@@ -989,10 +1036,25 @@ function updateQuickStatistics() {
     if (todayJobsCount) {
 
         todayJobsCount.textContent =
-            jobs.filter(x =>
-                (x.postedDate || "")
-                .startsWith(today)
-            ).length;
+            jobs.filter((x) => {
+                const posted = String(x.postedDate || "");
+                if (posted.startsWith(today)) return true;
+
+                try {
+                    if (x.createdAt?.toDate) {
+                        return x.createdAt.toDate().toISOString().startsWith(today);
+                    }
+                    if (typeof x.createdAt?.seconds === "number") {
+                        return new Date(x.createdAt.seconds * 1000)
+                            .toISOString()
+                            .startsWith(today);
+                    }
+                } catch {
+                    return false;
+                }
+
+                return false;
+            }).length;
 
     }
 

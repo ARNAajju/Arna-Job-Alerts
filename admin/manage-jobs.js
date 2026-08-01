@@ -4,25 +4,63 @@ import {
     onSnapshot,
     updateDoc,
     deleteDoc,
-    doc
+    doc,
+    serverTimestamp
 } from "../js/firebase.js";
 import { normalizeJobCategory } from "../js/job-utils.js";
+import { escapeHTML, logActivity } from "./admin-utils.js";
 
 const table = document.getElementById("jobTable");
 const searchJob = document.getElementById("searchJob");
 const filterState = document.getElementById("filterState");
 const filterCategory = document.getElementById("filterCategory");
+const filterStatus = document.getElementById("filterStatus");
+const filterPublished = document.getElementById("filterPublished");
 const prevPage = document.getElementById("prevPage");
 const nextPage = document.getElementById("nextPage");
 const pageInfo = document.getElementById("pageInfo");
 
 const JOBS_PER_PAGE = 10;
+const PUBLIC_JOB_BASE = "https://arna-jobs.web.app/job.html";
 
 let allJobs = [];
 let filteredJobs = [];
 let currentPage = 1;
 let sortField = "createdAt";
 let sortDir = "desc";
+let deletingJobId = null;
+let jobsUnsubscribe = null;
+
+function getJobShareUrl(jobId) {
+    return `${PUBLIC_JOB_BASE}?id=${encodeURIComponent(jobId)}`;
+}
+
+function setJobsSyncStatus(state, detail = "") {
+    const badge = document.getElementById("jobsSyncStatus");
+    const lastSync = document.getElementById("jobsLastSync");
+
+    if (badge) {
+        if (state === "live") {
+            badge.className = "badge bg-success";
+            badge.textContent = "Firestore Live";
+        } else if (state === "error") {
+            badge.className = "badge bg-danger";
+            badge.textContent = "Sync Error";
+        } else if (state === "loading") {
+            badge.className = "badge bg-secondary";
+            badge.textContent = "Syncing…";
+        } else {
+            badge.className = "badge bg-secondary";
+            badge.textContent = "Connecting…";
+        }
+    }
+
+    if (lastSync && state === "live") {
+        lastSync.textContent = `Last sync: ${new Date().toLocaleTimeString()}${detail ? ` · ${detail}` : ""}`;
+    } else if (lastSync && state === "error" && detail) {
+        lastSync.textContent = detail;
+    }
+}
 
 function normalizeCategory(value) {
     return (value || "").toLowerCase().trim();
@@ -72,19 +110,37 @@ function applyFilters() {
     const keyword = (searchJob?.value || "").toLowerCase().trim();
     const state = filterState?.value || "";
     const category = filterCategory?.value || "";
+    const status = filterStatus?.value || "";
+    const publishedFilter = filterPublished?.value || "";
 
     filteredJobs = allJobs.filter((job) => {
-        const keywordMatch =
-            !keyword ||
-            (job.title || "").toLowerCase().includes(keyword) ||
-            (job.department || "").toLowerCase().includes(keyword) ||
-            (job.district || "").toLowerCase().includes(keyword) ||
-            (job.category || "").toLowerCase().includes(keyword);
+        const haystack = [
+            job.title,
+            job.department,
+            job.district,
+            job.category,
+            job.state,
+            job.qualification,
+            job.status,
+            job.id
+        ]
+            .map((value) => String(value || "").toLowerCase())
+            .join(" ");
 
+        const keywordMatch = !keyword || haystack.includes(keyword);
         const stateMatch = !state || (job.state || "") === state;
         const categoryMatch = matchesCategory(job, category);
+        const statusMatch =
+            !status ||
+            String(job.status || "Active").toLowerCase() === status.toLowerCase();
 
-        return keywordMatch && stateMatch && categoryMatch;
+        const isPublished = job.published !== false;
+        const publishedMatch =
+            !publishedFilter ||
+            (publishedFilter === "published" && isPublished) ||
+            (publishedFilter === "unpublished" && !isPublished);
+
+        return keywordMatch && stateMatch && categoryMatch && statusMatch && publishedMatch;
     });
 
     filteredJobs = sortJobs(filteredJobs);
@@ -125,35 +181,82 @@ function renderTable() {
     const pageData = filteredJobs.slice(start, start + JOBS_PER_PAGE);
 
     table.innerHTML = pageData.map((job) => `
-        <tr>
+        <tr data-job-id="${escapeHTML(job.id)}">
             <td>
                 <input
                     type="checkbox"
                     class="form-check-input job-row-select"
-                    data-id="${job.id}">
+                    data-id="${escapeHTML(job.id)}">
             </td>
             <td>
                 <img
-                    src="${job.thumbnail || "https://placehold.co/120x80?text=No+Image"}"
+                    src="${escapeHTML(job.thumbnail || "https://placehold.co/120x80?text=No+Image")}"
                     width="120"
+                    alt=""
                     style="object-fit:cover; border-radius:8px;">
             </td>
-            <td>${job.title || "-"}</td>
-            <td>${job.department || "-"}</td>
-            <td>${job.district || "-"}</td>
-            <td>${job.lastDate || "-"}</td>
+            <td>${escapeHTML(job.title || "-")}</td>
+            <td>${escapeHTML(job.department || "-")}</td>
+            <td>${escapeHTML(job.district || "-")}</td>
+            <td>${escapeHTML(job.lastDate || "-")}</td>
             <td>
-                <span class="badge bg-secondary">${job.status || "Active"}</span>
+                <span class="badge ${
+                    String(job.status || "Active").toLowerCase() === "closed"
+                        ? "bg-secondary"
+                        : String(job.status || "").toLowerCase() === "upcoming"
+                            ? "bg-info"
+                            : "bg-success"
+                }">${escapeHTML(job.status || "Active")}</span>
+                ${job.published === false
+                    ? '<span class="badge bg-warning text-dark ms-1">Unpublished</span>'
+                    : '<span class="badge bg-primary ms-1">Published</span>'}
             </td>
-            <td>
-                <a class="btn btn-sm btn-primary" href="../job.html?id=${job.id}">
+            <td class="job-actions">
+                <a class="btn btn-sm btn-primary" href="${getJobShareUrl(job.id)}" target="_blank" rel="noopener noreferrer">
                     View
                 </a>
-                <a class="btn btn-sm btn-warning" href="edit-job.html?id=${job.id}">
+                <a class="btn btn-sm btn-warning" href="add-job-card.html?edit=${encodeURIComponent(job.id)}">
                     Edit
                 </a>
-                <button class="btn btn-sm btn-danger" onclick="deleteJob('${job.id}')">
-                    Delete
+                <button
+                    type="button"
+                    class="btn btn-sm ${job.published === false ? "btn-success" : "btn-outline-secondary"}"
+                    data-action="toggle-publish"
+                    data-id="${escapeHTML(job.id)}"
+                    data-published="${job.published === false ? "false" : "true"}">
+                    ${job.published === false ? "Publish" : "Unpublish"}
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-dark"
+                    data-action="copy-link"
+                    data-id="${escapeHTML(job.id)}"
+                    title="Copy share link">
+                    Copy Link
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-success"
+                    data-action="share-whatsapp"
+                    data-id="${escapeHTML(job.id)}"
+                    title="Share on WhatsApp">
+                    WhatsApp
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-info text-white"
+                    data-action="share-telegram"
+                    data-id="${escapeHTML(job.id)}"
+                    title="Share on Telegram">
+                    Telegram
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    data-action="delete-job"
+                    data-id="${escapeHTML(job.id)}"
+                    ${deletingJobId === job.id ? "disabled" : ""}>
+                    ${deletingJobId === job.id ? "Deleting..." : "Delete"}
                 </button>
             </td>
         </tr>
@@ -175,52 +278,119 @@ function renderTable() {
 function loadJobsRealtime() {
     if (!table) return;
 
+    if (typeof jobsUnsubscribe === "function") {
+        jobsUnsubscribe();
+        jobsUnsubscribe = null;
+    }
+
+    setJobsSyncStatus("loading");
     table.innerHTML = `
         <tr>
-            <td colspan="8" class="text-center py-4">Loading jobs...</td>
+            <td colspan="8" class="text-center py-4">Loading jobs from Firestore...</td>
         </tr>`;
 
-    onSnapshot(collection(db, "jobs"), (snapshot) => {
+    jobsUnsubscribe = onSnapshot(collection(db, "jobs"), (snapshot) => {
         allJobs = snapshot.docs.map((jobDoc) => ({
             id: jobDoc.id,
             ...jobDoc.data()
         }));
+        setJobsSyncStatus("live", `${allJobs.length} job(s)`);
         applyFilters();
     }, (error) => {
         console.error("Error loading jobs:", error);
+        setJobsSyncStatus("error", error.message || "Failed to sync jobs");
         table.innerHTML = `
             <tr>
                 <td colspan="8" class="text-center text-danger py-4">
-                    Failed to load jobs.
+                    Failed to load jobs from Firestore.
+                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="retryJobsSync">
+                        Retry
+                    </button>
                 </td>
             </tr>`;
+        document.getElementById("retryJobsSync")?.addEventListener("click", loadJobsRealtime);
     });
 }
 
-window.deleteJob = async (id) => {
-    if (!confirm("Are you sure you want to delete this job?")) return;
+async function deleteJob(id) {
+    const job = allJobs.find((item) => item.id === id);
+    const title = job?.title || id;
+
+    if (!confirm(`Delete this job?\n\n${title}`)) return;
+
+    deletingJobId = id;
+    renderTable();
 
     try {
         await deleteDoc(doc(db, "jobs", id));
+        await logActivity({
+            action: "delete",
+            module: "jobs",
+            title,
+            details: `Deleted job ${id}`
+        });
     } catch (error) {
         console.error("Error deleting job:", error);
-        alert("Failed to delete job.");
+        alert("Failed to delete job.\n\n" + (error.message || "Unknown error"));
+    } finally {
+        deletingJobId = null;
+        renderTable();
     }
-};
+}
+
+async function togglePublishJob(id, currentlyPublished) {
+    const job = allJobs.find((item) => item.id === id);
+    const title = job?.title || id;
+    const nextPublished = !currentlyPublished;
+
+    // Homepage hides Closed; keep Active/Upcoming when publishing so jobs reappear.
+    const payload = {
+        published: nextPublished,
+        updatedAt: serverTimestamp()
+    };
+
+    if (nextPublished) {
+        const status = String(job?.status || "").toLowerCase();
+        if (!status || status === "closed" || status === "draft" || status === "expired") {
+            payload.status = "Active";
+        }
+    } else {
+        payload.status = "Closed";
+    }
+
+    try {
+        await updateDoc(doc(db, "jobs", id), payload);
+        await logActivity({
+            action: nextPublished ? "publish" : "unpublish",
+            module: "jobs",
+            title,
+            details: `published=${nextPublished}; status=${payload.status || job?.status || ""}`
+        });
+    } catch (error) {
+        console.error("Publish toggle failed:", error);
+        alert("Failed to update publish state.\n\n" + (error.message || "Unknown error"));
+    }
+}
 
 async function bulkDeleteJobs() {
     const ids = getSelectedIds();
     if (ids.length === 0) return;
 
-    if (!confirm(`Delete ${ids.length} selected job(s)?`)) return;
+    if (!confirm(`Delete ${ids.length} selected job(s)? This cannot be undone.`)) return;
 
     try {
         await Promise.all(
             ids.map((id) => deleteDoc(doc(db, "jobs", id)))
         );
+        await logActivity({
+            action: "bulk-delete",
+            module: "jobs",
+            title: `${ids.length} jobs`,
+            details: ids.join(", ")
+        });
     } catch (error) {
         console.error(error);
-        alert("Bulk delete failed.");
+        alert("Bulk delete failed.\n\n" + (error.message || "Unknown error"));
     }
 }
 
@@ -230,19 +400,33 @@ async function bulkUpdateJobStatus() {
 
     if (ids.length === 0 || !status) return;
 
+    const published = status !== "Closed";
+
     try {
         await Promise.all(
-            ids.map((id) => updateDoc(doc(db, "jobs", id), { status }))
+            ids.map((id) => updateDoc(doc(db, "jobs", id), {
+                status,
+                published,
+                updatedAt: serverTimestamp()
+            }))
         );
+        await logActivity({
+            action: "bulk-status",
+            module: "jobs",
+            title: `${ids.length} jobs → ${status}`,
+            details: ids.join(", ")
+        });
     } catch (error) {
         console.error(error);
-        alert("Bulk status update failed.");
+        alert("Bulk status update failed.\n\n" + (error.message || "Unknown error"));
     }
 }
 
 searchJob?.addEventListener("input", applyFilters);
 filterState?.addEventListener("change", applyFilters);
 filterCategory?.addEventListener("change", applyFilters);
+filterStatus?.addEventListener("change", applyFilters);
+filterPublished?.addEventListener("change", applyFilters);
 
 prevPage?.addEventListener("click", () => {
     if (currentPage > 1) {
@@ -286,16 +470,140 @@ document.getElementById("selectAllJobs")?.addEventListener("change", (event) => 
     updateBulkBar();
 });
 
+async function bulkSetPublished(nextPublished) {
+    const ids = getSelectedIds();
+    if (ids.length === 0) return;
+
+    const label = nextPublished ? "publish" : "unpublish";
+    if (!confirm(`${label[0].toUpperCase()}${label.slice(1)} ${ids.length} selected job(s)?`)) return;
+
+    try {
+        await Promise.all(
+            ids.map((id) => {
+                const job = allJobs.find((item) => item.id === id);
+                const payload = {
+                    published: nextPublished,
+                    updatedAt: serverTimestamp()
+                };
+
+                if (nextPublished) {
+                    const status = String(job?.status || "").toLowerCase();
+                    if (!status || status === "closed" || status === "draft" || status === "expired") {
+                        payload.status = "Active";
+                    }
+                } else {
+                    payload.status = "Closed";
+                }
+
+                return updateDoc(doc(db, "jobs", id), payload);
+            })
+        );
+        await logActivity({
+            action: `bulk-${label}`,
+            module: "jobs",
+            title: `${ids.length} jobs`,
+            details: ids.join(", ")
+        });
+    } catch (error) {
+        console.error(error);
+        alert(`Bulk ${label} failed.\n\n` + (error.message || "Unknown error"));
+    }
+}
+
+function buildJobShareText(job, url) {
+    const title = job?.title || "Job Alert";
+    const department = job?.department || "";
+    const lastDate = job?.lastDate || "";
+    return [
+        title,
+        department ? `Department: ${department}` : "",
+        lastDate ? `Last Date: ${lastDate}` : "",
+        "",
+        url,
+        "",
+        "Arna Job Alerts"
+    ].filter((line, index, arr) => line !== "" || (arr[index - 1] && arr[index - 1] !== "")).join("\n");
+}
+
+async function copyJobLink(id) {
+    const url = getJobShareUrl(id);
+
+    try {
+        await navigator.clipboard.writeText(url);
+        alert("Share link copied:\n" + url);
+    } catch (error) {
+        console.error(error);
+        window.prompt("Copy this share link:", url);
+    }
+}
+
+function shareJobWhatsApp(id) {
+    const job = allJobs.find((item) => item.id === id);
+    const url = getJobShareUrl(id);
+    const text = buildJobShareText(job, url);
+    window.open(
+        `https://wa.me/?text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+
+function shareJobTelegram(id) {
+    const job = allJobs.find((item) => item.id === id);
+    const url = getJobShareUrl(id);
+    const text = buildJobShareText(job, url);
+    window.open(
+        `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+
 table?.addEventListener("change", (event) => {
     if (event.target.classList.contains("job-row-select")) {
         updateBulkBar();
     }
 });
 
+table?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-action]");
+    if (!button) return;
+
+    const id = button.dataset.id;
+    if (!id) return;
+
+    if (button.dataset.action === "delete-job") {
+        deleteJob(id);
+        return;
+    }
+
+    if (button.dataset.action === "toggle-publish") {
+        const currentlyPublished = button.dataset.published !== "false";
+        togglePublishJob(id, currentlyPublished);
+        return;
+    }
+
+    if (button.dataset.action === "copy-link") {
+        copyJobLink(id);
+        return;
+    }
+
+    if (button.dataset.action === "share-whatsapp") {
+        shareJobWhatsApp(id);
+        return;
+    }
+
+    if (button.dataset.action === "share-telegram") {
+        shareJobTelegram(id);
+    }
+});
+
 document.getElementById("bulkDeleteJobs")?.addEventListener("click", bulkDeleteJobs);
 document.getElementById("bulkUpdateJobs")?.addEventListener("click", bulkUpdateJobStatus);
+document.getElementById("bulkPublishJobs")?.addEventListener("click", () => bulkSetPublished(true));
+document.getElementById("bulkUnpublishJobs")?.addEventListener("click", () => bulkSetPublished(false));
 document.getElementById("refreshJobs")?.addEventListener("click", () => {
-    applyFilters();
+    loadJobsRealtime();
 });
 
 loadJobsRealtime();
