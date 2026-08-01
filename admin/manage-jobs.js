@@ -7,6 +7,7 @@ import {
     doc
 } from "../js/firebase.js";
 import { normalizeJobCategory } from "../js/job-utils.js";
+import { escapeHTML, logActivity } from "./admin-utils.js";
 
 const table = document.getElementById("jobTable");
 const searchJob = document.getElementById("searchJob");
@@ -23,6 +24,7 @@ let filteredJobs = [];
 let currentPage = 1;
 let sortField = "createdAt";
 let sortDir = "desc";
+let deletingJobId = null;
 
 function normalizeCategory(value) {
     return (value || "").toLowerCase().trim();
