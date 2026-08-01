@@ -7,7 +7,7 @@ import {
 } from "./firebase.js";
 import {
     escapeHTML,
-    IMAGE_FALLBACK as LOCAL_IMAGE_FALLBACK,
+    IMAGE_FALLBACK,
     matchesStateFilter,
     toSortableTime
 } from "./job-utils.js";
@@ -43,7 +43,6 @@ const SCHEMES_PER_PAGE = 9;
 let currentPage = 1;
 
 
-const IMAGE_FALLBACK = LOCAL_IMAGE_FALLBACK;
 
 
 function getSchemeTitle(scheme) {

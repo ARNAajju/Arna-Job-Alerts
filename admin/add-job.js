@@ -104,7 +104,7 @@ form.addEventListener("submit", async (e) => {
         featured,
         sponsored,
         urgent,
-        published: status !== "Closed" && status !== "Draft",
+        published: status !== "Closed",
         postedDate,
         thumbnail,
         instagram,
@@ -138,7 +138,7 @@ form.addEventListener("submit", async (e) => {
                 btn.textContent = "Publish Job";
             }
         } else {
-            await addDoc(
+            const docRef = await addDoc(
                 collection(db, "jobs"),
                 {
                     ...jobData,
@@ -146,7 +146,17 @@ form.addEventListener("submit", async (e) => {
                 }
             );
 
-            alert("✅ Job Published Successfully!");
+            const jobUrl = new URL("../job.html", window.location.href);
+            jobUrl.searchParams.set("id", docRef.id);
+
+            alert(
+                "✅ Job Published Successfully!\n\nShare this link:\n" +
+                jobUrl.href
+            );
+
+            if (confirm("Open the job detail page?")) {
+                window.open(jobUrl.href, "_blank");
+            }
         }
 
         form.reset();
