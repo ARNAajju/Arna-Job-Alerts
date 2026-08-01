@@ -511,7 +511,7 @@ function isUrgent(lastDate){
 
     const diff=Math.ceil(
 
-        (expire-today)/(1000*60*60*24)
+        (expire-currentDate)/(1000*60*60*24)
 
     );
 
@@ -614,6 +614,10 @@ alert("Unable to Copy Link");
     }
 
 }
+
+// Expose for inline onclick handlers (ES modules are scoped)
+window.saveJob = saveJob;
+window.shareJob = shareJob;
 
 // ======================================
 // FEATURED JOB SLIDER
