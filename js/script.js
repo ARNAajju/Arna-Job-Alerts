@@ -377,10 +377,11 @@ onclick="shareJob('${job.id}')">
 // SEARCH
 // =========================================
 
-if (searchInput) {
-    searchInput.addEventListener("keyup", function () {
+function runJobSearch() {
 
-    const value = this.value.toLowerCase().trim();
+    if (!searchInput) return;
+
+    const value = searchInput.value.toLowerCase().trim();
 
     filteredJobs = jobs.filter(job => {
 
@@ -406,7 +407,16 @@ if (searchInput) {
 
     displayJobs(filteredJobs);
 
-    });
+}
+
+if (searchInput) {
+    searchInput.addEventListener("keyup", runJobSearch);
+}
+
+const searchBtn = document.getElementById("searchBtn");
+
+if (searchBtn) {
+    searchBtn.addEventListener("click", runJobSearch);
 }
 
 // =========================================
@@ -451,6 +461,31 @@ categoryButtons.forEach(button => {
     });
 
 });
+
+function applyCategoryFromHash() {
+
+    const hash = window.location.hash.replace("#", "");
+
+    if (!hash) return;
+
+    const targetBtn = document.getElementById(hash);
+
+    if (targetBtn && targetBtn.classList.contains("category-btn")) {
+
+        targetBtn.click();
+
+        const jobSection = document.getElementById("jobContainer");
+
+        if (jobSection) {
+            jobSection.scrollIntoView({ behavior: "smooth" });
+        }
+
+    }
+
+}
+
+window.addEventListener("hashchange", applyCategoryFromHash);
+window.addEventListener("load", applyCategoryFromHash);
 
 // =========================================
 // FEATURED JOB

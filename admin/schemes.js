@@ -4,9 +4,8 @@
    Part 1 - Imports & Global Variables
 ========================================================= */
 
-import { db } from "../js/firebase-config.js";
-
 import {
+    db,
     collection,
     addDoc,
     getDocs,
@@ -17,7 +16,7 @@ import {
     serverTimestamp,
     query,
     orderBy
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+} from "../js/firebase.js";
 
 /* =========================================================
    Firestore Collection

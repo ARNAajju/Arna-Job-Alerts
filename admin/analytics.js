@@ -1,9 +1,8 @@
-import { db } from "../js/firebase.js";
-
 import {
+    db,
     collection,
     getDocs
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+} from "../js/firebase.js";
 
 let doughnutChart;
 let barChart;

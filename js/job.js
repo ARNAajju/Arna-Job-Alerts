@@ -39,11 +39,11 @@ if (loading) loading.style.display = "block";
 
     try {
 
-        if (loading) loading.style.display = "none";
-
         const snap = await getDoc(doc(db, "jobs", jobId));
 
         if (!snap.exists()) {
+
+            if (loading) loading.style.display = "none";
 
             document.body.innerHTML = `
             <div class="container py-5">
@@ -392,50 +392,60 @@ officialBtn.rel = "noopener noreferrer";
 
             }
 
+            const officialWrap =
+                document.getElementById("officialWebsiteBtnWrap");
+
+            if (officialWrap) {
+                officialWrap.style.display = "";
+            }
+
         }
 
+        if (loading) loading.style.display = "none";
+
         // ==========================
-        // LATEST JOBS
+        // LATEST + RELATED JOBS (single fetch)
         // ==========================
 
         const latestJobs = document.getElementById("latestJobs");
+        const related = document.getElementById("relatedJobs");
 
-        if (latestJobs) {
+        if (latestJobs || related) {
 
-            latestJobs.innerHTML = "";
-
-            const latestSnapshot = await getDocs(
+            const allJobsSnapshot = await getDocs(
                 collection(db, "jobs")
             );
 
-            let latest = [];
+            let allJobs = [];
 
-            latestSnapshot.forEach(docSnap => {
+            allJobsSnapshot.forEach(docSnap => {
 
-                latest.push(normalizeJobRecord({
-
+                allJobs.push(normalizeJobRecord({
                     id: docSnap.id,
                     ...docSnap.data()
-
                 }));
 
             });
 
-            latest.sort((a, b) => {
+            if (latestJobs) {
 
-                const aa = a.createdAt?.seconds || 0;
-                const bb = b.createdAt?.seconds || 0;
+                latestJobs.innerHTML = "";
 
-                return bb - aa;
+                const latest = [...allJobs].sort((a, b) => {
 
-            });
+                    const aa = a.createdAt?.seconds || 0;
+                    const bb = b.createdAt?.seconds || 0;
 
-            latest
-                .filter(item => item.id !== job.id)
-                .slice(0, 6)
-                .forEach(item => {
+                    return bb - aa;
 
-                    latestJobs.innerHTML += `
+                });
+
+                latest
+                    .filter(item => item.id !== job.id)
+                    .slice(0, 6)
+                    .forEach(item => {
+
+                        latestJobs.innerHTML += `
 
 <div class="col-lg-4 mb-4">
 
@@ -472,39 +482,25 @@ View Details
 
 `;
 
-                });
+                    });
 
-        }
-                // ==========================
-        // RELATED JOBS
-        // ==========================
+            }
 
-        const related = document.getElementById("relatedJobs");
+            if (related) {
 
-        if (related) {
+                related.innerHTML = "";
 
-            related.innerHTML = "";
+                let count = 0;
 
-            const snapshot = await getDocs(
-                collection(db, "jobs")
-            );
+                allJobs.forEach(item => {
 
-            let count = 0;
+                    if (count >= 6) return;
 
-            snapshot.forEach(docSnap => {
+                    if (item.id === job.id) return;
 
-                if (count >= 6) return;
+                    if (item.category !== job.category) return;
 
-                if (docSnap.id === job.id) return;
-
-                const item = normalizeJobRecord({
-                    id: docSnap.id,
-                    ...docSnap.data()
-                });
-
-                if (item.category !== job.category) return;
-
-                related.innerHTML += `
+                    related.innerHTML += `
 
 <div class="col-lg-4 mb-4">
 
@@ -537,18 +533,20 @@ View Details
 
 `;
 
-                count++;
+                    count++;
 
-            });
+                });
 
-            if (count === 0) {
+                if (count === 0) {
 
-                related.innerHTML = `
+                    related.innerHTML = `
 <div class="col-12">
 <div class="alert alert-light text-center">
 No similar jobs found.
 </div>
 </div>`;
+
+                }
 
             }
 
@@ -614,8 +612,6 @@ document.getElementById("copyLinkBtn")?.addEventListener("click", async () => {
 .then(()=>alert("Copied"))
 .catch(()=>alert("Copy Failed"));
 
-    alert("Job link copied successfully.");
-
 });
 
 // ==========================
@@ -627,6 +623,22 @@ document.getElementById("copyLink")?.addEventListener("click", async () => {
     await navigator.clipboard.writeText(window.location.href);
 
     alert("Job link copied successfully.");
+
+});
+
+document.getElementById("copyLinkBtn2")?.addEventListener("click", async () => {
+
+    try {
+
+        await navigator.clipboard.writeText(window.location.href);
+
+        alert("Job link copied successfully.");
+
+    } catch (error) {
+
+        alert("Copy Failed");
+
+    }
 
 });
 
