@@ -105,6 +105,8 @@ form.addEventListener("submit", async (e) => {
         status,
         qualification,
         salary,
+        age,
+        fee,
         lastDate,
         featured,
         sponsored,
@@ -236,6 +238,12 @@ async function loadEditJob(id) {
 
         document.getElementById("qualification").value = job.qualification || "";
         document.getElementById("salary").value = job.salary || "";
+        if (document.getElementById("age")) {
+            document.getElementById("age").value = job.age || job.ageLimit || "";
+        }
+        if (document.getElementById("fee")) {
+            document.getElementById("fee").value = job.fee || job.applicationFee || "";
+        }
         document.getElementById("lastDate").value = job.lastDate || "";
         
         const statusEl = document.getElementById("status");
