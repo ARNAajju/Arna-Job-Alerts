@@ -119,17 +119,17 @@ function renderRows(docs) {
 
             <td>${formatTime(data)}</td>
 
-            <td>${data.email || data.user || "-"}</td>
+            <td>${escapeHTML(data.email || data.user || "-")}</td>
 
-            <td>${eventLabel(data)}</td>
+            <td>${escapeHTML(eventLabel(data))}</td>
 
-            <td>${detectDevice(data)}</td>
+            <td>${escapeHTML(detectDevice(data))}</td>
 
-            <td>${browserName}</td>
+            <td>${escapeHTML(browserName)}</td>
 
-            <td>${data.platform || "-"}</td>
+            <td>${escapeHTML(data.platform || "-")}</td>
 
-            <td style="font-size:12px">${shortSession(data, id)}</td>
+            <td style="font-size:12px">${escapeHTML(shortSession(data, id))}</td>
 
             <td>${statusBadge(data.status)}</td>
 

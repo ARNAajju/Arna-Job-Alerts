@@ -254,7 +254,7 @@ if (loading) loading.style.display = "block";
                 vacancies.forEach(item => {
 
                     vacancyList.innerHTML += `
-                        <li class="list-group-item">${item}</li>
+                        <li class="list-group-item">${escapeHTML(item)}</li>
                     `;
 
                 });
@@ -270,7 +270,7 @@ if (loading) loading.style.display = "block";
                     .forEach(item => {
 
                         vacancyList.innerHTML += `
-                            <li class="list-group-item">${item}</li>
+                            <li class="list-group-item">${escapeHTML(item)}</li>
                         `;
 
                     });
@@ -305,7 +305,7 @@ if (loading) loading.style.display = "block";
                 dates.forEach(item => {
 
                     dateList.innerHTML += `
-                        <li class="list-group-item">${item}</li>
+                        <li class="list-group-item">${escapeHTML(item)}</li>
                     `;
 
                 });
@@ -321,7 +321,7 @@ if (loading) loading.style.display = "block";
                     .forEach(item => {
 
                         dateList.innerHTML += `
-                            <li class="list-group-item">${item}</li>
+                            <li class="list-group-item">${escapeHTML(item)}</li>
                         `;
 
                     });
@@ -372,7 +372,7 @@ if (loading) loading.style.display = "block";
                     .forEach(item => {
 
                         documentList.innerHTML += `
-                            <li class="list-group-item">${item}</li>
+                            <li class="list-group-item">${escapeHTML(item)}</li>
                         `;
 
                     });
