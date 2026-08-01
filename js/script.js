@@ -10,7 +10,6 @@ import {
     normalizeJobCategory,
     normalizeJobRecord,
     escapeHTML,
-    isPubliclyVisible,
     IMAGE_FALLBACK
 } from "./job-utils.js";
 
@@ -28,6 +27,29 @@ let filteredJobs = [];
 
 const currentDate = new Date();
 const todayString = currentDate.toISOString().split("T")[0];
+
+/**
+ * Homepage-only visibility: Active/Upcoming jobs always render.
+ * Draft/Closed/Scheduled/Expired stay hidden.
+ */
+function isHomepageJobVisible(job = {}) {
+    const status = String(job.status || "").toLowerCase();
+
+    if (
+        status === "draft" ||
+        status === "scheduled" ||
+        status === "expired" ||
+        status === "closed"
+    ) {
+        return false;
+    }
+
+    if (status === "active" || status === "upcoming") {
+        return true;
+    }
+
+    return job.published !== false;
+}
 
 // Load Jobs
 
@@ -131,7 +153,7 @@ async function loadJobs() {
                 ...doc.data()
             });
 
-            if (isPubliclyVisible(record)) {
+            if (isHomepageJobVisible(record)) {
                 jobs.push(record);
             }
 
@@ -197,7 +219,6 @@ function removeExpiredJobs() {
 
         const lastDate = new Date(job.lastDate);
         if (Number.isNaN(lastDate.getTime())) return true;
-
         lastDate.setHours(23, 59, 59, 999);
 
         return lastDate >= today;
@@ -426,7 +447,9 @@ function runJobSearch() {
 
         (job.category || "").toLowerCase().includes(value) ||
 
-        (job.categoryRaw || "").toLowerCase().includes(value)
+        (job.categoryRaw || "").toLowerCase().includes(value) ||
+
+        (job.state || "").toLowerCase().includes(value)
 
     );
 
@@ -502,12 +525,11 @@ function applyCategoryFromHash() {
 
     if (!hash) return;
 
-    // Latest / job list anchors → show all jobs
     if (hash === "jobContainer" || hash === "todayContainer" || hash === "latestJobs") {
         const allBtn = document.getElementById("latestJobs")
             || document.querySelector('.category-btn[data-category="all"]');
         if (allBtn) {
-            categoryButtons.forEach((btn) => btn.classList.remove("active"));
+            document.querySelectorAll(".category-btn").forEach((btn) => btn.classList.remove("active"));
             allBtn.classList.add("active");
             displayJobs(jobs);
         }

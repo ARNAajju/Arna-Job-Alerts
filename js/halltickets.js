@@ -59,6 +59,7 @@ let currentPage = 1;
 
 
 
+
 function getTicketTitle(ticket) {
     return ticket.title || ticket.examName || "Hall Ticket";
 }

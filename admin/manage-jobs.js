@@ -6,6 +6,7 @@ import {
     deleteDoc,
     doc
 } from "../js/firebase.js";
+import { normalizeJobCategory } from "../js/job-utils.js";
 
 const table = document.getElementById("jobTable");
 const searchJob = document.getElementById("searchJob");
@@ -30,8 +31,8 @@ function normalizeCategory(value) {
 function matchesCategory(job, selected) {
     if (!selected) return true;
 
-    const category = normalizeCategory(job.category);
-    const selectedValue = normalizeCategory(selected);
+    const category = normalizeCategory(normalizeJobCategory(job.category));
+    const selectedValue = normalizeCategory(normalizeJobCategory(selected));
 
     return (
         category === selectedValue ||
