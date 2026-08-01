@@ -110,19 +110,37 @@ function applyFilters() {
     const keyword = (searchJob?.value || "").toLowerCase().trim();
     const state = filterState?.value || "";
     const category = filterCategory?.value || "";
+    const status = filterStatus?.value || "";
+    const publishedFilter = filterPublished?.value || "";
 
     filteredJobs = allJobs.filter((job) => {
-        const keywordMatch =
-            !keyword ||
-            (job.title || "").toLowerCase().includes(keyword) ||
-            (job.department || "").toLowerCase().includes(keyword) ||
-            (job.district || "").toLowerCase().includes(keyword) ||
-            (job.category || "").toLowerCase().includes(keyword);
+        const haystack = [
+            job.title,
+            job.department,
+            job.district,
+            job.category,
+            job.state,
+            job.qualification,
+            job.status,
+            job.id
+        ]
+            .map((value) => String(value || "").toLowerCase())
+            .join(" ");
 
+        const keywordMatch = !keyword || haystack.includes(keyword);
         const stateMatch = !state || (job.state || "") === state;
         const categoryMatch = matchesCategory(job, category);
+        const statusMatch =
+            !status ||
+            String(job.status || "Active").toLowerCase() === status.toLowerCase();
 
-        return keywordMatch && stateMatch && categoryMatch;
+        const isPublished = job.published !== false;
+        const publishedMatch =
+            !publishedFilter ||
+            (publishedFilter === "published" && isPublished) ||
+            (publishedFilter === "unpublished" && !isPublished);
+
+        return keywordMatch && stateMatch && categoryMatch && statusMatch && publishedMatch;
     });
 
     filteredJobs = sortJobs(filteredJobs);
@@ -407,6 +425,8 @@ async function bulkUpdateJobStatus() {
 searchJob?.addEventListener("input", applyFilters);
 filterState?.addEventListener("change", applyFilters);
 filterCategory?.addEventListener("change", applyFilters);
+filterStatus?.addEventListener("change", applyFilters);
+filterPublished?.addEventListener("change", applyFilters);
 
 prevPage?.addEventListener("click", () => {
     if (currentPage > 1) {
