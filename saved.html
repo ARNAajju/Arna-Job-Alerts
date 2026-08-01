@@ -19,6 +19,7 @@ content="Saved Jobs, Government Jobs, AP Jobs, TS Jobs, Central Jobs">
 content="Arna Job Alerts">
 
 <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="favicon.png" type="image/png">
 
 <!-- Bootstrap -->
 
@@ -49,6 +50,19 @@ href="style.css">
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d6efd">
+
+
+    <link rel="canonical" href="https://arna-jobs.web.app/saved.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Arna Job Alerts">
+    <meta property="og:title" content="Saved Jobs | Arna Job Alerts">
+    <meta property="og:description" content="View and manage your saved government job alerts.">
+    <meta property="og:url" content="https://arna-jobs.web.app/saved.html">
+    <meta property="og:image" content="https://arna-jobs.web.app/assets/logo.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Saved Jobs | Arna Job Alerts">
+    <meta name="twitter:description" content="View and manage your saved government job alerts.">
+    <meta name="twitter:image" content="https://arna-jobs.web.app/assets/logo.png">
 
 </head>
 
@@ -518,7 +532,7 @@ if ("serviceWorker" in navigator) {
             .register("./sw.js")
             .then(() => {
 
-                console.log("Service Worker Registered");
+                
 
             })
             .catch((error) => {
@@ -532,6 +546,7 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+<script type="module" src="js/site-settings.js"></script>
 </body>
 
 </html>

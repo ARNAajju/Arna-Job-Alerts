@@ -136,6 +136,18 @@ function setOnlineStatus() {
             "bg-success"
         );
 
+    const serverStatus = document.getElementById("serverStatus");
+    if (serverStatus) {
+        serverStatus.className = "badge bg-success";
+        serverStatus.textContent = "Realtime";
+    }
+
+    const storageStatus = document.getElementById("storageStatus");
+    if (storageStatus) {
+        storageStatus.className = "badge bg-primary";
+        storageStatus.textContent = "Active";
+    }
+
     updateSyncTime();
 
 }
@@ -153,6 +165,12 @@ function setOfflineStatus() {
             "bg-success",
             "bg-danger"
         );
+
+    const serverStatus = document.getElementById("serverStatus");
+    if (serverStatus) {
+        serverStatus.className = "badge bg-danger";
+        serverStatus.textContent = "Offline";
+    }
 
 }
 
@@ -1108,7 +1126,5 @@ setInterval(() => {
 window.addEventListener("load", () => {
 
     initDashboard();
-
-    console.log("✅ Arna Dashboard V2 Loaded");
 
 });

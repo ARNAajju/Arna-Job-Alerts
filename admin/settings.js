@@ -33,6 +33,12 @@ async function loadSettings() {
         document.getElementById("contactPhone").value = data.contactPhone || "";
         document.getElementById("whatsapp").value = data.whatsapp || "";
 
+        const supportUrl = document.getElementById("supportUrl");
+        if (supportUrl) supportUrl.value = data.supportUrl || "";
+
+        const contactAddress = document.getElementById("contactAddress");
+        if (contactAddress) contactAddress.value = data.contactAddress || "";
+
         document.getElementById("themeColor").value =
             data.themeColor || "#0d6efd";
 
@@ -104,6 +110,8 @@ form.addEventListener("submit", async (e) => {
         contactEmail: document.getElementById("contactEmail").value.trim(),
         contactPhone: document.getElementById("contactPhone").value.trim(),
         whatsapp: document.getElementById("whatsapp").value.trim(),
+        supportUrl: document.getElementById("supportUrl")?.value.trim() || "",
+        contactAddress: document.getElementById("contactAddress")?.value.trim() || "",
 
         themeColor: document.getElementById("themeColor").value,
 
