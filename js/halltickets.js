@@ -1,7 +1,7 @@
 import {
     db,
     collection,
-    getDocs,
+    onSnapshot,
     query,
     orderBy
 } from "./firebase.js";
@@ -33,6 +33,7 @@ const pagination =
 
 let allTickets = [];
 let filteredTickets = [];
+let hallticketsUnsubscribe = null;
 
 function matchesDepartmentFilter(item, filter) {
 
@@ -88,64 +89,59 @@ function isActiveTicket(ticket) {
 // LOAD HALL TICKETS
 // ==========================================
 
-async function loadHallTickets() {
+function loadHallTickets() {
 
-    try {
+    loadingState?.classList.remove("d-none");
+    noTickets?.classList.add("d-none");
 
-        loadingState?.classList.remove("d-none");
-        noTickets?.classList.add("d-none");
-
+    if (hallticketsContainer) {
         hallticketsContainer.innerHTML = "";
+    }
 
-        const q = query(
-            collection(db, "halltickets"),
-            orderBy("createdAt", "desc")
-        );
+    if (typeof hallticketsUnsubscribe === "function") {
+        hallticketsUnsubscribe();
+        hallticketsUnsubscribe = null;
+    }
 
-        const snapshot = await getDocs(q);
+    const q = query(
+        collection(db, "halltickets"),
+        orderBy("createdAt", "desc")
+    );
 
+    hallticketsUnsubscribe = onSnapshot(q, (snapshot) => {
         allTickets = [];
 
-        snapshot.forEach(doc => {
-
+        snapshot.forEach((docSnap) => {
             const ticket = {
-                id: doc.id,
-                ...doc.data()
+                id: docSnap.id,
+                ...docSnap.data()
             };
 
             if (isActiveTicket(ticket)) {
                 allTickets.push(ticket);
             }
-
         });
 
         filteredTickets = [...allTickets];
 
-        ticketCount.textContent = allTickets.length;
+        if (ticketCount) {
+            ticketCount.textContent = allTickets.length;
+        }
 
-        renderPage(1);
-
-    } catch (error) {
-
+        renderPage(currentPage || 1);
+    }, (error) => {
         console.error(error);
-
         loadingState?.classList.add("d-none");
 
-        hallticketsContainer.innerHTML = `
-
-<div class="col-12">
-
-<div class="alert alert-danger">
-
-Failed to load Hall Tickets.
-
-</div>
-
-</div>
-
-`;
-
-    }
+        if (hallticketsContainer) {
+            hallticketsContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        Failed to load hall tickets.
+                    </div>
+                </div>`;
+        }
+    });
 
 }
 
