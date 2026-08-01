@@ -4,9 +4,7 @@ import {
     doc,
     getDoc
 } from "./firebase.js";
-import { IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
-
-const IMAGE_FALLBACK = LOCAL_FB;
+import { IMAGE_FALLBACK } from "./job-utils.js";
 
 function getTicketTitle(ticket) {
     return ticket.title || ticket.examName || "Hall Ticket";
