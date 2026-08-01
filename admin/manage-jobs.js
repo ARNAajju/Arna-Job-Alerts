@@ -488,6 +488,55 @@ async function bulkSetPublished(nextPublished) {
     }
 }
 
+function buildJobShareText(job, url) {
+    const title = job?.title || "Job Alert";
+    const department = job?.department || "";
+    const lastDate = job?.lastDate || "";
+    return [
+        title,
+        department ? `Department: ${department}` : "",
+        lastDate ? `Last Date: ${lastDate}` : "",
+        "",
+        url,
+        "",
+        "Arna Job Alerts"
+    ].filter((line, index, arr) => line !== "" || (arr[index - 1] && arr[index - 1] !== "")).join("\n");
+}
+
+async function copyJobLink(id) {
+    const url = getJobShareUrl(id);
+
+    try {
+        await navigator.clipboard.writeText(url);
+        alert("Share link copied:\n" + url);
+    } catch (error) {
+        console.error(error);
+        window.prompt("Copy this share link:", url);
+    }
+}
+
+function shareJobWhatsApp(id) {
+    const job = allJobs.find((item) => item.id === id);
+    const url = getJobShareUrl(id);
+    const text = buildJobShareText(job, url);
+    window.open(
+        `https://wa.me/?text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+
+function shareJobTelegram(id) {
+    const job = allJobs.find((item) => item.id === id);
+    const url = getJobShareUrl(id);
+    const text = buildJobShareText(job, url);
+    window.open(
+        `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+
 table?.addEventListener("change", (event) => {
     if (event.target.classList.contains("job-row-select")) {
         updateBulkBar();
@@ -509,6 +558,21 @@ table?.addEventListener("click", (event) => {
     if (button.dataset.action === "toggle-publish") {
         const currentlyPublished = button.dataset.published !== "false";
         togglePublishJob(id, currentlyPublished);
+        return;
+    }
+
+    if (button.dataset.action === "copy-link") {
+        copyJobLink(id);
+        return;
+    }
+
+    if (button.dataset.action === "share-whatsapp") {
+        shareJobWhatsApp(id);
+        return;
+    }
+
+    if (button.dataset.action === "share-telegram") {
+        shareJobTelegram(id);
     }
 });
 
