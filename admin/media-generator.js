@@ -38,6 +38,9 @@ function buildCaptions({ title, department, lastDate, applyUrl }) {
         instagramCaption: `📢 ${t}\n\n🏛 ${dept}\n📅 Last Date: ${ld}\n\n✅ Details:\n${link}\n\n#ArnaJobAlerts #GovtJobs #Jobs`,
         telegramMessage: `🔔 *${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nApply: ${link}\n\n— Arna Job Alerts`,
         whatsappMessage: `*${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nDetails: ${link}\n\nArna Job Alerts`,
+        facebookCaption: `${t}\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nApply / Details: ${link}\n\nFollow Arna Job Alerts for daily updates.`,
+        youtubeDescription: `${t}\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nFull details and apply link:\n${link}\n\nSubscribe to Arna Job Alerts for government and private job updates.`,
+        hashtags: `#ArnaJobAlerts #GovtJobs #PrivateJobs #JobAlert #${String(dept).replace(/\s+/g, "")} #Recruitment #ApplyOnline`,
         seoTitle: `${t} | Apply Online | Arna Job Alerts`,
         seoDescription: `${t}. Department: ${dept}. Last date: ${ld}. Check eligibility, notification and apply online at Arna Job Alerts.`
     };
