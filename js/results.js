@@ -1,7 +1,7 @@
 import {
     db,
     collection,
-    getDocs,
+    onSnapshot,
     query,
     orderBy
 } from "./firebase.js";
@@ -21,6 +21,7 @@ const pagination = document.getElementById("pagination");
 let allResults = [];
 let filteredResults = [];
 let currentPage = 1;
+let resultsUnsubscribe = null;
 
 const RESULTS_PER_PAGE = 9;
 
@@ -56,30 +57,30 @@ function matchesDepartmentFilter(item, filter) {
 
 }
 
-async function loadResults() {
+function loadResults() {
 
-    try {
+    loadingState?.classList.remove("d-none");
+    noResults?.classList.add("d-none");
 
-        loadingState?.classList.remove("d-none");
-        noResults?.classList.add("d-none");
+    if (resultsContainer) {
+        resultsContainer.innerHTML = "";
+    }
 
-        if (resultsContainer) {
-            resultsContainer.innerHTML = "";
-        }
+    if (typeof resultsUnsubscribe === "function") {
+        resultsUnsubscribe();
+        resultsUnsubscribe = null;
+    }
 
-        const resultsQuery = query(
-            collection(db, "results"),
-            orderBy("createdAt", "desc")
-        );
+    const resultsQuery = query(
+        collection(db, "results"),
+        orderBy("createdAt", "desc")
+    );
 
-        const snapshot = await getDocs(resultsQuery);
-
-        allResults = snapshot.docs.map((snapshotDoc) => {
-            return {
-                id: snapshotDoc.id,
-                ...snapshotDoc.data()
-            };
-        });
+    resultsUnsubscribe = onSnapshot(resultsQuery, (snapshot) => {
+        allResults = snapshot.docs.map((snapshotDoc) => ({
+            id: snapshotDoc.id,
+            ...snapshotDoc.data()
+        }));
 
         filteredResults = allResults.filter(isPublished);
 
@@ -87,10 +88,8 @@ async function loadResults() {
             resultCount.textContent = filteredResults.length;
         }
 
-        renderPage(1);
-
-    } catch (error) {
-
+        renderPage(currentPage || 1);
+    }, (error) => {
         console.error(error);
         loadingState?.classList.add("d-none");
 
@@ -103,8 +102,7 @@ async function loadResults() {
                 </div>
             `;
         }
-
-    }
+    });
 
 }
 
