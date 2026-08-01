@@ -208,6 +208,30 @@ function renderTable() {
                 </button>
                 <button
                     type="button"
+                    class="btn btn-sm btn-outline-dark"
+                    data-action="copy-link"
+                    data-id="${escapeHTML(job.id)}"
+                    title="Copy share link">
+                    Copy Link
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-success"
+                    data-action="share-whatsapp"
+                    data-id="${escapeHTML(job.id)}"
+                    title="Share on WhatsApp">
+                    WhatsApp
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-info text-white"
+                    data-action="share-telegram"
+                    data-id="${escapeHTML(job.id)}"
+                    title="Share on Telegram">
+                    Telegram
+                </button>
+                <button
+                    type="button"
                     class="btn btn-sm btn-danger"
                     data-action="delete-job"
                     data-id="${escapeHTML(job.id)}"
