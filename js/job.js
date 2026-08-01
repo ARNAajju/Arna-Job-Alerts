@@ -76,20 +76,28 @@ if (loading) loading.style.display = "block";
         }
 
         // ==========================
-        // Increase Views
+        // Increase Views (best-effort; never block page render)
         // ==========================
 
-        await updateDoc(
-            doc(db, "jobs", job.id),
-            {
-                views: increment(1)
+        try {
+            await updateDoc(
+                doc(db, "jobs", job.id),
+                {
+                    views: increment(1)
+                }
+            );
+
+            const views = document.getElementById("jobViews");
+
+            if (views) {
+                views.textContent = (job.views || 0) + 1;
             }
-        );
-
-        const views = document.getElementById("jobViews");
-
-        if (views) {
-            views.textContent = (job.views || 0) + 1;
+        } catch (viewError) {
+            console.warn("View count update skipped:", viewError);
+            const views = document.getElementById("jobViews");
+            if (views) {
+                views.textContent = job.views || 0;
+            }
         }
 
         // ==========================

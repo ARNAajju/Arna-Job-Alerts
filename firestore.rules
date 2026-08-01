@@ -12,7 +12,17 @@ service cloud.firestore {
 
     match /jobs/{jobId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow create, delete: if isAdmin();
+      // Admin full updates, or public view-count increment only.
+      allow update: if isAdmin()
+        || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+          && request.resource.data.views is number
+          && (
+            !('views' in resource.data)
+            || request.resource.data.views == resource.data.views + 1
+          )
+        );
     }
 
     match /results/{id} {
