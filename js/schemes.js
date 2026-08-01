@@ -1,7 +1,7 @@
 import {
     db,
     collection,
-    getDocs,
+    onSnapshot,
     query,
     orderBy
 } from "./firebase.js";
@@ -38,6 +38,7 @@ const pagination =
 
 let allSchemes = [];
 let filteredSchemes = [];
+let schemesUnsubscribe = null;
 
 const SCHEMES_PER_PAGE = 9;
 let currentPage = 1;
@@ -74,64 +75,59 @@ function isActiveScheme(scheme) {
 // LOAD SCHEMES
 // ==========================================
 
-async function loadSchemes() {
+function loadSchemes() {
 
-    try {
+    loadingState?.classList.remove("d-none");
+    noSchemes?.classList.add("d-none");
 
-        loadingState?.classList.remove("d-none");
-        noSchemes?.classList.add("d-none");
-
+    if (schemesContainer) {
         schemesContainer.innerHTML = "";
+    }
 
-        const q = query(
-            collection(db, "schemes"),
-            orderBy("createdAt", "desc")
-        );
+    if (typeof schemesUnsubscribe === "function") {
+        schemesUnsubscribe();
+        schemesUnsubscribe = null;
+    }
 
-        const snapshot = await getDocs(q);
+    const q = query(
+        collection(db, "schemes"),
+        orderBy("createdAt", "desc")
+    );
 
+    schemesUnsubscribe = onSnapshot(q, (snapshot) => {
         allSchemes = [];
 
-        snapshot.forEach(doc => {
-
+        snapshot.forEach((docSnap) => {
             const scheme = {
-                id: doc.id,
-                ...doc.data()
+                id: docSnap.id,
+                ...docSnap.data()
             };
 
             if (isActiveScheme(scheme)) {
                 allSchemes.push(scheme);
             }
-
         });
 
         filteredSchemes = [...allSchemes];
 
-        schemeCount.textContent = allSchemes.length;
+        if (schemeCount) {
+            schemeCount.textContent = allSchemes.length;
+        }
 
-        renderPage(1);
-
-    } catch (error) {
-
+        renderPage(currentPage || 1);
+    }, (error) => {
         console.error(error);
-
         loadingState?.classList.add("d-none");
 
-        schemesContainer.innerHTML = `
-
-<div class="col-12">
-
-<div class="alert alert-danger">
-
-Failed to load Government Schemes.
-
-</div>
-
-</div>
-
-`;
-
-    }
+        if (schemesContainer) {
+            schemesContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        Failed to load Government Schemes.
+                    </div>
+                </div>`;
+        }
+    });
 
 }
 
