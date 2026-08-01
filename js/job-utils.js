@@ -18,12 +18,14 @@ export const IMAGE_FALLBACK = "assets/images/no-image.png";
 
 /**
  * Whether a content record should appear on the public site.
+ * Active/Upcoming jobs always show (Admin Publish path).
+ * Closed/draft/scheduled/expired stay hidden.
  * @param {Record<string, unknown>} item
  * @returns {boolean}
  */
 export function isPubliclyVisible(item = {}) {
-    if (item.published === false) return false;
     const status = String(item.status || "").toLowerCase();
+
     if (
         status === "draft" ||
         status === "scheduled" ||
@@ -32,7 +34,12 @@ export function isPubliclyVisible(item = {}) {
     ) {
         return false;
     }
-    return true;
+
+    if (status === "active" || status === "upcoming") {
+        return true;
+    }
+
+    return item.published !== false;
 }
 
 /**
