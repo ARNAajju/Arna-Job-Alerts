@@ -492,6 +492,33 @@
 
                             </button>
 
+                            <button
+                                class="btn btn-outline-danger"
+                                id="bulkDeleteBtn">
+
+                                <i class="fas fa-trash me-2"></i>
+                                Bulk Delete
+
+                            </button>
+
+                            <select
+                                class="form-select"
+                                id="bulkStatusSelect">
+
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+
+                            </select>
+
+                            <button
+                                class="btn btn-outline-secondary"
+                                id="bulkStatusBtn">
+
+                                <i class="fas fa-sync me-2"></i>
+                                Update Status
+
+                            </button>
+
                         </div>
 
                     </div>
@@ -581,6 +608,13 @@
 
                             <tr>
 
+                                <th style="width:40px;">
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        id="selectAllHallTickets">
+                                </th>
+
                                 <th style="width:70px;">#</th>
 
                                 <th>Title</th>
@@ -661,7 +695,7 @@
         class="toast-container position-fixed bottom-0 end-0 p-3"
         id="toastContainer">
 
-        <!-- Toasts will be added dynamically -->
+        <!-- Dynamic toasts -->
 
     </div>
 
@@ -890,14 +924,11 @@
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Firebase SDK -->
-    <script type="module" src="../js/firebase-config.js"></script>
-
     <!-- Authentication -->
-    <script type="module" src="../js/auth.js"></script>
+    <script type="module" src="auth.js"></script>
 
     <!-- Hall Tickets -->
-    <script type="module" src="../js/halltickets.js"></script>
+    <script type="module" src="halltickets.js"></script>
 
     <script>
         // Mobile Sidebar
