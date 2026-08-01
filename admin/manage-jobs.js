@@ -19,6 +19,7 @@ const nextPage = document.getElementById("nextPage");
 const pageInfo = document.getElementById("pageInfo");
 
 const JOBS_PER_PAGE = 10;
+const PUBLIC_JOB_BASE = "https://arna-jobs.web.app/job.html";
 
 let allJobs = [];
 let filteredJobs = [];
@@ -27,6 +28,10 @@ let sortField = "createdAt";
 let sortDir = "desc";
 let deletingJobId = null;
 let jobsUnsubscribe = null;
+
+function getJobShareUrl(jobId) {
+    return `${PUBLIC_JOB_BASE}?id=${encodeURIComponent(jobId)}`;
+}
 
 function setJobsSyncStatus(state, detail = "") {
     const badge = document.getElementById("jobsSyncStatus");
@@ -187,7 +192,7 @@ function renderTable() {
                     : '<span class="badge bg-primary ms-1">Published</span>'}
             </td>
             <td class="job-actions">
-                <a class="btn btn-sm btn-primary" href="../job.html?id=${encodeURIComponent(job.id)}">
+                <a class="btn btn-sm btn-primary" href="${getJobShareUrl(job.id)}" target="_blank" rel="noopener noreferrer">
                     View
                 </a>
                 <a class="btn btn-sm btn-warning" href="add-job-card.html?edit=${encodeURIComponent(job.id)}">
