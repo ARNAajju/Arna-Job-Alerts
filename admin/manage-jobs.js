@@ -26,6 +26,34 @@ let currentPage = 1;
 let sortField = "createdAt";
 let sortDir = "desc";
 let deletingJobId = null;
+let jobsUnsubscribe = null;
+
+function setJobsSyncStatus(state, detail = "") {
+    const badge = document.getElementById("jobsSyncStatus");
+    const lastSync = document.getElementById("jobsLastSync");
+
+    if (badge) {
+        if (state === "live") {
+            badge.className = "badge bg-success";
+            badge.textContent = "Firestore Live";
+        } else if (state === "error") {
+            badge.className = "badge bg-danger";
+            badge.textContent = "Sync Error";
+        } else if (state === "loading") {
+            badge.className = "badge bg-secondary";
+            badge.textContent = "Syncing…";
+        } else {
+            badge.className = "badge bg-secondary";
+            badge.textContent = "Connecting…";
+        }
+    }
+
+    if (lastSync && state === "live") {
+        lastSync.textContent = `Last sync: ${new Date().toLocaleTimeString()}${detail ? ` · ${detail}` : ""}`;
+    } else if (lastSync && state === "error" && detail) {
+        lastSync.textContent = detail;
+    }
+}
 
 function normalizeCategory(value) {
     return (value || "").toLowerCase().trim();
