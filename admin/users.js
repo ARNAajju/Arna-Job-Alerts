@@ -1,11 +1,10 @@
-import { db } from "../js/firebase.js";
-
 import {
+    db,
     collection,
     getDocs,
     query,
     orderBy
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+} from "../js/firebase.js";
 
 const usersTable = document.getElementById("usersTable");
 const totalUsers = document.getElementById("totalUsers");
@@ -142,7 +141,7 @@ function renderUsers(data) {
 
                 <button
                     class="btn btn-sm btn-info me-1 viewBtn"
-                    data-index="${index}">
+                    data-id="${user.id}">
 
                     View
 
@@ -202,7 +201,9 @@ function bindButtons() {
 
         btn.onclick = () => {
 
-            const user = users[btn.dataset.index];
+            const user = users.find(u => u.id === btn.dataset.id);
+
+            if (!user) return;
 
             document.getElementById("viewName").textContent =
                 user.name || "-";

@@ -3,9 +3,8 @@
    RESULTS ADMIN
 ========================================================= */
 
-import { db } from "../js/firebase-config.js";
-
 import {
+    db,
     collection,
     addDoc,
     getDocs,
@@ -16,7 +15,7 @@ import {
     query,
     orderBy,
     serverTimestamp
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+} from "../js/firebase.js";
 
 const COLLECTION_NAME = "results";
 const RESULTS_PER_PAGE = 10;

@@ -136,8 +136,6 @@ required>
 
 <div class="col-md-4">
 
-<div class="col-md-4">
-
 <label class="form-label">
 
 State
@@ -182,8 +180,6 @@ required>
 
 </div>
 
-</div>
-
 <div class="col-md-4">
 
 <label class="form-label">
@@ -218,6 +214,14 @@ required>
 Last Date *
 </label>
 
+<input
+type="date"
+id="lastDate"
+class="form-control"
+required>
+
+</div>
+
 <div class="col-md-4">
 
 <label class="form-label">
@@ -225,6 +229,20 @@ Last Date *
 Status
 
 </label>
+
+<select
+id="status"
+class="form-select">
+
+<option value="Active">Active</option>
+
+<option value="Upcoming">Upcoming</option>
+
+<option value="Closed">Closed</option>
+
+</select>
+
+</div>
 
 <div class="col-md-4">
 
@@ -276,50 +294,6 @@ No
 
 Yes
 
-</option>
-
-</select>
-
-</div>
-
-<select
-id="status"
-class="form-select">
-
-<option value="Active">Active</option>
-
-<option value="Upcoming">Upcoming</option>
-
-<option value="Closed">Closed</option>
-
-</select>
-
-</div>
-
-<input
-type="date"
-id="lastDate"
-class="form-control"
-required>
-
-</div>
-
-<div class="col-md-4">
-
-<label class="form-label">
-Featured
-</label>
-
-<select
-id="featured"
-class="form-select">
-
-<option value="false">
-No
-</option>
-
-<option value="true">
-Yes
 </option>
 
 </select>

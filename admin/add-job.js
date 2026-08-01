@@ -75,7 +75,18 @@ form.addEventListener("submit", async (e) => {
     let thumbnail = existingThumbnail;
 
     if (imageFile) {
-        thumbnail = await uploadThumbnail(imageFile);
+        try {
+            thumbnail = await uploadThumbnail(imageFile);
+        } catch (uploadError) {
+            console.error(uploadError);
+            alert("Image Upload Failed\n\n" + uploadError.message);
+            return;
+        }
+
+        if (!thumbnail) {
+            alert("Image Upload Failed\n\nNo image URL returned.");
+            return;
+        }
     }
 
     const jobData = {

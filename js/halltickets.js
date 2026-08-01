@@ -33,6 +33,26 @@ const pagination =
 let allTickets = [];
 let filteredTickets = [];
 
+function matchesDepartmentFilter(item, filter) {
+
+    if (!filter) return true;
+
+    const value = filter.toLowerCase();
+    const department = (item.department || "").toLowerCase();
+    const category = (item.category || "").toLowerCase();
+    const state = (item.state || "").toLowerCase();
+
+    return (
+        department === value ||
+        category === value ||
+        state === value ||
+        department.includes(value) ||
+        category.includes(value) ||
+        state.includes(value)
+    );
+
+}
+
 const TICKETS_PER_PAGE = 9;
 let currentPage = 1;
 
@@ -236,7 +256,7 @@ function filterTickets() {
 
             department === "" ||
 
-            (ticket.department || "") === department;
+            matchesDepartmentFilter(ticket, department);
 
         return keywordMatch && departmentMatch;
 

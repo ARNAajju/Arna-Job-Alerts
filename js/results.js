@@ -35,6 +35,26 @@ function isPublished(result) {
     return result.published !== false;
 }
 
+function matchesDepartmentFilter(item, filter) {
+
+    if (!filter) return true;
+
+    const value = filter.toLowerCase();
+    const department = (item.department || "").toLowerCase();
+    const category = (item.category || "").toLowerCase();
+    const state = (item.state || "").toLowerCase();
+
+    return (
+        department === value ||
+        category === value ||
+        state === value ||
+        department.includes(value) ||
+        category.includes(value) ||
+        state.includes(value)
+    );
+
+}
+
 async function loadResults() {
 
     try {
@@ -182,7 +202,7 @@ function filterResults() {
 
         const departmentMatch =
             department === "" ||
-            (result.department || "") === department;
+            matchesDepartmentFilter(result, department);
 
         return keywordMatch && departmentMatch;
 
