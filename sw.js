@@ -44,7 +44,15 @@ const urlsToCache = [
 self.addEventListener("install", (event) => {
     self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+        caches.open(CACHE_NAME).then((cache) =>
+            Promise.all(
+                urlsToCache.map((url) =>
+                    cache.add(url).catch((err) => {
+                        console.warn("SW cache skip:", url, err);
+                    })
+                )
+            )
+        )
     );
 });
 
@@ -110,7 +118,7 @@ self.addEventListener("fetch", (event) => {
 
                     return networkResponse;
                 })
-                .catch(() => caches.match("/offline.html"));
+                .catch(() => caches.match(event.request));
         })
     );
 });

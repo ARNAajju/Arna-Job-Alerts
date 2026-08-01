@@ -53,6 +53,7 @@ form.addEventListener("submit", async (e) => {
     const apply = document.getElementById("apply").value.trim();
     const notification = document.getElementById("notification").value.trim();
     const about = document.getElementById("about").value.trim();
+    const documents = document.getElementById("documents")?.value.trim() || "";
     const vacancies = document.getElementById("vacancies").value.trim();
     const qualificationDetails = document.getElementById("qualificationDetails").value.trim();
     const selectionProcess = document.getElementById("selectionProcess").value.trim();
@@ -103,6 +104,7 @@ form.addEventListener("submit", async (e) => {
         featured,
         sponsored,
         urgent,
+        published: status !== "Closed" && status !== "Draft",
         postedDate,
         thumbnail,
         instagram,
@@ -110,6 +112,7 @@ form.addEventListener("submit", async (e) => {
         apply,
         notification,
         about,
+        documents,
         vacancies,
         qualificationDetails,
         selectionProcess,
@@ -208,6 +211,9 @@ async function loadEditJob(id) {
         document.getElementById("instagram").value = job.instagram || "";
 
         document.getElementById("about").value = job.about || "";
+        if (document.getElementById("documents")) {
+            document.getElementById("documents").value = job.documents || "";
+        }
         document.getElementById("vacancies").value = job.vacancies || "";
         document.getElementById("qualificationDetails").value = job.qualificationDetails || "";
         document.getElementById("selectionProcess").value = job.selectionProcess || "";

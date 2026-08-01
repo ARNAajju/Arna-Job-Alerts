@@ -4,8 +4,9 @@ import {
     doc,
     getDoc
 } from "./firebase.js";
+import { IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
 
-const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Hall+Ticket";
+const IMAGE_FALLBACK = LOCAL_FB;
 
 function getTicketTitle(ticket) {
     return ticket.title || ticket.examName || "Hall Ticket";
@@ -83,6 +84,16 @@ async function loadHallTicket() {
         }
 
         const ticket = docSnap.data();
+
+        if (ticket.published === false) {
+            document.body.innerHTML = `
+                <div class="container py-5 text-center">
+                    <h3>Hall Ticket Not Available</h3>
+                    <a href="halltickets.html" class="btn btn-primary mt-3">Back</a>
+                </div>`;
+            return;
+        }
+
         const titleText = getTicketTitle(ticket);
 
         document.title = titleText + " | Arna Job Alerts";

@@ -6,6 +6,7 @@ import {
     orderBy,
     onSnapshot
 } from "../js/firebase.js";
+import { escapeHTML } from "./admin-utils.js";
 
 const tbody = document.getElementById("historyTable");
 

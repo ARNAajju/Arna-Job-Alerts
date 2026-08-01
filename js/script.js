@@ -9,7 +9,9 @@ import {
 import {
     normalizeJobCategory,
     normalizeJobRecord,
-    escapeHTML
+    escapeHTML,
+    isPubliclyVisible,
+    IMAGE_FALLBACK
 } from "./job-utils.js";
 
 // =========================================
@@ -124,10 +126,14 @@ async function loadJobs() {
 
         querySnapshot.forEach((doc) => {
 
-            jobs.push(normalizeJobRecord({
+            const record = normalizeJobRecord({
                 id: doc.id,
                 ...doc.data()
-            }));
+            });
+
+            if (isPubliclyVisible(record)) {
+                jobs.push(record);
+            }
 
         });
 
@@ -937,6 +943,10 @@ return job.featured||isUrgent(job.lastDate)||job.postedDate===todayString;
 
 trending.slice(0,6).forEach(job=>{
 
+const safeTitle = escapeHTML(job.title || "");
+const safeDistrict = escapeHTML(job.district || "");
+const safeThumb = escapeHTML(job.thumbnail || IMAGE_FALLBACK);
+
 container.innerHTML+=`
 
 <div class="col-lg-4 mb-4">
@@ -944,10 +954,10 @@ container.innerHTML+=`
 <div class="trending-card">
 
 <img
-src="${job.thumbnail || 'assets/images/no-image.jpg'}"
+src="${safeThumb}"
 loading="lazy"
-alt="${job.title}"
-onerror="this.onerror=null;this.src='assets/images/no-image.jpg';">
+alt="${safeTitle}"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}'">
 
 <div class="trending-body">
 
@@ -963,13 +973,13 @@ ${isUrgent(job.lastDate)?'<span>🚨 Urgent</span>':''}
 
 <h4 class="trending-title">
 
-${job.title}
+${safeTitle}
 
 </h4>
 
 <p>
 
-📍 ${job.district}
+📍 ${safeDistrict}
 
 </p>
 
@@ -1025,6 +1035,11 @@ return;
 
 closingJobs.forEach(job=>{
 
+const safeTitle = escapeHTML(job.title || "");
+const safeDistrict = escapeHTML(job.district || "");
+const safeLast = escapeHTML(job.lastDate || "");
+const safeThumb = escapeHTML(job.thumbnail || IMAGE_FALLBACK);
+
 container.innerHTML+=`
 
 <div class="col-lg-4 mb-4">
@@ -1032,11 +1047,11 @@ container.innerHTML+=`
 <div class="job-card">
 
 <img
-src="${job.thumbnail || 'assets/images/no-image.jpg'}"
+src="${safeThumb}"
 class="job-image"
 loading="lazy"
-alt="${job.title}"
-onerror="this.onerror=null;this.src='assets/images/no-image.jpg';">
+alt="${safeTitle}"
+onerror="this.onerror=null;this.src='${IMAGE_FALLBACK}'">
 
 <div class="job-content">
 
@@ -1046,11 +1061,11 @@ onerror="this.onerror=null;this.src='assets/images/no-image.jpg';">
 
 </span>
 
-<h4>${job.title}</h4>
+<h4>${safeTitle}</h4>
 
-<p>📍 ${job.district}</p>
+<p>📍 ${safeDistrict}</p>
 
-<p>📅 ${job.lastDate}</p>
+<p>📅 ${safeLast}</p>
 
 <a href="./job.html?id=${encodeURIComponent(job.id)}"
 

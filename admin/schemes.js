@@ -736,7 +736,7 @@ function renderTable() {
 
         const thumbnail =
             item.thumbnail ||
-            "../assets/no-image.png";
+            "../assets/images/no-image.png";
 
         tableBody.insertAdjacentHTML(
             "beforeend",
@@ -990,6 +990,7 @@ schemeForm.addEventListener("submit", async (e) => {
         const data = {
 
             schemeName: document.getElementById("schemeName").value.trim(),
+            title: document.getElementById("schemeName").value.trim(),
 
             department: document.getElementById("department").value.trim(),
 
@@ -1000,12 +1001,16 @@ schemeForm.addEventListener("submit", async (e) => {
             status: document.getElementById("status").value,
 
             publishedDate: document.getElementById("publishedDate").value,
+            date: document.getElementById("publishedDate").value,
 
             thumbnail: document.getElementById("thumbnail").value.trim(),
 
             officialLink: document.getElementById("officialLink").value.trim(),
+            officialWebsite: document.getElementById("officialLink").value.trim(),
+            applyLink: document.getElementById("officialLink").value.trim(),
 
-            description: document.getElementById("description").value.trim()
+            description: document.getElementById("description").value.trim(),
+            published: document.getElementById("status").value !== "closed"
 
         };
 

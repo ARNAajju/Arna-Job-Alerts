@@ -146,8 +146,22 @@ async function applyWebsiteSettings() {
             });
         }
         if (data.telegram) {
+            document.querySelectorAll(".footer-social .fa-telegram, .footer-social .fa-telegram-plane").forEach((i) => {
+                const a = i.closest("a");
+                if (a) a.href = data.telegram;
+            });
             document.querySelectorAll('[data-social="telegram"]').forEach((a) => {
                 a.href = data.telegram;
+            });
+        }
+        if (data.whatsapp) {
+            document.querySelectorAll(".footer-social .fa-whatsapp").forEach((i) => {
+                const a = i.closest("a");
+                if (a) {
+                    a.href = data.whatsapp.startsWith("http")
+                        ? data.whatsapp
+                        : `https://wa.me/${data.whatsapp.replace(/\D/g, "")}`;
+                }
             });
         }
 

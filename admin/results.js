@@ -257,7 +257,7 @@ function getResultDescription(item) {
 }
 
 function getResultThumbnail(item) {
-    return item.thumbnail || "../assets/no-image.png";
+    return item.thumbnail || "../assets/images/no-image.png";
 }
 
 function getNotificationPdfUrl(item) {
@@ -715,7 +715,7 @@ function renderTable() {
                         src="${escapeHTML(getResultThumbnail(item))}"
                         alt="${escapeHTML(getResultTitle(item))}"
                         class="result-thumbnail"
-                        onerror="this.onerror=null; this.src='../assets/no-image.png';">
+                        onerror="this.onerror=null; this.src='../assets/images/no-image.png';">
                 </td>
                 <td>
                     <strong>${escapeHTML(getResultTitle(item))}</strong>

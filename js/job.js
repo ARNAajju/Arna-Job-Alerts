@@ -8,7 +8,10 @@ import {
     increment
 } from "./firebase.js";
 import {
-    normalizeJobRecord
+    normalizeJobRecord,
+    escapeHTML,
+    isPubliclyVisible,
+    IMAGE_FALLBACK
 } from "./job-utils.js";
 
 // =========================================
@@ -59,6 +62,18 @@ if (loading) loading.style.display = "block";
             id: snap.id,
             ...snap.data()
         });
+
+        if (!isPubliclyVisible(job)) {
+            if (loading) loading.style.display = "none";
+            document.body.innerHTML = `
+            <div class="container py-5">
+                <div class="alert alert-warning">
+                    This job is not available.
+                </div>
+                <a href="index.html" class="btn btn-primary">Back to Jobs</a>
+            </div>`;
+            return;
+        }
 
         // ==========================
         // Increase Views
@@ -117,7 +132,7 @@ if (loading) loading.style.display = "block";
         // ==========================
 
         document.getElementById("jobImage").src =
-            job.thumbnail || "assets/images/no-image.png";
+            job.thumbnail || IMAGE_FALLBACK;
 
         document.getElementById("jobTitle").textContent =
             job.title || "-";
@@ -144,13 +159,13 @@ if (loading) loading.style.display = "block";
             job.description || "No description available.";
 
         document.getElementById("qualificationDetails").innerHTML =
-            job.qualificationDetails || "-";
+            escapeHTML(job.qualificationDetails || "-").replace(/\n/g, "<br>");
 
         document.getElementById("selectionProcess").innerHTML =
-            job.selectionProcess || "-";
+            escapeHTML(job.selectionProcess || "-").replace(/\n/g, "<br>");
 
         document.getElementById("howToApply").innerHTML =
-            job.howToApply || "-";
+            escapeHTML(job.howToApply || "-").replace(/\n/g, "<br>");
 
         // ==========================
         // Badges
@@ -341,7 +356,7 @@ if (loading) loading.style.display = "block";
                 docs.forEach(item => {
 
                     documentList.innerHTML += `
-                        <li class="list-group-item">${item}</li>
+                        <li class="list-group-item">${escapeHTML(item)}</li>
                     `;
 
                 });
@@ -420,10 +435,13 @@ officialBtn.rel = "noopener noreferrer";
 
             allJobsSnapshot.forEach(docSnap => {
 
-                allJobs.push(normalizeJobRecord({
+                const record = normalizeJobRecord({
                     id: docSnap.id,
                     ...docSnap.data()
-                }));
+                });
+                if (isPubliclyVisible(record)) {
+                    allJobs.push(record);
+                }
 
             });
 
@@ -452,22 +470,22 @@ officialBtn.rel = "noopener noreferrer";
 <div class="card h-100 shadow-sm">
 
 <img
-src="${item.thumbnail || 'assets/images/no-image.jpg'}"
+src="${escapeHTML(item.thumbnail || IMAGE_FALLBACK)}"
 loading="lazy"
-onerror="this.onerror=null;this.src='assets/images/no-image.jpg';"
+onerror="this.onerror=null;this.src='assets/images/no-image.png';"
 class="card-img-top"
 style="height:180px;object-fit:cover;">
 
 <div class="card-body">
 
-<h6>${item.title}</h6>
+<h6>${escapeHTML(item.title || "")}</h6>
 
 <p class="mb-2">
-📍 ${item.district}
+📍 ${escapeHTML(item.district || "")}
 </p>
 
 <a
-href="job.html?id=${item.id}"
+href="job.html?id=${encodeURIComponent(item.id)}"
 class="btn btn-primary w-100">
 
 View Details
@@ -507,18 +525,18 @@ View Details
 <div class="card h-100 shadow-sm">
 
 <img
-src="${item.thumbnail || 'assets/images/no-image.png'}"
+src="${escapeHTML(item.thumbnail || IMAGE_FALLBACK)}"
 class="card-img-top"
 style="height:180px;object-fit:cover;">
 
 <div class="card-body">
 
-<h6>${item.title}</h6>
+<h6>${escapeHTML(item.title || "")}</h6>
 
-<p>📍 ${item.district || "-"}</p>
+<p>📍 ${escapeHTML(item.district || "-")}</p>
 
 <a
-href="job.html?id=${item.id}"
+href="job.html?id=${encodeURIComponent(item.id)}"
 class="btn btn-primary w-100">
 
 View Details
