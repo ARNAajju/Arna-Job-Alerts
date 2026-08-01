@@ -158,6 +158,8 @@ async function loadJobs() {
 
         showTodayJobs();
 
+        applyCategoryFromHash();
+
     }
 
    catch (error) {
@@ -194,6 +196,8 @@ function removeExpiredJobs() {
         if (!job.lastDate) return true;
 
         const lastDate = new Date(job.lastDate);
+        if (Number.isNaN(lastDate.getTime())) return true;
+
         lastDate.setHours(23, 59, 59, 999);
 
         return lastDate >= today;
@@ -422,7 +426,9 @@ function runJobSearch() {
 
         (job.category || "").toLowerCase().includes(value) ||
 
-        (job.categoryRaw || "").toLowerCase().includes(value)
+        (job.categoryRaw || "").toLowerCase().includes(value) ||
+
+        (job.state || "").toLowerCase().includes(value)
 
     );
 
@@ -497,6 +503,21 @@ function applyCategoryFromHash() {
     const hash = window.location.hash.replace("#", "");
 
     if (!hash) return;
+
+    if (hash === "jobContainer" || hash === "todayContainer" || hash === "latestJobs") {
+        const allBtn = document.getElementById("latestJobs")
+            || document.querySelector('.category-btn[data-category="all"]');
+        if (allBtn) {
+            categoryButtons.forEach((btn) => btn.classList.remove("active"));
+            allBtn.classList.add("active");
+            displayJobs(jobs);
+        }
+        const jobSection = document.getElementById("jobContainer");
+        if (jobSection) {
+            jobSection.scrollIntoView({ behavior: "smooth" });
+        }
+        return;
+    }
 
     const targetBtn = document.getElementById(hash);
 
@@ -875,13 +896,18 @@ const news=document.getElementById("breakingNews");
 
 if(!news) return;
 
+if (!jobs.length) {
+    news.textContent = "No latest jobs available right now.";
+    return;
+}
+
 news.innerHTML=
 
 jobs
 
 .slice(0,10)
 
-.map(job=>`🔥 ${job.title} | Last Date: ${job.lastDate}`)
+.map(job=>`🔥 ${escapeHTML(job.title || "Job")} | Last Date: ${escapeHTML(job.lastDate || "-")}`)
 
 .join(" ⭐ ");
 
@@ -1090,8 +1116,6 @@ View Details
 // =========================================
 // MODULE PREVIEWS (Results / Hall Tickets / Schemes)
 // =========================================
-
-const IMAGE_FALLBACK = "https://placehold.co/600x400?text=Arna+Jobs";
 
 function previewCard(options) {
     return `

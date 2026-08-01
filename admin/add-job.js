@@ -37,10 +37,12 @@ form.addEventListener("submit", async (e) => {
 
     const postedDate = new Date().toISOString().split("T")[0];
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     if (lastDate) {
         const end = new Date(lastDate);
-        if (end < today) {
+        end.setHours(23, 59, 59, 999);
+        if (!Number.isNaN(end.getTime()) && end < today) {
             status = "Closed";
         }
     }
@@ -138,7 +140,7 @@ form.addEventListener("submit", async (e) => {
                 btn.textContent = "Publish Job";
             }
         } else {
-            await addDoc(
+            const ref = await addDoc(
                 collection(db, "jobs"),
                 {
                     ...jobData,
@@ -146,7 +148,13 @@ form.addEventListener("submit", async (e) => {
                 }
             );
 
-            alert("✅ Job Published Successfully!");
+            const publicUrl = `${window.location.origin}/job.html?id=${encodeURIComponent(ref.id)}`;
+
+            alert(
+                "✅ Job Published Successfully!\n\nShareable link:\n" +
+                publicUrl +
+                "\n\nHomepage / Latest / Category / Search will show this job."
+            );
         }
 
         form.reset();

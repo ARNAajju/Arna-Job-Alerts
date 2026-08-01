@@ -15,18 +15,15 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
 <h2 class="mb-0">Media Generator</h2>
-<div class="d-flex gap-2">
-<a href="ai-assistant.html" class="btn btn-outline-primary">AI Assistant</a>
 <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
-</div>
 </div>
 
 <div class="card shadow mb-4">
-<div class="card-header bg-primary text-white">Load Job or Enter Details</div>
+<div class="card-header bg-primary text-white">Load One Job</div>
 <div class="card-body">
 <div class="row g-3">
 <div class="col-md-8">
-<label class="form-label">Select published / draft job</label>
+<label class="form-label">Select job</label>
 <select id="jobSelect" class="form-select">
 <option value="">— Manual entry —</option>
 </select>
@@ -51,7 +48,7 @@
 <input type="url" id="applyUrl" class="form-control">
 </div>
 <div class="col-12">
-<button type="button" id="generateBtn" class="btn btn-success">Generate All Captions</button>
+<button type="button" id="generateBtn" class="btn btn-success">Generate From Job</button>
 <span id="status" class="ms-2 text-muted small"></span>
 </div>
 </div>
@@ -76,26 +73,18 @@
 <textarea id="whatsappMessage" rows="4" class="form-control"></textarea>
 </div>
 <div class="col-lg-6">
-<label class="form-label">Facebook Post</label>
-<textarea id="facebookPost" rows="4" class="form-control"></textarea>
+<label class="form-label">SEO Title</label>
+<input type="text" id="seoTitle" class="form-control">
 </div>
 <div class="col-lg-6">
-<label class="form-label">Twitter / X Post</label>
-<textarea id="twitterPost" rows="4" class="form-control"></textarea>
-</div>
-<div class="col-lg-6">
-<label class="form-label">YouTube Title</label>
-<input type="text" id="youtubeTitle" class="form-control">
-</div>
-<div class="col-lg-6">
-<label class="form-label">YouTube Description</label>
-<textarea id="youtubeDescription" rows="4" class="form-control"></textarea>
+<label class="form-label">Meta Description</label>
+<textarea id="seoDescription" rows="4" class="form-control"></textarea>
 </div>
 </div>
 
 <div class="mt-3 d-flex flex-wrap gap-2">
 <button type="button" id="copyAllBtn" class="btn btn-dark">Copy All</button>
-<button type="button" id="saveMediaBtn" class="btn btn-primary">Save to Job (media fields)</button>
+<button type="button" id="saveMediaBtn" class="btn btn-primary">Save to Job</button>
 </div>
 
 </div>

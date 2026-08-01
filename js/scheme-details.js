@@ -7,7 +7,7 @@ import {
     query,
     orderBy
 } from "./firebase.js";
-import { escapeHTML, IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
+import { escapeHTML, IMAGE_FALLBACK } from "./job-utils.js";
 
 // ==========================================
 // ARNA JOB ALERTS
@@ -16,7 +16,6 @@ import { escapeHTML, IMAGE_FALLBACK as LOCAL_FB } from "./job-utils.js";
 // ==========================================
 
 
-const IMAGE_FALLBACK = LOCAL_FB;
 
 
 function getSchemeTitle(scheme) {

@@ -71,22 +71,38 @@ export function matchesStateFilter(itemState, filterState) {
     return normalize(a) === normalize(b);
 }
 
+/** Canonical public category labels used by homepage filters. */
 const CATEGORY_ALIASES = Object.freeze({
-    "ap government": "AP Jobs",
-    "ap jobs": "AP Jobs",
-    "andhra pradesh": "AP Jobs",
-    "ts government": "TS Jobs",
-    "ts jobs": "TS Jobs",
-    "telangana": "TS Jobs",
-    "central government": "Central Jobs",
-    "central jobs": "Central Jobs",
-    "central": "Central Jobs",
+    "ap government": "AP Government",
+    "ap jobs": "AP Government",
+    "andhra pradesh": "AP Government",
+    "ts government": "TS Government",
+    "ts jobs": "TS Government",
+    "telangana": "TS Government",
+    "central government": "Central Government",
+    "central jobs": "Central Government",
+    "central": "Central Government",
+    "private jobs": "Private Jobs",
+    "private": "Private Jobs",
     "railway jobs": "Railway",
     "railway": "Railway",
     "bank jobs": "Bank",
     "bank": "Bank",
     "police jobs": "Police",
-    "police": "Police"
+    "police": "Police",
+    "teaching": "Teaching",
+    "medical": "Medical",
+    "engineering": "Engineering",
+    "defence": "Defence",
+    "defense": "Defence",
+    "apprenticeship": "Apprenticeship",
+    "contract": "Contract",
+    "walk-in": "Walk-in",
+    "walk in": "Walk-in",
+    "results": "Results",
+    "hall tickets": "Hall Tickets",
+    "halltickets": "Hall Tickets",
+    "schemes": "Schemes"
 });
 
 export function normalizeJobCategory(category) {
@@ -140,4 +156,16 @@ export function normalizeJobRecord(job = {}) {
         description: getJobDescription(job)
     };
 
+}
+
+/**
+ * Public shareable URL for a single job.
+ * @param {string} jobId
+ * @returns {string}
+ */
+export function getJobShareUrl(jobId) {
+    const origin = typeof window !== "undefined" && window.location?.origin
+        ? window.location.origin
+        : "https://arna-jobs.web.app";
+    return `${origin}/job.html?id=${encodeURIComponent(jobId)}`;
 }
