@@ -10,7 +10,7 @@
       <title>Arna Job Alerts — Latest Notifications</title>
       <link>https://arna-jobs.web.app/index.html</link>
       <guid isPermaLink="true">https://arna-jobs.web.app/index.html</guid>
-      <description>Visit Arna Job Alerts for the latest government job notifications. Use Admin → Auto Post to regenerate this feed from live Firestore data.</description>
+      <description>Visit Arna Job Alerts for the latest government job notifications from Firestore-backed listings.</description>
       <category>Jobs</category>
     </item>
   </channel>

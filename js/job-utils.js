@@ -18,12 +18,14 @@ export const IMAGE_FALLBACK = "assets/images/no-image.png";
 
 /**
  * Whether a content record should appear on the public site.
+ * Active/Upcoming jobs always show (Admin Publish path).
+ * Closed/draft/scheduled/expired stay hidden.
  * @param {Record<string, unknown>} item
  * @returns {boolean}
  */
 export function isPubliclyVisible(item = {}) {
-    if (item.published === false) return false;
     const status = String(item.status || "").toLowerCase();
+
     if (
         status === "draft" ||
         status === "scheduled" ||
@@ -32,7 +34,12 @@ export function isPubliclyVisible(item = {}) {
     ) {
         return false;
     }
-    return true;
+
+    if (status === "active" || status === "upcoming") {
+        return true;
+    }
+
+    return item.published !== false;
 }
 
 /**
@@ -77,6 +84,13 @@ export const JOB_CATEGORIES = Object.freeze([
     "TS Government",
     "Central Government",
     "Private Jobs",
+    "IT",
+    "BPO",
+    "Work From Home",
+    "Internship",
+    "Apprenticeship",
+    "Contract",
+    "Walk-in",
     "Railway",
     "Bank",
     "Police",
@@ -84,9 +98,14 @@ export const JOB_CATEGORIES = Object.freeze([
     "Medical",
     "Engineering",
     "Defence",
-    "Apprenticeship",
-    "Contract",
-    "Walk-in",
+    "Forest",
+    "Revenue",
+    "Municipality",
+    "Collector Office",
+    "University",
+    "Health",
+    "Electricity",
+    "Ports",
     "Results",
     "Hall Tickets",
     "Schemes"
@@ -108,6 +127,16 @@ const CATEGORY_ALIASES = Object.freeze({
     "private": "Private Jobs",
     "private job": "Private Jobs",
     "private jobs": "Private Jobs",
+    "it": "IT",
+    "it jobs": "IT",
+    "software": "IT",
+    "bpo": "BPO",
+    "bpo jobs": "BPO",
+    "work from home": "Work From Home",
+    "wfh": "Work From Home",
+    "remote": "Work From Home",
+    "internship": "Internship",
+    "intern": "Internship",
     "railway jobs": "Railway",
     "railway": "Railway",
     "bank jobs": "Bank",
@@ -123,10 +152,22 @@ const CATEGORY_ALIASES = Object.freeze({
     "contract": "Contract",
     "walk-in": "Walk-in",
     "walkin": "Walk-in",
+    "forest": "Forest",
+    "revenue": "Revenue",
+    "municipality": "Municipality",
+    "collector office": "Collector Office",
+    "collector": "Collector Office",
+    "university": "University",
+    "health": "Health",
+    "electricity": "Electricity",
+    "ports": "Ports",
+    "port": "Ports",
     "results": "Results",
     "hall tickets": "Hall Tickets",
+    "hall ticket": "Hall Tickets",
     "halltickets": "Hall Tickets",
-    "schemes": "Schemes"
+    "schemes": "Schemes",
+    "scheme": "Schemes"
 });
 
 export function normalizeJobCategory(category) {

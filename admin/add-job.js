@@ -19,6 +19,9 @@ window.editingJobId = null;
 // Keep existing thumbnail while editing
 let existingThumbnail = "";
 
+if (!form) {
+    console.error("Add Job form (#jobForm) was not found on this page.");
+} else {
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -29,6 +32,8 @@ form.addEventListener("submit", async (e) => {
     const category = document.getElementById("category").value.trim();
     const qualification = document.getElementById("qualification").value.trim();
     const salary = document.getElementById("salary").value.trim();
+    const age = document.getElementById("age")?.value.trim() || "";
+    const fee = document.getElementById("fee")?.value.trim() || "";
     const lastDate = document.getElementById("lastDate").value;
     let status = document.getElementById("status").value;
     const featured = document.getElementById("featured").value === "true";
@@ -103,6 +108,8 @@ form.addEventListener("submit", async (e) => {
         status,
         qualification,
         salary,
+        age,
+        fee,
         lastDate,
         featured,
         sponsored,
@@ -185,6 +192,7 @@ form.addEventListener("submit", async (e) => {
         }
     }
 });
+} // end form guard
 
 // =============================
 // EDIT MODE
@@ -234,6 +242,12 @@ async function loadEditJob(id) {
 
         document.getElementById("qualification").value = job.qualification || "";
         document.getElementById("salary").value = job.salary || "";
+        if (document.getElementById("age")) {
+            document.getElementById("age").value = job.age || job.ageLimit || "";
+        }
+        if (document.getElementById("fee")) {
+            document.getElementById("fee").value = job.fee || job.applicationFee || "";
+        }
         document.getElementById("lastDate").value = job.lastDate || "";
         
         const statusEl = document.getElementById("status");
@@ -351,4 +365,59 @@ const editId = params.get("edit") || params.get("id");
 
 if (editId) {
     loadEditJob(editId);
+} else if (params.get("from") === "arna-ai") {
+    try {
+        const raw = sessionStorage.getItem("arnaAiJobDraft");
+        if (raw) {
+            const draft = JSON.parse(raw);
+            sessionStorage.removeItem("arnaAiJobDraft");
+
+            const setIf = (id, value) => {
+                const el = document.getElementById(id);
+                if (el && value != null && value !== "") el.value = value;
+            };
+
+            setIf("title", draft.title);
+            setIf("department", draft.department);
+            setIf("category", draft.category);
+            setIf("qualification", draft.qualification);
+            setIf("salary", draft.salary);
+            setIf("age", draft.age);
+            setIf("fee", draft.fee);
+            setIf("lastDate", draft.lastDate);
+            setIf("status", draft.status || "Upcoming");
+            setIf("featured", String(draft.featured || false));
+            setIf("sponsored", String(draft.sponsored || false));
+            setIf("urgent", String(draft.urgent || false));
+            setIf("apply", draft.apply);
+            setIf("notification", draft.notification);
+            setIf("about", draft.about || draft.description);
+            setIf("selectionProcess", draft.selectionProcess);
+            setIf("officialWebsite", draft.officialWebsite);
+
+            if (stateSelect && draft.state) {
+                stateSelect.value = draft.state;
+                stateSelect.dispatchEvent(new Event("change"));
+                requestAnimationFrame(() => {
+                    const districtEl = document.getElementById("district");
+                    if (!districtEl) return;
+                    const wanted = draft.district || "";
+                    if (wanted && ![...districtEl.options].some((opt) => opt.value === wanted || opt.text === wanted)) {
+                        const option = document.createElement("option");
+                        option.value = wanted;
+                        option.textContent = wanted;
+                        districtEl.appendChild(option);
+                    }
+                    if (wanted) districtEl.value = wanted;
+                });
+            }
+
+            const heading = document.querySelector("h2");
+            if (heading) heading.textContent = "✏️ Review AI Draft (not published)";
+
+            alert("Arna AI draft loaded.\n\nReview every field, upload a thumbnail if needed, then click Publish Job only when ready.");
+        }
+    } catch (error) {
+        console.error(error);
+    }
 }

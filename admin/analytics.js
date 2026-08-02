@@ -283,6 +283,33 @@ function barChartConfig(label, labels, data, colors) {
    RENDER
 ========================================================== */
 
+function buildPopularJobs() {
+    const table = document.getElementById("popularJobsTable");
+    if (!table) return;
+
+    const popular = [...jobs]
+        .sort((a, b) => getJobViews(b) - getJobViews(a))
+        .slice(0, 10);
+
+    if (popular.length === 0) {
+        table.innerHTML = `
+<tr>
+<td colspan="5" class="text-center text-muted">No job view data yet</td>
+</tr>`;
+        return;
+    }
+
+    table.innerHTML = popular.map((job, index) => `
+<tr>
+<td>${index + 1}</td>
+<td>${String(job.title || "-").replace(/</g, "&lt;")}</td>
+<td>${String(job.category || "-").replace(/</g, "&lt;")}</td>
+<td>${getJobViews(job)}</td>
+<td>${String(job.status || "Active").replace(/</g, "&lt;")}</td>
+</tr>
+`).join("");
+}
+
 function buildTable(stats) {
     const table = document.getElementById("statsTable");
     if (!table) return;
@@ -520,6 +547,7 @@ function computeAndRender() {
     setText("expiredJobs", expiredJobs);
 
     buildTable(stats);
+    buildPopularJobs();
     drawCharts(stats);
 }
 

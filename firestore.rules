@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.email == 'rkarjundev@gmail.com';
+    }
+
+    match /jobs/{jobId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      // Admin full updates, or public view-count increment only.
+      allow update: if isAdmin()
+        || (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+          && request.resource.data.views is number
+          && (
+            !('views' in resource.data)
+            || request.resource.data.views == resource.data.views + 1
+          )
+        );
+    }
+
+    match /results/{id} {
+      allow read: if resource == null || resource.data.published != false || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /halltickets/{id} {
+      allow read: if resource == null || resource.data.published != false || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /schemes/{id} {
+      allow read: if resource == null || resource.data.published != false || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /notifications/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /loginHistory/{id} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    match /activityLogs/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      // Public pages read website settings; only admin can write.
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

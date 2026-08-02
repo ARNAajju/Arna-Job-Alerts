@@ -294,7 +294,7 @@ function getPrimaryResultUrl(item) {
         getApplyViewResultUrl(item) ||
         getOfficialWebsiteUrl(item) ||
         getNotificationPdfUrl(item) ||
-        `../result-details.html?id=${item.id}`
+        `https://arna-jobs.web.app/result-details.html?id=${encodeURIComponent(item.id)}`
     );
 
 }

@@ -38,6 +38,9 @@ function buildCaptions({ title, department, lastDate, applyUrl }) {
         instagramCaption: `📢 ${t}\n\n🏛 ${dept}\n📅 Last Date: ${ld}\n\n✅ Details:\n${link}\n\n#ArnaJobAlerts #GovtJobs #Jobs`,
         telegramMessage: `🔔 *${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nApply: ${link}\n\n— Arna Job Alerts`,
         whatsappMessage: `*${t}*\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nDetails: ${link}\n\nArna Job Alerts`,
+        facebookCaption: `${t}\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nApply / Details: ${link}\n\nFollow Arna Job Alerts for daily updates.`,
+        youtubeDescription: `${t}\n\nDepartment: ${dept}\nLast Date: ${ld}\n\nFull details and apply link:\n${link}\n\nSubscribe to Arna Job Alerts for government and private job updates.`,
+        hashtags: `#ArnaJobAlerts #GovtJobs #PrivateJobs #JobAlert #${String(dept).replace(/\s+/g, "")} #Recruitment #ApplyOnline`,
         seoTitle: `${t} | Apply Online | Arna Job Alerts`,
         seoDescription: `${t}. Department: ${dept}. Last date: ${ld}. Check eligibility, notification and apply online at Arna Job Alerts.`
     };
@@ -91,6 +94,9 @@ async function loadSelectedJob() {
     if (job.instagramCaption) setValue("instagramCaption", job.instagramCaption);
     if (job.telegramMessage) setValue("telegramMessage", job.telegramMessage);
     if (job.whatsappMessage) setValue("whatsappMessage", job.whatsappMessage);
+    if (job.facebookCaption) setValue("facebookCaption", job.facebookCaption);
+    if (job.youtubeDescription) setValue("youtubeDescription", job.youtubeDescription);
+    if (job.hashtags) setValue("hashtags", job.hashtags);
     if (job.thumbnailPrompt) setValue("thumbnailPrompt", job.thumbnailPrompt);
     if (job.seoTitle) setValue("seoTitle", job.seoTitle);
     if (job.seoDescription) setValue("seoDescription", job.seoDescription);
@@ -115,6 +121,9 @@ function copyAll() {
         "instagramCaption",
         "telegramMessage",
         "whatsappMessage",
+        "facebookCaption",
+        "youtubeDescription",
+        "hashtags",
         "seoTitle",
         "seoDescription"
     ]
@@ -140,6 +149,9 @@ async function saveToJob() {
         instagramCaption: getValue("instagramCaption"),
         telegramMessage: getValue("telegramMessage"),
         whatsappMessage: getValue("whatsappMessage"),
+        facebookCaption: getValue("facebookCaption"),
+        youtubeDescription: getValue("youtubeDescription"),
+        hashtags: getValue("hashtags"),
         seoTitle: getValue("seoTitle"),
         seoDescription: getValue("seoDescription")
     };

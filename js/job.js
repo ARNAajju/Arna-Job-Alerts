@@ -76,20 +76,28 @@ if (loading) loading.style.display = "block";
         }
 
         // ==========================
-        // Increase Views
+        // Increase Views (best-effort; never block page render)
         // ==========================
 
-        await updateDoc(
-            doc(db, "jobs", job.id),
-            {
-                views: increment(1)
+        try {
+            await updateDoc(
+                doc(db, "jobs", job.id),
+                {
+                    views: increment(1)
+                }
+            );
+
+            const views = document.getElementById("jobViews");
+
+            if (views) {
+                views.textContent = (job.views || 0) + 1;
             }
-        );
-
-        const views = document.getElementById("jobViews");
-
-        if (views) {
-            views.textContent = (job.views || 0) + 1;
+        } catch (viewError) {
+            console.warn("View count update skipped:", viewError);
+            const views = document.getElementById("jobViews");
+            if (views) {
+                views.textContent = job.views || 0;
+            }
         }
 
         // ==========================
@@ -140,6 +148,11 @@ if (loading) loading.style.display = "block";
         document.getElementById("jobDepartment").textContent =
             job.department || "-";
 
+        const jobCategoryEl = document.getElementById("jobCategory");
+        if (jobCategoryEl) {
+            jobCategoryEl.textContent = job.category || job.categoryRaw || "-";
+        }
+
         document.getElementById("jobLocation").textContent =
             job.district || "-";
 
@@ -152,11 +165,21 @@ if (loading) loading.style.display = "block";
         document.getElementById("jobSalary").textContent =
             job.salary || "-";
 
+        const jobAgeEl = document.getElementById("jobAge");
+        if (jobAgeEl) {
+            jobAgeEl.textContent = job.age || job.ageLimit || "-";
+        }
+
+        const jobFeeEl = document.getElementById("jobFee");
+        if (jobFeeEl) {
+            jobFeeEl.textContent = job.fee || job.applicationFee || "-";
+        }
+
         document.getElementById("jobLastDate").textContent =
             job.lastDate || "-";
 
         document.getElementById("jobDescription").textContent =
-            job.description || "No description available.";
+            job.description || job.about || "No description available.";
 
         document.getElementById("qualificationDetails").innerHTML =
             escapeHTML(job.qualificationDetails || "-").replace(/\n/g, "<br>");
