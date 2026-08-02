@@ -36,11 +36,12 @@ form.addEventListener("submit", async (e) => {
     const urgent = document.getElementById("urgent").value === "true";
 
     const postedDate = new Date().toISOString().split("T")[0];
-    const today = new Date();
 
+    // Compare calendar dates only (end-of-day). Same-day lastDate stays open.
     if (lastDate) {
-        const end = new Date(lastDate);
-        if (end < today) {
+        const endDay = new Date(`${lastDate}T23:59:59`);
+        const now = new Date();
+        if (!Number.isNaN(endDay.getTime()) && endDay < now) {
             status = "Closed";
         }
     }
@@ -91,6 +92,8 @@ form.addEventListener("submit", async (e) => {
         }
     }
 
+    const published = status !== "Closed";
+
     const jobData = {
         title,
         department,
@@ -104,7 +107,7 @@ form.addEventListener("submit", async (e) => {
         featured,
         sponsored,
         urgent,
-        published: status !== "Closed",
+        published,
         postedDate,
         thumbnail,
         instagram,
@@ -118,8 +121,16 @@ form.addEventListener("submit", async (e) => {
         selectionProcess,
         importantDates,
         howToApply,
-        officialWebsite
+        officialWebsite,
+        updatedAt: serverTimestamp()
     };
+
+    const submitBtn = form.querySelector("button[type='submit']");
+    const previousLabel = submitBtn ? submitBtn.textContent : "";
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = window.editingJobId ? "Updating..." : "Publishing...";
+    }
 
     try {
         if (window.editingJobId) {
@@ -133,10 +144,8 @@ form.addEventListener("submit", async (e) => {
             window.editingJobId = null;
             existingThumbnail = "";
 
-            const btn = form.querySelector("button[type='submit']");
-            if (btn) {
-                btn.textContent = "Publish Job";
-            }
+            window.location.href = "manage-jobs.html";
+            return;
         } else {
             const docRef = await addDoc(
                 collection(db, "jobs"),
@@ -146,20 +155,20 @@ form.addEventListener("submit", async (e) => {
                 }
             );
 
-            const jobUrl = new URL("../job.html", window.location.href);
-            jobUrl.searchParams.set("id", docRef.id);
+            const jobUrl = `https://arna-jobs.web.app/job.html?id=${encodeURIComponent(docRef.id)}`;
 
             alert(
                 "✅ Job Published Successfully!\n\nShare this link:\n" +
-                jobUrl.href
+                jobUrl
             );
 
             if (confirm("Open the job detail page?")) {
-                window.open(jobUrl.href, "_blank");
+                window.open(jobUrl, "_blank", "noopener,noreferrer");
             }
         }
 
         form.reset();
+        existingThumbnail = "";
 
         if (typeof loadDashboard === "function") {
             loadDashboard();
@@ -167,6 +176,13 @@ form.addEventListener("submit", async (e) => {
     } catch (error) {
         console.error(error);
         alert("Operation Failed\n\n" + error.message);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            if (!window.editingJobId) {
+                submitBtn.textContent = previousLabel || "Publish Job";
+            }
+        }
     }
 });
 
@@ -200,6 +216,22 @@ async function loadEditJob(id) {
         }
         
         document.getElementById("district").value = job.district || "";
+
+        // Re-apply district after state options finish rebuilding.
+        requestAnimationFrame(() => {
+            const districtEl = document.getElementById("district");
+            if (!districtEl) return;
+
+            const wanted = job.district || "";
+            if (wanted && ![...districtEl.options].some((opt) => opt.value === wanted || opt.text === wanted)) {
+                const option = document.createElement("option");
+                option.value = wanted;
+                option.textContent = wanted;
+                districtEl.appendChild(option);
+            }
+            districtEl.value = wanted;
+        });
+
         document.getElementById("qualification").value = job.qualification || "";
         document.getElementById("salary").value = job.salary || "";
         document.getElementById("lastDate").value = job.lastDate || "";
@@ -234,6 +266,11 @@ async function loadEditJob(id) {
         const btn = form.querySelector("button[type='submit']");
         if (btn) {
             btn.textContent = "Update Job";
+        }
+
+        const heading = document.querySelector("h2");
+        if (heading) {
+            heading.textContent = "✏️ Edit Job";
         }
     } catch (error) {
         console.error(error);
@@ -310,7 +347,7 @@ stateSelect?.addEventListener("change", () => {
 });
 
 const params = new URLSearchParams(window.location.search);
-const editId = params.get("edit");
+const editId = params.get("edit") || params.get("id");
 
 if (editId) {
     loadEditJob(editId);
